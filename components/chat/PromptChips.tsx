@@ -9,24 +9,21 @@ interface PromptChipsProps {
 
 export function PromptChips({ suggestions, onSelect }: PromptChipsProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="flex flex-wrap gap-2 mt-3"
-    >
+    <div className="flex flex-wrap gap-2 mt-3">
       {suggestions.map((s, i) => (
         <motion.button
           key={s}
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2, delay: 0.05 * i }}
+          transition={{ duration: 0.22, delay: 0.04 * i, type: "spring", stiffness: 300, damping: 24 }}
+          whileHover={{ scale: 1.03, y: -1 }}
+          whileTap={{ scale: 0.96 }}
           onClick={() => onSelect(s)}
-          className="px-3 py-1.5 text-sm rounded-full border border-[#1A1A1A]/15 bg-white/70 text-[#1A1A1A]/80 hover:border-[#C4654A]/40 hover:text-[#C4654A] hover:bg-[#C4654A]/5 transition-all duration-150 cursor-pointer"
+          className="px-3 py-1.5 text-sm rounded-full border border-[#1A1A1A]/12 bg-white/80 text-[#1A1A1A]/70 hover:border-[#C4654A]/35 hover:text-[#C4654A] hover:bg-[#C4654A]/5 transition-colors duration-150 cursor-pointer"
         >
           {s}
         </motion.button>
       ))}
-    </motion.div>
+    </div>
   );
 }

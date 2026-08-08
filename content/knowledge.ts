@@ -186,6 +186,7 @@ export const knowledge = {
           "Score was ignored at best; undermined service credibility at worst",
           "High support ticket volume from users confused about what the score meant",
         ],
+        researchMethod: "Heuristic evaluation → remote interviews with internal users (solution architects and engineers) → support ticket review → competitor analysis.",
         userVoice: [
           "\"It is not clear to me how Resilience Hub calculated those numbers.\"",
           "\"I need more guidance — what should I do? Is it something you expect me to do?\"",
@@ -283,13 +284,13 @@ export const knowledge = {
 
   promptSuggestions: [
     { label: "Show me the Qlik project", intent: "case_study_qlik" },
-    { label: "How does she approach research?", intent: "process" },
+    { label: "How do you approach research?", intent: "process" },
     { label: "Walk me through AWS Resilience Hub", intent: "case_study_aws" },
-    { label: "What's her take on AI in design?", intent: "ai_philosophy" },
-    { label: "How does art history show up in her work?", intent: "background" },
-    { label: "What would she do in her first 30 days?", intent: "working_style" },
-    { label: "See her career timeline", intent: "timeline" },
-    { label: "What's she honest about not having yet?", intent: "growth" },
+    { label: "What's your take on AI in design?", intent: "ai_philosophy" },
+    { label: "How does art history show up in your work?", intent: "background" },
+    { label: "What would you do in your first 30 days?", intent: "working_style" },
+    { label: "Show me your career timeline", intent: "timeline" },
+    { label: "What are you honest about not having yet?", intent: "growth" },
   ],
 
   skills: {

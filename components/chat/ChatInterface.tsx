@@ -31,9 +31,16 @@ export function ChatInterface() {
   } as Parameters<typeof useChat>[0]);
 
   const isLoading = status === "submitted" || status === "streaming";
+  const hasMounted = useRef(false);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+    if (messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const submitText = useCallback(
@@ -129,7 +136,7 @@ export function ChatInterface() {
                       }
                       if (isToolUIPart(part)) {
                         const name = getToolName(part);
-                        if (part.state !== "output-available") return null;
+                        if (part.state === "input-streaming") return null;
                         const input = "input" in part ? part.input : {};
                         return <div key={partIdx}>{renderToolPart(name, input)}</div>;
                       }

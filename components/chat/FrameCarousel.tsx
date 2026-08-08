@@ -103,7 +103,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-[#1A1A1A]/40">
-              {study.company} — Case Study
+              {study.company}
             </p>
             <h3 className="text-base font-semibold text-[#1A1A1A] mt-0.5">
               {study.title}
