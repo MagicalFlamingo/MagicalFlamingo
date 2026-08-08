@@ -10,7 +10,7 @@ export default function Home() {
       <About />
       <footer className="px-8 lg:px-14 py-8 border-t border-[#1A1A1A]/8">
         <p className="text-xs text-[#1A1A1A]/30">
-          &copy; 2025 Danielle Goldberg. Conversational portfolio.
+          &copy; 2026 Danielle Goldberg
         </p>
       </footer>
     </main>

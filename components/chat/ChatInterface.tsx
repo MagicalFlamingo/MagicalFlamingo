@@ -129,7 +129,7 @@ export function ChatInterface() {
                       }
                       if (isToolUIPart(part)) {
                         const name = getToolName(part);
-                        if (part.state !== "output-available") return null;
+                        if (part.state === "input-streaming") return null;
                         const input = "input" in part ? part.input : {};
                         return <div key={partIdx}>{renderToolPart(name, input)}</div>;
                       }
