@@ -22,11 +22,11 @@ type ToolArgs = {
 };
 
 export function ChatInterface() {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState("");
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     api: "/api/chat",
   } as Parameters<typeof useChat>[0]);
 
@@ -38,8 +38,9 @@ export function ChatInterface() {
       hasMounted.current = true;
       return;
     }
-    if (messages.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > 0 && scrollContainerRef.current) {
+      const el = scrollContainerRef.current;
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages]);
 
@@ -91,7 +92,7 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 scrollbar-thin">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-6 scrollbar-thin">
         {showInitialChips && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -160,7 +161,11 @@ export function ChatInterface() {
           </motion.div>
         )}
 
-        <div ref={bottomRef} />
+        {error && (
+          <p className="text-xs text-red-400 px-1">
+            Something went wrong. Check that the API key is configured.
+          </p>
+        )}
       </div>
 
       <div className="border-t border-[#1A1A1A]/10 px-4 py-4 bg-[#F7F6F3]">
