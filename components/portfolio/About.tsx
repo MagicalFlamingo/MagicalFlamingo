@@ -28,6 +28,23 @@ export function About() {
             {bio}
           </p>
 
+          <div className="mt-8 mb-2 grid grid-cols-3 gap-x-6 py-7 border-t border-b border-[#1A1A1A]/8 max-w-[36ch]">
+            {[
+              { number: "8+", label: "years in product design" },
+              { number: "400K", label: "monthly users at Menora" },
+              { number: "95%", label: "conversion rate achieved" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-2xl font-bold text-[#1A1A1A] font-serif tracking-tight">
+                  {stat.number}
+                </p>
+                <p className="mt-0.5 text-[11px] text-[#1A1A1A]/40 leading-snug">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+
           <div className="mt-6 flex flex-wrap gap-3">
             <a
               href="/danielle-goldberg-cv.pdf"

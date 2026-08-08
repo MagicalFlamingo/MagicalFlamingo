@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Lock } from "lucide-react";
+import { ArrowUpRight, Lock } from "lucide-react";
 import { knowledge, type CaseStudyId, type CaseStudy } from "@/content/knowledge";
 import { CaseStudyModal } from "./CaseStudyModal";
 
 const PROJECTS: CaseStudyId[] = ["qlik", "aws", "sprout"];
+
+const CARD_STATS: Record<CaseStudyId, string> = {
+  qlik: "5-month longitudinal study · 4 user groups · roadmap influence",
+  aws: "Shipped to AWS production · support tickets dropped",
+  sprout: "Component library adopted by the full design team",
+};
 
 export function CaseStudyTiles() {
   const [open, setOpen] = useState<CaseStudyId | null>(null);
@@ -43,17 +49,27 @@ export function CaseStudyTiles() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.45, delay: 0.1 * i }}
-              whileHover={{ y: -3, boxShadow: "0 12px 40px rgba(26,26,26,0.10)" }}
+              whileHover={{ y: -4, boxShadow: "0 20px 48px rgba(26,26,26,0.10)" }}
               onClick={() => setOpen(id)}
-              className="group text-left rounded-2xl bg-white border border-[#1A1A1A]/10 overflow-hidden transition-colors duration-200 hover:border-[#1A1A1A]/16"
+              className="group text-left rounded-2xl overflow-hidden border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/14 transition-colors duration-300 relative"
+              style={{ backgroundColor: study.accentColor }}
             >
-              {/* Color band — thicker on hover */}
+              {/* Color band */}
               <div
-                className="h-1 w-full group-hover:h-[5px] transition-all duration-200"
+                className="h-[3px] w-full transition-all duration-300 group-hover:h-[5px]"
                 style={{ backgroundColor: study.color }}
               />
 
-              <div className="p-6">
+              {/* Main card content */}
+              <div className="p-6 pb-14 relative">
+                {/* Large editorial number */}
+                <span
+                  className="absolute top-3 right-5 text-[68px] font-bold font-serif leading-none select-none pointer-events-none"
+                  style={{ color: study.color, opacity: 0.07 }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]/35">
                     {study.company}
@@ -76,17 +92,42 @@ export function CaseStudyTiles() {
                   {sections.map((label) => (
                     <span
                       key={label}
-                      className="text-[10px] px-2 py-0.5 rounded bg-[#F7F6F3] text-[#1A1A1A]/40 border border-[#1A1A1A]/8 font-medium"
+                      className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-[#1A1A1A]/40 border border-[#1A1A1A]/8 font-medium"
                     >
                       {label}
                     </span>
                   ))}
                 </div>
+              </div>
 
-                <div className="mt-5 flex items-center gap-1.5 text-sm font-medium text-[#C4654A] group-hover:gap-3 transition-all duration-200">
+              {/* Default CTA — fades and lifts on hover */}
+              <div
+                className="absolute bottom-0 left-0 right-0 px-6 py-4 flex items-center gap-1.5 transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1"
+                style={{
+                  background: `linear-gradient(to top, ${study.accentColor} 72%, transparent)`,
+                }}
+              >
+                <span className="text-sm font-medium" style={{ color: study.color }}>
                   View case study
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-                </div>
+                </span>
+                <ArrowUpRight className="h-3.5 w-3.5" style={{ color: study.color }} />
+              </div>
+
+              {/* Stat reveal strip — slides up from below on hover */}
+              <div
+                className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-6 py-4 border-t translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
+                style={{
+                  backgroundColor: study.accentColor,
+                  borderColor: `${study.color}22`,
+                }}
+              >
+                <p className="text-[11px] text-[#1A1A1A]/55 leading-snug pr-2">
+                  {CARD_STATS[id]}
+                </p>
+                <ArrowUpRight
+                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  style={{ color: study.color }}
+                />
               </div>
             </motion.button>
           );

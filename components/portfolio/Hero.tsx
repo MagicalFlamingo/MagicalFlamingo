@@ -33,6 +33,13 @@ export function Hero() {
           >
             Portfolio
           </motion.span>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0, 0.1, 1] }}
+            style={{ transformOrigin: "left center" }}
+            className="mt-2 h-px w-10 bg-[#C4654A]/35"
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}
