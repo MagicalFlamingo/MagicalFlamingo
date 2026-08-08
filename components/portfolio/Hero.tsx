@@ -48,14 +48,19 @@ export function Hero() {
             </p>
           </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.22 }}
-            className="mt-6 text-[15px] text-[#1A1A1A]/60 leading-[1.85] max-w-[36ch]"
-          >
-            {tagline}
-          </motion.p>
+          <p className="mt-6 text-[15px] text-[#1A1A1A]/60 leading-[1.85] max-w-[36ch]">
+            {tagline.split(" ").map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.26 + i * 0.038 }}
+                className="inline-block mr-[0.28em]"
+              >
+                {word}
+              </motion.span>
+            ))}
+          </p>
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -88,7 +93,14 @@ export function Hero() {
           transition={{ delay: 0.72 }}
           className="mt-10 lg:mt-0 text-xs text-[#1A1A1A]/22 tracking-wide"
         >
-          Scroll to see work below ↓
+          Scroll to see work below{" "}
+          <motion.span
+            animate={{ y: [0, 3, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="inline-block"
+          >
+            ↓
+          </motion.span>
         </motion.div>
       </div>
 

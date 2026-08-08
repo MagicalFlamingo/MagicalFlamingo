@@ -1,10 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
-import { useChat } from "@ai-sdk/react";
-import { isToolUIPart, getToolName } from "ai";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2 } from "lucide-react";
+import { Send } from "lucide-react";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyCard } from "./CaseStudyCard";
 import { FrameCarousel } from "./FrameCarousel";
@@ -12,25 +10,24 @@ import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
+import { matchIntent } from "@/lib/match-intent";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
-type ToolArgs = {
-  project?: CaseStudyId;
-  suggestions?: string[];
-  context?: string;
+type AppMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  tool?: string;
+  toolArgs?: Record<string, unknown>;
+  chips?: string[];
 };
 
 export function ChatInterface() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState("");
-
-  const { messages, sendMessage, status, error } = useChat({
-    api: "/api/chat",
-  } as Parameters<typeof useChat>[0]);
-
-  const isLoading = status === "submitted" || status === "streaming";
+  const [messages, setMessages] = useState<AppMessage[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
   const hasMounted = useRef(false);
 
   useEffect(() => {
@@ -38,62 +35,79 @@ export function ChatInterface() {
       hasMounted.current = true;
       return;
     }
-    if (messages.length > 0 && scrollContainerRef.current) {
+    if (scrollContainerRef.current) {
       const el = scrollContainerRef.current;
       el.scrollTop = el.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isThinking]);
 
   const submitText = useCallback(
     (text: string) => {
-      if (!text.trim()) return;
-      sendMessage({ text });
+      if (!text.trim() || isThinking) return;
       setInputValue("");
+
+      const userMsg: AppMessage = {
+        id: Date.now().toString(),
+        role: "user",
+        text,
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setIsThinking(true);
+
+      setTimeout(() => {
+        const result = matchIntent(text);
+        const assistantMsg: AppMessage = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          text: result.response,
+          tool: result.tool,
+          toolArgs: result.toolArgs,
+          chips: result.chips,
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+        setIsThinking(false);
+      }, 380);
     },
-    [sendMessage]
+    [isThinking]
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitText(inputValue);
-  };
-
-  const renderToolPart = (toolName: string, input: unknown) => {
-    const args = (input ?? {}) as ToolArgs;
-
-    switch (toolName) {
+  const renderTool = (tool: string, args: Record<string, unknown>) => {
+    switch (tool) {
+      case "showFrameCarousel":
+        return args.project ? (
+          <FrameCarousel project={args.project as CaseStudyId} />
+        ) : null;
       case "showCaseStudyCard":
         return args.project ? (
           <CaseStudyCard
-            project={args.project}
+            project={args.project as CaseStudyId}
             onExpand={(p) =>
-              submitText(`Walk me through the full ${knowledge.caseStudies[p].title} case study`)
+              submitText(
+                `Walk me through the full ${knowledge.caseStudies[p].title} case study`
+              )
             }
           />
         ) : null;
-      case "showFrameCarousel":
-        return args.project ? <FrameCarousel project={args.project} /> : null;
       case "showSkillsMap":
         return <SkillsMap />;
       case "showTimelineCard":
         return <TimelineCard />;
-      case "showPromptChips":
-        return args.suggestions && args.suggestions.length > 0 ? (
-          <PromptChips suggestions={args.suggestions} onSelect={submitText} />
-        ) : null;
       case "showNDASafeNote":
-        return args.context ? <NDASafeNote context={args.context} /> : null;
+        return args.context ? (
+          <NDASafeNote context={args.context as string} />
+        ) : null;
       default:
         return null;
     }
   };
 
-  const showInitialChips = messages.length === 0;
-
   return (
     <div className="flex flex-col h-full">
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-6 space-y-6 scrollbar-thin">
-        {showInitialChips && (
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-thin"
+      >
+        {messages.length === 0 && !isThinking && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -113,36 +127,33 @@ export function ChatInterface() {
               key={message.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
               className={`flex ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <div className={message.role === "user" ? "max-w-[75%]" : "w-full"}>
+              <div
+                className={
+                  message.role === "user" ? "max-w-[75%]" : "w-full"
+                }
+              >
                 {message.role === "user" ? (
                   <div className="bg-[#1A1A1A] text-[#F7F6F3] rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
-                    {message.parts.filter((p) => p.type === "text").map((p, i) => (
-                      <span key={i}>{p.type === "text" ? p.text : ""}</span>
-                    ))}
+                    {message.text}
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    {message.parts.map((part, partIdx) => {
-                      if (part.type === "text" && part.text.trim()) {
-                        return (
-                          <p key={partIdx} className="text-sm text-[#1A1A1A] leading-[1.75] whitespace-pre-wrap">
-                            {part.text}
-                          </p>
-                        );
-                      }
-                      if (isToolUIPart(part)) {
-                        const name = getToolName(part);
-                        if (part.state === "input-streaming") return null;
-                        const input = "input" in part ? part.input : {};
-                        return <div key={partIdx}>{renderToolPart(name, input)}</div>;
-                      }
-                      return null;
-                    })}
+                  <div className="space-y-2">
+                    <p className="text-sm text-[#1A1A1A] leading-[1.75]">
+                      {message.text}
+                    </p>
+                    {message.tool &&
+                      renderTool(message.tool, message.toolArgs ?? {})}
+                    {message.chips && message.chips.length > 0 && (
+                      <PromptChips
+                        suggestions={message.chips}
+                        onSelect={submitText}
+                      />
+                    )}
                   </div>
                 )}
               </div>
@@ -150,40 +161,47 @@ export function ChatInterface() {
           ))}
         </AnimatePresence>
 
-        {isLoading && (
+        {isThinking && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-[#1A1A1A]/40"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-1.5"
           >
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            <span className="text-xs">thinking…</span>
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/25"
+                animate={{ y: [0, -4, 0] }}
+                transition={{
+                  duration: 0.55,
+                  delay: i * 0.12,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
           </motion.div>
-        )}
-
-        {error && (
-          <p className="text-xs text-red-400 px-1">
-            Something went wrong. Check that the API key is configured.
-          </p>
         )}
       </div>
 
       <div className="border-t border-[#1A1A1A]/10 px-4 py-4 bg-[#F7F6F3]">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitText(inputValue);
+          }}
           className="flex items-center gap-3 bg-white rounded-full border border-[#1A1A1A]/15 px-4 py-2.5 focus-within:border-[#1A1A1A]/30 transition-colors"
         >
           <input
-            ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask about her work, process, or background…"
             className="flex-1 text-sm text-[#1A1A1A] placeholder:text-[#1A1A1A]/35 outline-none bg-transparent"
-            disabled={isLoading}
+            disabled={isThinking}
           />
           <button
             type="submit"
-            disabled={isLoading || !inputValue.trim()}
+            disabled={isThinking || !inputValue.trim()}
             className="w-7 h-7 rounded-full bg-[#C4654A] flex items-center justify-center shrink-0 disabled:opacity-40 hover:bg-[#B55940] transition-colors"
           >
             <Send className="h-3.5 w-3.5 text-white" />
