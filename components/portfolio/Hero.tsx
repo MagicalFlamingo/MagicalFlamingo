@@ -114,7 +114,7 @@ export function Hero() {
             Talk to the portfolio directly. Ask about her work, process, or background.
           </p>
         </div>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-h-0">
           <ChatInterface />
         </div>
       </motion.div>

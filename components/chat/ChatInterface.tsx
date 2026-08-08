@@ -31,9 +31,16 @@ export function ChatInterface() {
   } as Parameters<typeof useChat>[0]);
 
   const isLoading = status === "submitted" || status === "streaming";
+  const hasMounted = useRef(false);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+    if (messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const submitText = useCallback(
