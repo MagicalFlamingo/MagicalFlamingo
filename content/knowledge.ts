@@ -144,7 +144,8 @@ export const knowledge = {
           { name: "AI auto-fill concept", description: "Placeholder for AI-assisted connection configuration - documented as Iteration 3 scope. Reception across groups was positive." },
           { name: "Post-creation next steps", description: "Each product group had specific expectations: Analytics users want to preview a table; Pipeline users want to start a sync; Automation users want a starter workflow." },
         ],
-        ndaSafeNote: "I'm not showing internal screens from this project - it's still in active development at Qlik. But after Iteration 2, participants sent detailed written feedback on the prototype - specific, multi-paragraph, completely unprompted. That kind of engagement is a result in itself.",
+        image: { src: "/case-studies/qlik/browse-connections.jpg", alt: "Unified connections browse table - all connection types in one view, with use case, connector, and owner columns" },
+        ndaSafeNote: "I'm not showing internal screens from this project - it's still in active development at Qlik. The screen here is the prototype itself, with placeholder data - after Iteration 2, participants sent detailed written feedback on it, specific, multi-paragraph, completely unprompted. That kind of engagement is a result in itself.",
       },
 
       impact: {
@@ -175,6 +176,7 @@ export const knowledge = {
       hook: {
         headline: "AWS showed customers a number - 13% - and expected them to trust it.",
         context: `AWS Resilience Hub is a service that helps teams define, validate, and track the resiliency of applications running on AWS.\n\nThe platform calculated a "Resiliency Score" - a proprietary aggregation of assessments - and displayed it as a single percentage in a small corner of the application summary page. No breakdown. No explanation of what went into it. No guidance on what to do next.`,
+        image: { src: "/case-studies/aws/problem-13-percent.jpg", alt: "AWS Resilience Hub showing a bare 13% resiliency score with no breakdown or explanation" },
       },
 
       friction: {
@@ -208,6 +210,7 @@ export const knowledge = {
           { name: "Policy breach breakdown", description: "Expandable section showing breaches by layer (Application / Infrastructure / Availability Zone / Region) plus outstanding recommendations by type." },
           { name: "Role-aware views", description: "DevOps engineer sees Score Breakdown by default. Portfolio manager sees the trend chart first - posture across applications." },
         ],
+        image: { src: "/case-studies/aws/solution-67-100.jpg", alt: "Redesigned resiliency score: 67/100 with Action Items and Score Breakdown tabs" },
       },
 
       impact: {
@@ -225,48 +228,50 @@ export const knowledge = {
 
     sprout: {
       id: "sprout",
-      title: "Sprout AI - Component Library",
-      company: "Sprout AI",
-      year: "2025",
-      role: "Lead Designer - Design System, AI Component Library",
-      ndaLevel: "low" as const,
+      title: "Sprout 2.0 - Qlik's Design System",
+      company: "Qlik",
+      year: "2025 - Present",
+      role: "Senior Product Designer - Design System, Component Library",
+      ndaLevel: "partial" as const,
       color: "#2E9B5C",
       accentColor: "#F0FBF2",
 
       hook: {
-        headline: "Building an AI agent is easy. Making it feel consistent across a whole product team is not.",
-        context: `Sprout AI is building an AI agent. As the design work scaled, the team needed a shared component library specifically for the agent's UI - so every designer and developer working on it could build from the same foundation rather than solving the same interface problems independently.\n\nI designed and built that library.`,
+        headline: "The unified connections work needed a shared visual language before any of it could ship.",
+        context: `Sprout 2.0 is Qlik's own design system. While leading the unified data connections research (the Qlik case study), I also owned building out Sprout 2.0 components for the new experience - so the wizard, the browse table, and every surface it touches share one visual language instead of each screen inventing its own.\n\nSame project as Qlik, different lens: that one is the research story, this is the systems-building one.`,
       },
 
       friction: {
-        headline: "Without shared components, every new feature in an AI agent reinvents the same interactions.",
+        headline: "Without shared components, every screen reinvents the same buttons, inputs, and states.",
         problems: [
-          "No shared vocabulary for how the agent communicates - inputs, responses, states",
-          "Multiple designers solving the same AI UX problems with different visual solutions",
-          "Inconsistency in the AI experience erodes trust - if the agent behaves differently in different parts of the product, users can't build a mental model of it",
-          "Handoff to engineering was painful without a single source of truth",
+          "No shared token set - colors and spacing were hardcoded per screen, drifting from spec over time",
+          "Search, filters, and toggles were each built ad hoc, with inconsistent radius, focus states, and spacing",
+          "Selection and status states (connected, breached, preview) had no single source of truth",
+          "Handoff to engineering meant re-explaining the same interaction rules on every new screen",
         ],
       },
 
       solution: {
-        headline: "A Figma component library - purpose-built for an AI agent's UI - that the whole team can use.",
+        headline: "A real Sprout 2.0 token set and componentized UI - search, toggles, badges, cards - built for the connections work and reusable beyond it.",
         features: [
-          { name: "Agent interaction components", description: "The full set of UI primitives for the AI agent: input states, response containers, loading/thinking states, retry and regenerate patterns." },
-          { name: "Shared design language", description: "One visual system for the agent across all features - so wherever a user encounters the AI, it looks and behaves like the same thing." },
-          { name: "Built for the team", description: "Designed with variants, auto-layout, and documentation so any designer can use the components without coming back to me. The goal was to get myself out of the bottleneck." },
+          { name: "Token-first refactor", description: "Replaced hardcoded hex values with the Sprout 2.0 token set, so color and spacing changes propagate from one place instead of being hunted down screen by screen." },
+          { name: "Component audit against spec", description: "Search, filter pills, switches, and badges rebuilt to match Sprout 2.0 component specs exactly - radius, focus states, spacing." },
+          { name: "Shared shell integration", description: "The wizard and the browse connections table share one chrome (sidebar, topbar) instead of each screen owning its own." },
+          { name: "Built for reuse", description: "Documented and componentized so the next designer or engineer extends the system instead of re-deriving it from scratch." },
         ],
-        ndaSafeNote: "Happy to walk through the component structure and design decisions in detail during an interview.",
+        image: { src: "/case-studies/qlik/wizard-configure-step.jpg", alt: "The Create New Connection wizard's Configure step, built on Sprout 2.0 components" },
+        ndaSafeNote: "This is the same in-progress Qlik project as the connections case study - happy to walk through the actual component structure in an interview.",
       },
 
       impact: {
-        headline: "One library. Every designer on the team building from the same foundation.",
+        headline: "One design system underneath both the wizard and the browse experience.",
         status: "In progress",
         outcomes: [
-          "Standardized AI interaction patterns across the product team",
-          "Removed designer-to-designer inconsistency in how the agent is represented",
-          "Faster handoff to engineering - components are documented and ready to implement",
+          "Removed hardcoded color and spacing values in favor of a real token set",
+          "Consistent component behavior across the wizard and the browse table",
+          "Faster handoff to engineering - components documented against spec, not re-explained per screen",
         ],
-        whatIDifferently: "I'd run a short audit of how engineers were already implementing similar patterns before starting the Figma work - so the components are designed around what's actually buildable in the codebase.",
+        whatIDifferently: "I'd start the token audit before the first wizard screen was built, not after - retrofitting a design system onto existing screens costs more than building on it from day one.",
       },
     },
   },
@@ -304,6 +309,11 @@ export const knowledge = {
 export type KnowledgeBase = typeof knowledge;
 export type CaseStudyId = keyof typeof knowledge.caseStudies;
 
+export interface CaseStudyImage {
+  src: string;
+  alt: string;
+}
+
 export interface CaseStudy {
   id: string;
   title: string;
@@ -313,9 +323,9 @@ export interface CaseStudy {
   ndaLevel: "low" | "partial" | "high";
   color: string;
   accentColor: string;
-  hook: { headline: string; context: string; scale?: string };
-  friction: { headline: string; problems: string[]; userVoice?: string[]; researchMethod?: string };
-  pivot?: { headline: string; insight: string; designDecision?: string };
-  solution: { headline: string; features: { name: string; description: string }[]; ndaSafeNote?: string };
-  impact: { headline: string; status?: string; outcomes: string[]; whatIDifferently: string };
+  hook: { headline: string; context: string; scale?: string; image?: CaseStudyImage };
+  friction: { headline: string; problems: string[]; userVoice?: string[]; researchMethod?: string; image?: CaseStudyImage };
+  pivot?: { headline: string; insight: string; designDecision?: string; image?: CaseStudyImage };
+  solution: { headline: string; features: { name: string; description: string }[]; ndaSafeNote?: string; image?: CaseStudyImage };
+  impact: { headline: string; status?: string; outcomes: string[]; whatIDifferently: string; image?: CaseStudyImage };
 }

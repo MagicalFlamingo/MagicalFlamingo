@@ -10,6 +10,7 @@ import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
+import { pick, thinkingPhrases } from "@/content/responses";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 4).map((p) => p.label);
 
@@ -27,6 +28,7 @@ export function ChatInterface() {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<AppMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
+  const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
   const hasMounted = useRef(false);
 
   useEffect(() => {
@@ -51,6 +53,7 @@ export function ChatInterface() {
         text,
       };
       setMessages((prev) => [...prev, userMsg]);
+      setThinkingPhrase(pick(thinkingPhrases));
       setIsThinking(true);
 
       setTimeout(() => {
@@ -187,9 +190,9 @@ export function ChatInterface() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-[11px] uppercase tracking-[0.12em] text-[#211D1D]/35 font-medium"
+                className="text-[11px] tracking-[0.02em] text-[#211D1D]/40 font-medium italic"
               >
-                thinking
+                {thinkingPhrase}
               </motion.span>
             </motion.div>
           )}

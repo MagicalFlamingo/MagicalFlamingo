@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { knowledge, type CaseStudyId, type CaseStudy } from "@/content/knowledge";
+import { knowledge, type CaseStudyId, type CaseStudy, type CaseStudyImage } from "@/content/knowledge";
 
 const FRAME_ICONS: Record<string, string> = {
   Hook: "○",
@@ -25,6 +25,7 @@ type FrameData = {
   nda?: boolean;
   quote?: string;
   extra?: string;
+  image?: CaseStudyImage;
 };
 
 function clean(s: string) {
@@ -38,6 +39,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       headline: study.hook.headline,
       body: clean(study.hook.context),
       extra: study.hook.scale,
+      image: study.hook.image,
     },
     {
       label: "Friction",
@@ -45,6 +47,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       body: study.friction.problems.map((p) => `• ${p}`).join("\n"),
       quote: study.friction.userVoice?.[0],
       extra: study.friction.researchMethod,
+      image: study.friction.image,
     },
   ];
 
@@ -53,6 +56,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       label: "Pivot",
       headline: study.pivot.headline,
       body: clean(study.pivot.insight),
+      image: study.pivot.image,
     });
   }
 
@@ -65,6 +69,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       .join("\n\n"),
     nda: study.ndaLevel === "partial",
     extra: study.solution.ndaSafeNote,
+    image: study.solution.image,
   });
 
   frames.push({
@@ -72,6 +77,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
     headline: study.impact.headline,
     body: study.impact.outcomes.map((o) => `• ${o}`).join("\n"),
     extra: `What I'd do differently: ${study.impact.whatIDifferently}`,
+    image: study.impact.image,
   });
 
   return frames;
@@ -193,6 +199,14 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                   <h3 className="text-xl font-bold text-[#211D1D] leading-snug font-serif">
                     {frame.headline}
                   </h3>
+                  {frame.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={frame.image.src}
+                      alt={frame.image.alt}
+                      className="w-full rounded-lg border border-[#211D1D]/10"
+                    />
+                  )}
                   <p className="text-[15px] text-[#211D1D]/60 leading-relaxed whitespace-pre-wrap">
                     {frame.body}
                   </p>
