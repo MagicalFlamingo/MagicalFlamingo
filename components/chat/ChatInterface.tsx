@@ -2,20 +2,17 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, ExternalLink } from "lucide-react";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyCard } from "./CaseStudyCard";
 import { FrameCarousel } from "./FrameCarousel";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
-import { CaseStudyTiles } from "@/components/portfolio/CaseStudyTiles";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases } from "@/content/responses";
+import { pick, thinkingPhrases, introMessage } from "@/content/responses";
 
-const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 4).map((p) => p.label);
-const bio = knowledge.identity.positioning.split("\n\n")[0].trim();
+const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 5).map((p) => p.label);
 
 type AppMessage = {
   id: string;
@@ -33,6 +30,7 @@ export function ChatInterface() {
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
   const hasMounted = useRef(false);
+  const hasIntroed = useRef(false);
 
   useEffect(() => {
     if (!hasMounted.current) {
@@ -44,6 +42,27 @@ export function ChatInterface() {
       el.scrollTop = el.scrollHeight;
     }
   }, [messages, isThinking]);
+
+  // Agent greets first: thinking indicator, then a first-person intro
+  // with chips to pick where to dig in - nothing sits static on load.
+  useEffect(() => {
+    if (hasIntroed.current) return;
+    hasIntroed.current = true;
+    setThinkingPhrase(pick(thinkingPhrases));
+    setIsThinking(true);
+    const t = setTimeout(() => {
+      setMessages([
+        {
+          id: "intro",
+          role: "assistant",
+          text: introMessage,
+          chips: INITIAL_CHIPS,
+        },
+      ]);
+      setIsThinking(false);
+    }, 900);
+    return () => clearTimeout(t);
+  }, []);
 
   const submitText = useCallback(
     (text: string) => {
@@ -112,51 +131,6 @@ export function ChatInterface() {
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-thin"
       >
-        {messages.length === 0 && !isThinking && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="pb-2 space-y-7"
-          >
-            <div>
-              <p className="text-[15px] text-[#211D1D]/70 leading-[1.7] max-w-[60ch]">
-                {bio}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2.5">
-                <a
-                  href="/danielle-goldberg-cv.pdf"
-                  download
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#211D1D] text-[#FAF3E7] text-xs font-medium hover:bg-[#332D2A] transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Download CV
-                </a>
-                <a
-                  href={`mailto:${knowledge.identity.email}`}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#211D1D]/20 text-[#211D1D] text-xs font-medium hover:bg-[#211D1D]/5 transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Get in touch
-                </a>
-              </div>
-            </div>
-
-            <CaseStudyTiles />
-
-            <div>
-              <p className="text-sm text-[#211D1D]/40 mb-3 font-medium">
-                Start with a question, or try one of these:
-              </p>
-              <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} />
-            </div>
-
-            <p className="text-[11px] text-[#211D1D]/25 pt-2">
-              &copy; 2026 Danielle Goldberg
-            </p>
-          </motion.div>
-        )}
-
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div
@@ -244,7 +218,7 @@ export function ChatInterface() {
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask Danielle anything…"
+            placeholder="Ask me anything…"
             className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
             disabled={isThinking}
           />
