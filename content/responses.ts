@@ -30,6 +30,9 @@ export const thinkingPhrases: string[] = [
   "connecting this to something real",
 ];
 
+export const introMessage =
+  "Hi, I'm Danielle - senior product designer, eight years in enterprise B2B, currently at Qlik. I turn complicated systems into things people actually understand, and I can tell you exactly why every decision was made.\n\nPick a place to start, or ask me anything.";
+
 export const fallbackResponses: string[] = [
   "I can cover the case studies, research approach, working style, or career background. What's most relevant to what you're evaluating?",
   "That's a bit outside what I can answer here - try asking about a specific project, how I work, or what I'd do in the first 30 days.",
