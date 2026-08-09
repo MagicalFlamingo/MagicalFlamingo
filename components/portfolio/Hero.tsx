@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="flex flex-col lg:flex-row">
       {/* Left - identity (desktop only) */}
-      <div className="hidden lg:flex lg:w-[42%] flex-col justify-between px-14 pt-20 pb-12 border-r border-[#211D1D]/8 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[42%] flex-col justify-center px-14 border-r border-[#211D1D]/8 relative overflow-hidden">
         <div className="relative">
           {/* Eyebrow + rule */}
           <motion.span
@@ -65,21 +65,6 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="text-xs text-[#211D1D]/22 tracking-wide"
-        >
-          Scroll to see work below{" "}
-          <motion.span
-            animate={{ y: [0, 3, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            className="inline-block"
-          >
-            ↓
-          </motion.span>
-        </motion.div>
       </div>
 
       {/* Right - chat (full-screen on mobile) */}
