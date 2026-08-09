@@ -241,7 +241,7 @@ function TiltCard({
         <ArrowUpRight className="h-3.5 w-3.5 text-[#211D1D]/30" />
       </div>
 
-      {/* Hover reveal — user voice quote or fallback stat */}
+      {/* Hover reveal - user voice quote or fallback stat */}
       <div
         className="absolute bottom-0 left-0 right-0 px-6 py-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out border-t"
         style={{

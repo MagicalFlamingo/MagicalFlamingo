@@ -65,7 +65,7 @@ export function ChatInterface() {
         };
         setMessages((prev) => [...prev, assistantMsg]);
         setIsThinking(false);
-      }, 380);
+      }, 650);
     },
     [isThinking]
   );
@@ -160,27 +160,40 @@ export function ChatInterface() {
           ))}
         </AnimatePresence>
 
-        {isThinking && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5"
-          >
-            {[0, 1, 2].map((i) => (
+        <AnimatePresence>
+          {isThinking && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4, transition: { duration: 0.15 } }}
+              className="flex items-center gap-2.5"
+            >
+              <div className="flex items-center gap-1">
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-[#2E9B5C]"
+                    animate={{ y: [0, -6, 0], opacity: [0.35, 1, 0.35] }}
+                    transition={{
+                      duration: 0.7,
+                      delay: i * 0.14,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+              </div>
               <motion.span
-                key={i}
-                className="w-1.5 h-1.5 rounded-full bg-[#211D1D]/25"
-                animate={{ y: [0, -4, 0] }}
-                transition={{
-                  duration: 0.55,
-                  delay: i * 0.12,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </motion.div>
-        )}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-[11px] uppercase tracking-[0.12em] text-[#211D1D]/35 font-medium"
+              >
+                thinking
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="border-t border-[#211D1D]/10 px-5 py-3 bg-[#FAF3E7]">

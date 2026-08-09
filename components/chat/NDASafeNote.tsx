@@ -24,7 +24,7 @@ export function NDASafeNote({ context }: NDASafeNoteProps) {
         </p>
         <p className="text-sm text-[#211D1D]/65 leading-relaxed">{context}</p>
         <p className="text-xs text-[#211D1D]/40 mt-2 italic">
-          Happy to discuss what changed, how we'd measure it, and what I'd do differently — without surfacing client-specific data.
+          Happy to discuss what changed, how we'd measure it, and what I'd do differently - without surfacing client-specific data.
         </p>
       </div>
     </motion.div>

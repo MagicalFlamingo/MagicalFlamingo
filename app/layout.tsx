@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Danielle Goldberg — Senior Product Designer",
+  title: "Danielle Goldberg - Senior Product Designer",
   description:
     "Portfolio of Danielle Goldberg, Senior Product Designer. Research-first, systems-thinking design for complex enterprise and AI products.",
 };

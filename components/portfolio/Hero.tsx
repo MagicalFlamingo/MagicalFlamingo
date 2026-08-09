@@ -10,7 +10,7 @@ export function Hero() {
 
   return (
     <section className="flex flex-col lg:flex-row">
-      {/* Left — identity (desktop only) */}
+      {/* Left - identity (desktop only) */}
       <div className="hidden lg:flex lg:w-[42%] flex-col justify-between px-14 pt-20 pb-12 border-r border-[#211D1D]/8 relative overflow-hidden">
         <div className="relative">
           {/* Eyebrow + rule */}
@@ -30,7 +30,7 @@ export function Hero() {
             className="mt-2 h-px w-10 bg-[#2E9B5C]/35"
           />
 
-          {/* Name — character by character */}
+          {/* Name - character by character */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -82,14 +82,14 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Right — chat (full-screen on mobile) */}
+      {/* Right - chat (full-screen on mobile) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
         className="flex-1 flex flex-col h-[100dvh]"
       >
-        {/* Mobile header — name + title as agent identity */}
+        {/* Mobile header - name + title as agent identity */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
