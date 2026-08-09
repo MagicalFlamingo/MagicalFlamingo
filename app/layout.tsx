@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { CursorDot } from "@/components/ui/CursorDot";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,8 +32,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full bg-[#FAF3E7] md:cursor-none">
-        <CursorDot />
+      <body className="min-h-full bg-[#FAF3E7]">
         {children}
       </body>
     </html>

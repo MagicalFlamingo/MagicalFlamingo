@@ -18,7 +18,7 @@ export function TimelineCard() {
           <div className="flex flex-col gap-5">
             {career.map((item, i) => (
               <motion.div key={`${item.company}-${i}`} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.07 * i, duration: 0.25 }} className="flex gap-4 relative">
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-[#C1502D] bg-[#FFFDF9] shrink-0 mt-0.5 z-10" />
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-[#2E9B5C] bg-[#FFFDF9] shrink-0 mt-0.5 z-10" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline justify-between gap-2 flex-wrap">
                     <h4 className="text-sm font-semibold text-[#211D1D]">{item.company}</h4>

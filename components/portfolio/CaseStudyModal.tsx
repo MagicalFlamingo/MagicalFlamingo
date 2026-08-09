@@ -187,7 +187,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#C1502D]">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#2E9B5C]">
                     {frame.label}
                   </p>
                   <h3 className="text-xl font-bold text-[#211D1D] leading-snug font-serif">
@@ -197,7 +197,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                     {frame.body}
                   </p>
                   {frame.quote && (
-                    <p className="text-sm text-[#211D1D]/50 italic border-l-2 border-[#C1502D]/30 pl-3 leading-relaxed">
+                    <p className="text-sm text-[#211D1D]/50 italic border-l-2 border-[#2E9B5C]/30 pl-3 leading-relaxed">
                       {frame.quote}
                     </p>
                   )}
@@ -229,7 +229,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                 onClick={() => go(i)}
                 className={`rounded-full transition-all duration-150 ${
                   i === current
-                    ? "bg-[#C1502D] w-5 h-1.5"
+                    ? "bg-[#2E9B5C] w-5 h-1.5"
                     : "bg-[#211D1D]/15 w-1.5 h-1.5"
                 }`}
               />

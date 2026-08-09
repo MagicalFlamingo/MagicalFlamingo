@@ -2,7 +2,6 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send } from "lucide-react";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyCard } from "./CaseStudyCard";
 import { FrameCarousel } from "./FrameCarousel";
@@ -12,7 +11,7 @@ import { NDASafeNote } from "./NDASafeNote";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
 
-const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
+const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 4).map((p) => p.label);
 
 type AppMessage = {
   id: string;
@@ -184,27 +183,27 @@ export function ChatInterface() {
         )}
       </div>
 
-      <div className="border-t border-[#211D1D]/10 px-4 py-4 bg-[#FAF3E7]">
+      <div className="border-t border-[#211D1D]/10 px-5 py-3 bg-[#FAF3E7]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             submitText(inputValue);
           }}
-          className="flex items-center gap-3 bg-[#FFFDF9] rounded-full border border-[#211D1D]/15 px-4 py-2.5 focus-within:border-[#211D1D]/30 transition-colors"
+          className="flex items-center gap-3"
         >
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask about her work, process, or background…"
-            className="flex-1 text-sm text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
+            className="flex-1 text-sm text-[#211D1D] placeholder:text-[#211D1D]/30 outline-none bg-transparent py-2"
             disabled={isThinking}
           />
           <button
             type="submit"
             disabled={isThinking || !inputValue.trim()}
-            className="w-7 h-7 rounded-full bg-[#C1502D] flex items-center justify-center shrink-0 disabled:opacity-40 hover:bg-[#A8431F] transition-colors"
+            className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#2E9B5C] disabled:opacity-30 hover:text-[#227A46] transition-colors"
           >
-            <Send className="h-3.5 w-3.5 text-white" />
+            Send
           </button>
         </form>
       </div>

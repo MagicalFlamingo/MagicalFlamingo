@@ -230,7 +230,7 @@ export const knowledge = {
       year: "2025",
       role: "Lead Designer — Design System, AI Component Library",
       ndaLevel: "low" as const,
-      color: "#B08D57",
+      color: "#2E9B5C",
       accentColor: "#F0FBF2",
 
       hook: {
@@ -283,14 +283,12 @@ export const knowledge = {
   ],
 
   promptSuggestions: [
-    { label: "Show me the Qlik project", intent: "case_study_qlik" },
-    { label: "How do you approach research?", intent: "process" },
-    { label: "Walk me through AWS Resilience Hub", intent: "case_study_aws" },
-    { label: "What's your take on AI in design?", intent: "ai_philosophy" },
-    { label: "How does art history show up in your work?", intent: "background" },
-    { label: "What would you do in your first 30 days?", intent: "working_style" },
-    { label: "Show me your career timeline", intent: "timeline" },
+    { label: "What makes you different from other designers?", intent: "different" },
+    { label: "How did you end up in product design?", intent: "background" },
+    { label: "Are you open to new roles right now?", intent: "availability" },
     { label: "What are you honest about not having yet?", intent: "growth" },
+    { label: "What would you do in your first 30 days here?", intent: "first30" },
+    { label: "How can I get in touch?", intent: "contact" },
   ],
 
   skills: {
