@@ -63,7 +63,7 @@ export const intents: Intent[] = [
   {
     id: "aws",
     keywords: ["aws", "amazon", "resilience hub", "resiliency", "resiliency score", "disaster recovery", "cloud resilience", "resilience"],
-    weights: { aws: 4, amazon: 3, "resilience hub": 5, "resiliency score": 5, resiliency: 3, "resilience hub": 4 },
+    weights: { aws: 4, amazon: 3, "resilience hub": 5, "resiliency score": 5, resiliency: 3 },
     responses: [
       "AWS Resilience Hub showed customers a number — 13% — and expected them to act on it. They didn't, because the number had nothing to say.",
       "The resiliency score problem was a trust problem before it was a UI problem. Walk through it here.",
