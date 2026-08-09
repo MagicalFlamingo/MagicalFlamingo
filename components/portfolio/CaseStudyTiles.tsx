@@ -60,7 +60,7 @@ function TiltCard({
         backgroundColor: study.accentColor,
       }}
       whileHover={{ boxShadow: "0 24px 56px rgba(26,26,26,0.12)" }}
-      className="group text-left rounded-2xl overflow-hidden border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/14 transition-colors duration-300 relative"
+      className="group text-left rounded-2xl overflow-hidden border border-[#211D1D]/10 hover:border-[#211D1D]/14 transition-colors duration-300 relative"
     >
       {/* Color band */}
       <div
@@ -79,20 +79,20 @@ function TiltCard({
         </span>
 
         <div className="flex items-start justify-between gap-3 mb-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]/35">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#211D1D]/35">
             {study.company}
           </p>
           {study.ndaLevel === "partial" && (
-            <span className="flex items-center gap-1 text-[10px] text-[#1A1A1A]/35 bg-[#1A1A1A]/5 px-1.5 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-[10px] text-[#211D1D]/35 bg-[#211D1D]/5 px-1.5 py-0.5 rounded-full">
               <Lock className="h-2.5 w-2.5" /> Partial NDA
             </span>
           )}
         </div>
 
-        <h3 className="text-lg font-bold text-[#1A1A1A] leading-snug font-serif">
+        <h3 className="text-lg font-bold text-[#211D1D] leading-snug font-serif">
           {study.title}
         </h3>
-        <p className="mt-2 text-sm text-[#1A1A1A]/50 leading-relaxed">
+        <p className="mt-2 text-sm text-[#211D1D]/50 leading-relaxed">
           {study.hook.headline}
         </p>
 
@@ -100,7 +100,7 @@ function TiltCard({
           {sections.map((label) => (
             <span
               key={label}
-              className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-[#1A1A1A]/40 border border-[#1A1A1A]/8 font-medium"
+              className="text-[10px] px-2 py-0.5 rounded bg-[#FFFDF9]/70 text-[#211D1D]/40 border border-[#211D1D]/8 font-medium"
             >
               {label}
             </span>
@@ -129,7 +129,7 @@ function TiltCard({
           borderColor: `${study.color}22`,
         }}
       >
-        <p className="text-[11px] text-[#1A1A1A]/55 leading-snug pr-2">
+        <p className="text-[11px] text-[#211D1D]/55 leading-snug pr-2">
           {CARD_STATS[id]}
         </p>
         <ArrowUpRight
@@ -145,7 +145,7 @@ export function CaseStudyTiles() {
   const [open, setOpen] = useState<CaseStudyId | null>(null);
 
   return (
-    <section className="px-8 py-20 lg:px-14 border-t border-[#1A1A1A]/8">
+    <section className="px-8 py-20 lg:px-14 border-t border-[#211D1D]/8">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -153,13 +153,13 @@ export function CaseStudyTiles() {
         transition={{ duration: 0.5 }}
         className="mb-12"
       >
-        <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#C4654A] mb-2">
+        <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#C1502D] mb-2">
           Selected Work
         </p>
-        <h2 className="text-3xl font-bold text-[#1A1A1A] tracking-tight font-serif">
+        <h2 className="text-3xl font-bold text-[#211D1D] tracking-tight font-serif">
           Three projects worth understanding
         </h2>
-        <p className="mt-2 text-[#1A1A1A]/50 text-[15px] max-w-[50ch]">
+        <p className="mt-2 text-[#211D1D]/50 text-[15px] max-w-[50ch]">
           Each represents a different kind of design problem. Click to walk through the story.
         </p>
       </motion.div>

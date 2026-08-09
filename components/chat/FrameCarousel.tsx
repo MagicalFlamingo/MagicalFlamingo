@@ -93,23 +93,23 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
-      className="mt-3 rounded-xl overflow-hidden border border-[#1A1A1A]/10 bg-white"
+      className="mt-3 rounded-xl overflow-hidden border border-[#211D1D]/10 bg-[#FFFDF9]"
     >
       {/* Header */}
       <div
-        className="px-5 pt-4 pb-3 border-b border-[#1A1A1A]/8"
+        className="px-5 pt-4 pb-3 border-b border-[#211D1D]/8"
         style={{ borderTopColor: study.color, borderTopWidth: 3 }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#1A1A1A]/40">
+            <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
               {study.company}
             </p>
-            <h3 className="text-base font-semibold text-[#1A1A1A] mt-0.5">
+            <h3 className="text-base font-semibold text-[#211D1D] mt-0.5">
               {study.title}
             </h3>
           </div>
-          <span className="text-xs text-[#1A1A1A]/40">
+          <span className="text-xs text-[#211D1D]/40">
             {current + 1} / {frames.length}
           </span>
         </div>
@@ -122,8 +122,8 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
               onClick={() => go(i)}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
                 i === current
-                  ? "bg-[#1A1A1A] text-white"
-                  : "bg-[#F7F6F3] text-[#1A1A1A]/50 hover:text-[#1A1A1A]/80"
+                  ? "bg-[#211D1D] text-white"
+                  : "bg-[#FAF3E7] text-[#211D1D]/50 hover:text-[#211D1D]/80"
               }`}
             >
               <span className="text-[10px]">{FRAME_ICONS[f.label] ?? "·"}</span>
@@ -146,40 +146,40 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
           >
             {frame.nda ? (
               <div className="flex flex-col items-start gap-2">
-                <div className="flex items-center gap-2 text-[#1A1A1A]/40">
+                <div className="flex items-center gap-2 text-[#211D1D]/40">
                   <Lock className="h-4 w-4" />
                   <span className="text-xs font-medium uppercase tracking-wider">
                     NDA applies to specifics
                   </span>
                 </div>
-                <h4 className="text-lg font-semibold text-[#1A1A1A] leading-snug">
+                <h4 className="text-lg font-semibold text-[#211D1D] leading-snug">
                   {frame.headline}
                 </h4>
-                <p className="text-sm text-[#1A1A1A]/60 leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm text-[#211D1D]/60 leading-relaxed whitespace-pre-wrap">
                   {frame.body}
                 </p>
-                <p className="text-xs text-[#1A1A1A]/40 mt-1 italic">
+                <p className="text-xs text-[#211D1D]/40 mt-1 italic">
                   {study.solution.ndaSafeNote}
                 </p>
               </div>
             ) : (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#C4654A] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#C1502D] mb-2">
                   {frame.label}
                 </p>
-                <h4 className="text-lg font-semibold text-[#1A1A1A] leading-snug mb-3">
+                <h4 className="text-lg font-semibold text-[#211D1D] leading-snug mb-3">
                   {frame.headline}
                 </h4>
-                <p className="text-sm text-[#1A1A1A]/65 leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm text-[#211D1D]/65 leading-relaxed whitespace-pre-wrap">
                   {frame.body}
                 </p>
                 {frame.quote && (
-                  <p className="mt-3 text-xs text-[#1A1A1A]/50 italic border-l-2 border-[#C4654A]/30 pl-3 leading-relaxed">
+                  <p className="mt-3 text-xs text-[#211D1D]/50 italic border-l-2 border-[#C1502D]/30 pl-3 leading-relaxed">
                     {frame.quote}
                   </p>
                 )}
                 {frame.extra && (
-                  <p className="mt-3 pt-3 border-t border-[#1A1A1A]/8 text-xs text-[#1A1A1A]/40 italic leading-relaxed">
+                  <p className="mt-3 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">
                     {frame.extra}
                   </p>
                 )}
@@ -190,11 +190,11 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
       </div>
 
       {/* Nav */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-[#1A1A1A]/8 bg-[#F7F6F3]/50">
+      <div className="flex items-center justify-between px-5 py-3 border-t border-[#211D1D]/8 bg-[#FAF3E7]/50">
         <button
           onClick={() => go(Math.max(0, current - 1))}
           disabled={current === 0}
-          className="flex items-center gap-1 text-sm text-[#1A1A1A]/50 hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           <ChevronLeft className="h-4 w-4" /> Prev
         </button>
@@ -204,7 +204,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
               key={i}
               onClick={() => go(i)}
               className={`h-1.5 rounded-full transition-all duration-150 ${
-                i === current ? "bg-[#C4654A] w-4" : "bg-[#1A1A1A]/20 w-1.5"
+                i === current ? "bg-[#C1502D] w-4" : "bg-[#211D1D]/20 w-1.5"
               }`}
             />
           ))}
@@ -212,7 +212,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         <button
           onClick={() => go(Math.min(frames.length - 1, current + 1))}
           disabled={current === frames.length - 1}
-          className="flex items-center gap-1 text-sm text-[#1A1A1A]/50 hover:text-[#1A1A1A] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           Next <ChevronRight className="h-4 w-4" />
         </button>

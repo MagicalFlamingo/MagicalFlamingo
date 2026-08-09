@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/*
+ * Palette (glam edit of Happy Hues #14)
+ * cream      #FAF3E7  body background
+ * ink        #211D1D  headline/body text, dark surfaces
+ * terracotta #C1502D  primary accent
+ * gold       #B08D57  secondary accent (was mint green)
+ * paper      #FFFDF9  card surfaces on cream
+ */
+
 * {
   box-sizing: border-box;
 }
@@ -10,8 +19,8 @@ html {
 }
 
 body {
-  background-color: #F7F6F3;
-  color: #1A1A1A;
+  background-color: #FAF3E7;
+  color: #211D1D;
   font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -21,7 +30,7 @@ body {
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(26, 26, 26, 0.12) transparent;
+  scrollbar-color: rgba(33, 29, 29, 0.12) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -33,7 +42,7 @@ body {
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(26, 26, 26, 0.12);
+  background: rgba(33, 29, 29, 0.12);
   border-radius: 2px;
 }
 

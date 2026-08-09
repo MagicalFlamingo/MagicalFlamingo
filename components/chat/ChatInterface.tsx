@@ -114,7 +114,7 @@ export function ChatInterface() {
             transition={{ delay: 0.5 }}
             className="pb-2"
           >
-            <p className="text-sm text-[#1A1A1A]/40 mb-3 font-medium">
+            <p className="text-sm text-[#211D1D]/40 mb-3 font-medium">
               Start with a question, or try one of these:
             </p>
             <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} />
@@ -138,12 +138,12 @@ export function ChatInterface() {
                 }
               >
                 {message.role === "user" ? (
-                  <div className="bg-[#1A1A1A] text-[#F7F6F3] rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
+                  <div className="bg-[#211D1D] text-[#FAF3E7] rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
                     {message.text}
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p className="text-sm text-[#1A1A1A] leading-[1.75]">
+                    <p className="text-sm text-[#211D1D] leading-[1.75]">
                       {message.text}
                     </p>
                     {message.tool &&
@@ -170,7 +170,7 @@ export function ChatInterface() {
             {[0, 1, 2].map((i) => (
               <motion.span
                 key={i}
-                className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/25"
+                className="w-1.5 h-1.5 rounded-full bg-[#211D1D]/25"
                 animate={{ y: [0, -4, 0] }}
                 transition={{
                   duration: 0.55,
@@ -184,25 +184,25 @@ export function ChatInterface() {
         )}
       </div>
 
-      <div className="border-t border-[#1A1A1A]/10 px-4 py-4 bg-[#F7F6F3]">
+      <div className="border-t border-[#211D1D]/10 px-4 py-4 bg-[#FAF3E7]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             submitText(inputValue);
           }}
-          className="flex items-center gap-3 bg-white rounded-full border border-[#1A1A1A]/15 px-4 py-2.5 focus-within:border-[#1A1A1A]/30 transition-colors"
+          className="flex items-center gap-3 bg-[#FFFDF9] rounded-full border border-[#211D1D]/15 px-4 py-2.5 focus-within:border-[#211D1D]/30 transition-colors"
         >
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Ask about her work, process, or background…"
-            className="flex-1 text-sm text-[#1A1A1A] placeholder:text-[#1A1A1A]/35 outline-none bg-transparent"
+            className="flex-1 text-sm text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
             disabled={isThinking}
           />
           <button
             type="submit"
             disabled={isThinking || !inputValue.trim()}
-            className="w-7 h-7 rounded-full bg-[#C4654A] flex items-center justify-center shrink-0 disabled:opacity-40 hover:bg-[#B55940] transition-colors"
+            className="w-7 h-7 rounded-full bg-[#C1502D] flex items-center justify-center shrink-0 disabled:opacity-40 hover:bg-[#A8431F] transition-colors"
           >
             <Send className="h-3.5 w-3.5 text-white" />
           </button>

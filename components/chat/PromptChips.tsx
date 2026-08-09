@@ -19,7 +19,7 @@ export function PromptChips({ suggestions, onSelect }: PromptChipsProps) {
           whileHover={{ scale: 1.03, y: -1 }}
           whileTap={{ scale: 0.96 }}
           onClick={() => onSelect(s)}
-          className="px-3 py-1.5 text-sm rounded-full border border-[#1A1A1A]/12 bg-white/80 text-[#1A1A1A]/70 hover:border-[#C4654A]/35 hover:text-[#C4654A] hover:bg-[#C4654A]/5 transition-colors duration-150 cursor-pointer"
+          className="px-3 py-1.5 text-sm rounded-full border border-[#211D1D]/12 bg-[#FFFDF9]/80 text-[#211D1D]/70 hover:border-[#C1502D]/35 hover:text-[#C1502D] hover:bg-[#C1502D]/5 transition-colors duration-150 cursor-pointer"
         >
           {s}
         </motion.button>
