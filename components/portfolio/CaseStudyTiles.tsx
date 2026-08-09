@@ -260,27 +260,18 @@ function TiltCard({
   );
 }
 
+// Embedded directly in the chat's welcome canvas - no standalone section,
+// no page-level scroll. This IS the agent; there's nothing "below" it.
 export function CaseStudyTiles() {
   const [open, setOpen] = useState<CaseStudyId | null>(null);
 
   return (
-    <section className="px-8 py-20 lg:px-14 border-t border-[#211D1D]/8">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5 }}
-        className="mb-10"
-      >
-        <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#2E9B5C] mb-2">
-          Selected Work
-        </p>
-        <h2 className="text-3xl font-bold text-[#211D1D] tracking-tight font-serif">
-          Three problems worth understanding
-        </h2>
-      </motion.div>
+    <div>
+      <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#2E9B5C] mb-3">
+        Three problems worth understanding
+      </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 gap-3">
         {PROJECTS.map((id, i) => (
           <TiltCard key={id} id={id} i={i} onOpen={() => setOpen(id)} />
         ))}
@@ -289,6 +280,6 @@ export function CaseStudyTiles() {
       <AnimatePresence>
         {open && <CaseStudyModal project={open} onClose={() => setOpen(null)} />}
       </AnimatePresence>
-    </section>
+    </div>
   );
 }
