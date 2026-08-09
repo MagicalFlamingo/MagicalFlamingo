@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { knowledge } from "@/content/knowledge";
 
 const SECTION_COLORS: Record<string, string> = {
-  core: "#C1502D",
-  tools: "#B08D57",
+  core: "#2E9B5C",
+  tools: "#F2A93C",
   domains: "#4A6FA5",
   languages: "#9B72CF",
 };

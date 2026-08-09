@@ -1,50 +1,8 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { Download, ExternalLink } from "lucide-react";
 import { knowledge } from "@/content/knowledge";
-
-const STATS = [
-  { target: 8, suffix: "+", label: "years in product design" },
-  { target: 400, suffix: "K", label: "monthly users at Menora" },
-  { target: 95, suffix: "%", label: "conversion rate achieved" },
-];
-
-function StatItem({ target, suffix, label }: { target: number; suffix: string; label: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const duration = 1100;
-    const steps = 32;
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
-      if (step >= steps) {
-        clearInterval(timer);
-        setCount(target);
-      }
-    }, duration / steps);
-    return () => clearInterval(timer);
-  }, [isInView, target]);
-
-  return (
-    <div ref={ref}>
-      <p className="text-2xl font-bold text-[#211D1D] font-serif tracking-tight tabular-nums">
-        {count}{suffix}
-      </p>
-      <p className="mt-0.5 text-[11px] text-[#211D1D]/40 leading-snug">
-        {label}
-      </p>
-    </div>
-  );
-}
 
 export function About() {
   const { identity } = knowledge;
@@ -59,7 +17,7 @@ export function About() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#C1502D] mb-6">
+          <p className="text-xs font-medium tracking-[0.15em] uppercase text-[#2E9B5C] mb-6">
             About
           </p>
 
@@ -70,13 +28,7 @@ export function About() {
             {bio}
           </p>
 
-          <div className="mt-8 mb-2 grid grid-cols-3 gap-x-6 py-7 border-t border-b border-[#211D1D]/8 max-w-[36ch]">
-            {STATS.map((stat) => (
-              <StatItem key={stat.label} {...stat} />
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="/danielle-goldberg-cv.pdf"
               download

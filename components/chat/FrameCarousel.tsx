@@ -164,7 +164,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
               </div>
             ) : (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#C1502D] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#2E9B5C] mb-2">
                   {frame.label}
                 </p>
                 <h4 className="text-lg font-semibold text-[#211D1D] leading-snug mb-3">
@@ -174,7 +174,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                   {frame.body}
                 </p>
                 {frame.quote && (
-                  <p className="mt-3 text-xs text-[#211D1D]/50 italic border-l-2 border-[#C1502D]/30 pl-3 leading-relaxed">
+                  <p className="mt-3 text-xs text-[#211D1D]/50 italic border-l-2 border-[#2E9B5C]/30 pl-3 leading-relaxed">
                     {frame.quote}
                   </p>
                 )}
@@ -204,7 +204,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
               key={i}
               onClick={() => go(i)}
               className={`h-1.5 rounded-full transition-all duration-150 ${
-                i === current ? "bg-[#C1502D] w-4" : "bg-[#211D1D]/20 w-1.5"
+                i === current ? "bg-[#2E9B5C] w-4" : "bg-[#211D1D]/20 w-1.5"
               }`}
             />
           ))}

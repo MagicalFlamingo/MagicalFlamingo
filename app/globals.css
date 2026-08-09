@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 /*
- * Palette (glam edit of Happy Hues #14)
- * cream      #FAF3E7  body background
- * ink        #211D1D  headline/body text, dark surfaces
- * terracotta #C1502D  primary accent
- * gold       #B08D57  secondary accent (was mint green)
- * paper      #FFFDF9  card surfaces on cream
+ * Palette (fresh/hopeful edit, v2 — replaced the glam terracotta+gold pass)
+ * cream    #FAF3E7  body background
+ * ink      #211D1D  headline/body text, dark surfaces
+ * green    #2E9B5C  primary accent (CTAs, links, eyebrows)
+ * marigold #F2A93C  secondary accent (status dot, skill tags)
+ * paper    #FFFDF9  card surfaces on cream
  */
 
 * {

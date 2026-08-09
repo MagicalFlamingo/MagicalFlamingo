@@ -53,7 +53,7 @@ export function CaseStudyCard({ project, onExpand }: CaseStudyCardProps) {
         {onExpand && (
           <button
             onClick={() => onExpand(project)}
-            className="mt-4 flex items-center gap-1.5 text-sm text-[#C1502D] hover:gap-2.5 transition-all duration-150 font-medium"
+            className="mt-4 flex items-center gap-1.5 text-sm text-[#2E9B5C] hover:gap-2.5 transition-all duration-150 font-medium"
           >
             See full walkthrough <ArrowRight className="h-3.5 w-3.5" />
           </button>
