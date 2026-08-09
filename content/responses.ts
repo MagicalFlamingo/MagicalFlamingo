@@ -21,6 +21,15 @@ export function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+export const thinkingPhrases: string[] = [
+  "actually thinking, no LLM to blame",
+  "reading between the lines",
+  "checking my notes",
+  "no bullet points forming yet",
+  "being thorough, one sec",
+  "connecting this to something real",
+];
+
 export const fallbackResponses: string[] = [
   "I can cover the case studies, research approach, working style, or career background. What's most relevant to what you're evaluating?",
   "That's a bit outside what I can answer here - try asking about a specific project, how I work, or what I'd do in the first 30 days.",
@@ -81,18 +90,18 @@ export const intents: Intent[] = [
 
   {
     id: "sprout",
-    keywords: ["sprout", "component library", "design system", "figma library", "ai agent", "ai component", "design tokens"],
-    weights: { sprout: 5, "component library": 3, "design system": 2, "ai agent": 3, "figma library": 3 },
+    keywords: ["sprout", "sprout 2.0", "component library", "design system", "design tokens", "component audit"],
+    weights: { sprout: 5, "sprout 2.0": 5, "component library": 3, "design system": 3, "design tokens": 3 },
     responses: [
-      "Sprout AI needed a component library specifically for their agent's UI - so the whole team could build consistent interactions without solving the same problems independently.",
-      "Design systems work is often invisible when it's working well. This one's about making sure the AI agent looks and feels like the same thing wherever it shows up in the product.",
-      "The Sprout work is about removing myself from being the bottleneck - if I'm the only one who knows how the agent is supposed to behave, that doesn't scale.",
+      "Sprout 2.0 is Qlik's own design system - same project as the connections work, different lens. That case study is the research story; this is the systems-building one.",
+      "Design systems work is often invisible when it's working well. This one's about making sure the wizard and the browse table look and behave like the same product instead of two screens that happen to sit next to each other.",
+      "The Sprout work is about removing myself from being the bottleneck - if I'm the only one who knows the token set, that doesn't scale past this one project.",
     ],
     tool: "showFrameCarousel",
     toolArgs: { project: "sprout" },
     followups: [
-      "What components did you design?",
-      "How does this relate to the AWS or Qlik work?",
+      "What components did you rebuild?",
+      "How does this relate to the Qlik connections work?",
       "Show me your full skills breakdown",
     ],
   },
@@ -308,7 +317,7 @@ export const intents: Intent[] = [
       "'Add AI' is the new 'make it pop.' A brief, but not a problem statement. I want to know: what would the user have done without it, and is this version actually better - or just more impressive at a demo?",
     ],
     followups: [
-      "Show me the Sprout AI component library",
+      "Show me the Sprout 2.0 design system work",
       "How does this show up in your actual work?",
       "What's your design process?",
     ],
