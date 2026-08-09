@@ -4,11 +4,9 @@ import { motion } from "framer-motion";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { knowledge } from "@/content/knowledge";
 
-const OPEN_TO = ["Senior IC roles", "Staff-level roles", "Complex enterprise", "AI tooling"];
-
 export function Hero() {
   const { identity } = knowledge;
-  const tagline = identity.oneLiner.replace(" — and", ". And");
+  const chars = identity.name.split("");
 
   return (
     <section className="min-h-screen flex flex-col lg:flex-row">
@@ -25,6 +23,7 @@ export function Hero() {
         />
 
         <div className="relative">
+          {/* Eyebrow + rule */}
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -41,63 +40,76 @@ export function Hero() {
             className="mt-2 h-px w-10 bg-[#C4654A]/35"
           />
 
+          {/* Name — character by character */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.1 }}
-            className="mt-3"
+            className="mt-4"
           >
-            <h1 className="text-4xl lg:text-[52px] font-bold text-[#1A1A1A] tracking-tight leading-[1.04] font-serif">
-              {identity.name}
+            <h1 className="text-4xl lg:text-[52px] font-bold text-[#1A1A1A] tracking-tight leading-[1.04] font-serif overflow-hidden">
+              {chars.map((char, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: "60%" }}
+                  animate={{ opacity: 1, y: "0%" }}
+                  transition={{
+                    duration: 0.4,
+                    delay: 0.16 + i * 0.028,
+                    ease: [0.25, 0, 0.1, 1],
+                  }}
+                  className={char === " " ? "inline-block w-[0.28em]" : "inline-block"}
+                >
+                  {char !== " " ? char : null}
+                </motion.span>
+              ))}
             </h1>
-            <p className="mt-2 text-sm text-[#1A1A1A]/40 font-medium tracking-[0.06em]">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="mt-2 text-sm text-[#1A1A1A]/40 font-medium tracking-[0.06em]"
+            >
               {identity.title}
-            </p>
+            </motion.p>
           </motion.div>
 
-          <p className="mt-6 text-[15px] text-[#1A1A1A]/60 leading-[1.85] max-w-[36ch]">
-            {tagline.split(" ").map((word, i) => (
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.26 + i * 0.038 }}
-                className="inline-block mr-[0.28em]"
-              >
-                {word}
-              </motion.span>
-            ))}
-          </p>
+          {/* Tagline — simple fade, no word animation */}
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.65 }}
+            className="mt-6 text-[15px] text-[#1A1A1A]/60 leading-[1.85] max-w-[36ch]"
+          >
+            {identity.oneLiner}
+          </motion.p>
 
+          {/* Now / Open — editorial two-liner replacing pills */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.38 }}
-            className="mt-8"
+            transition={{ delay: 0.82 }}
+            className="mt-8 space-y-1.5"
           >
-            <p className="text-[10px] font-semibold text-[#1A1A1A]/28 uppercase tracking-[0.18em] mb-3">
-              Currently open to
+            <p className="text-xs text-[#1A1A1A]/45 flex items-baseline gap-2.5">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#1A1A1A]/22 shrink-0">
+                Now
+              </span>
+              Qlik — unified data connections research
             </p>
-            <div className="flex flex-wrap gap-2">
-              {OPEN_TO.map((tag, i) => (
-                <motion.span
-                  key={tag}
-                  initial={{ opacity: 0, scale: 0.88 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.44 + i * 0.07, type: "spring", stiffness: 280, damping: 22 }}
-                  className="text-xs text-[#1A1A1A]/55 border border-[#1A1A1A]/10 rounded-full px-3 py-1 bg-white/50"
-                >
-                  {tag}
-                </motion.span>
-              ))}
-            </div>
+            <p className="text-xs text-[#1A1A1A]/45 flex items-baseline gap-2.5">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#1A1A1A]/22 shrink-0">
+                Open
+              </span>
+              Senior IC · Staff · enterprise or AI product
+            </p>
           </motion.div>
         </div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.72 }}
+          transition={{ delay: 0.9 }}
           className="mt-10 lg:mt-0 text-xs text-[#1A1A1A]/22 tracking-wide"
         >
           Scroll to see work below{" "}

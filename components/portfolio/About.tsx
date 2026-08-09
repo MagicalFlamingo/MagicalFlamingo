@@ -1,8 +1,50 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
 import { Download, ExternalLink } from "lucide-react";
 import { knowledge } from "@/content/knowledge";
+
+const STATS = [
+  { target: 8, suffix: "+", label: "years in product design" },
+  { target: 400, suffix: "K", label: "monthly users at Menora" },
+  { target: 95, suffix: "%", label: "conversion rate achieved" },
+];
+
+function StatItem({ target, suffix, label }: { target: number; suffix: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    const duration = 1100;
+    const steps = 32;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (step >= steps) {
+        clearInterval(timer);
+        setCount(target);
+      }
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [isInView, target]);
+
+  return (
+    <div ref={ref}>
+      <p className="text-2xl font-bold text-[#1A1A1A] font-serif tracking-tight tabular-nums">
+        {count}{suffix}
+      </p>
+      <p className="mt-0.5 text-[11px] text-[#1A1A1A]/40 leading-snug">
+        {label}
+      </p>
+    </div>
+  );
+}
 
 export function About() {
   const { identity } = knowledge;
@@ -29,19 +71,8 @@ export function About() {
           </p>
 
           <div className="mt-8 mb-2 grid grid-cols-3 gap-x-6 py-7 border-t border-b border-[#1A1A1A]/8 max-w-[36ch]">
-            {[
-              { number: "8+", label: "years in product design" },
-              { number: "400K", label: "monthly users at Menora" },
-              { number: "95%", label: "conversion rate achieved" },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl font-bold text-[#1A1A1A] font-serif tracking-tight">
-                  {stat.number}
-                </p>
-                <p className="mt-0.5 text-[11px] text-[#1A1A1A]/40 leading-snug">
-                  {stat.label}
-                </p>
-              </div>
+            {STATS.map((stat) => (
+              <StatItem key={stat.label} {...stat} />
             ))}
           </div>
 
