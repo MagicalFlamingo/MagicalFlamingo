@@ -9,9 +9,9 @@ export function Hero() {
   const chars = identity.name.split("");
 
   return (
-    <section className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left — identity */}
-      <div className="lg:w-[42%] flex flex-col justify-between px-8 pt-16 pb-10 lg:px-14 lg:pt-20 lg:pb-12 border-b lg:border-b-0 lg:border-r border-[#1A1A1A]/8 relative overflow-hidden">
+    <section className="flex flex-col lg:flex-row">
+      {/* Left — identity (desktop only) */}
+      <div className="hidden lg:flex lg:w-[42%] flex-col justify-between px-14 pt-20 pb-12 border-r border-[#1A1A1A]/8 relative overflow-hidden">
         {/* Decorative soft orbs */}
         <div
           className="absolute -top-20 -right-20 w-72 h-72 rounded-full pointer-events-none"
@@ -47,7 +47,7 @@ export function Hero() {
             transition={{ duration: 0.55, delay: 0.1 }}
             className="mt-4"
           >
-            <h1 className="text-4xl lg:text-[52px] font-bold text-[#1A1A1A] tracking-tight leading-[1.04] font-serif overflow-hidden">
+            <h1 className="text-[52px] font-bold text-[#1A1A1A] tracking-tight leading-[1.04] font-serif overflow-hidden">
               {chars.map((char, i) => (
                 <motion.span
                   key={i}
@@ -73,44 +73,13 @@ export function Hero() {
               {identity.title}
             </motion.p>
           </motion.div>
-
-          {/* Tagline — simple fade, no word animation */}
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.65 }}
-            className="mt-6 text-[15px] text-[#1A1A1A]/60 leading-[1.85] max-w-[36ch]"
-          >
-            {identity.oneLiner}
-          </motion.p>
-
-          {/* Now / Open — editorial two-liner replacing pills */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.82 }}
-            className="mt-8 space-y-1.5"
-          >
-            <p className="text-xs text-[#1A1A1A]/45 flex items-baseline gap-2.5">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#1A1A1A]/22 shrink-0">
-                Now
-              </span>
-              Qlik — unified data connections research
-            </p>
-            <p className="text-xs text-[#1A1A1A]/45 flex items-baseline gap-2.5">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#1A1A1A]/22 shrink-0">
-                Open
-              </span>
-              Senior IC · Staff · enterprise or AI product
-            </p>
-          </motion.div>
         </div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
-          className="mt-10 lg:mt-0 text-xs text-[#1A1A1A]/22 tracking-wide"
+          className="text-xs text-[#1A1A1A]/22 tracking-wide"
         >
           Scroll to see work below{" "}
           <motion.span
@@ -123,15 +92,39 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Right — chat */}
+      {/* Right — chat (full-screen on mobile) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex-1 flex flex-col"
-        style={{ height: "100vh" }}
+        className="flex-1 flex flex-col h-[100dvh]"
       >
-        <div className="px-8 lg:px-10 pt-10 lg:pt-14 pb-4 border-b border-[#1A1A1A]/8">
+        {/* Mobile header — name + title as agent identity */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="lg:hidden px-6 pt-10 pb-5 border-b border-[#1A1A1A]/8"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#59CB74] opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#59CB74]" />
+            </span>
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#1A1A1A]/35">
+              Portfolio
+            </p>
+          </div>
+          <h1 className="text-[28px] font-bold text-[#1A1A1A] font-serif tracking-tight leading-tight">
+            {identity.name}
+          </h1>
+          <p className="mt-1 text-sm text-[#1A1A1A]/40 font-medium tracking-[0.04em]">
+            {identity.title}
+          </p>
+        </motion.div>
+
+        {/* Desktop header */}
+        <div className="hidden lg:block px-10 pt-14 pb-4 border-b border-[#1A1A1A]/8">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#59CB74] opacity-60" />
@@ -145,6 +138,7 @@ export function Hero() {
             Talk to the portfolio directly. Ask about her work, process, or background.
           </p>
         </div>
+
         <div className="flex-1 overflow-hidden min-h-0">
           <ChatInterface />
         </div>

@@ -24,9 +24,10 @@ export function pick<T>(arr: T[]): T {
 export const fallbackResponses: string[] = [
   "I can cover the case studies, research approach, working style, or career background. What's most relevant to what you're evaluating?",
   "That's a bit outside what I can answer here — try asking about a specific project, how I work, or what I'd do in the first 30 days.",
-  "I'm not reading that clearly — rephrase it and I'll give it another shot. Or pick one of the topics below.",
+  "Not quite landing for me — try rephrasing, or pick one of the prompts below and I'll run with it.",
   "Not sure I caught that. I can tell you about Qlik, AWS, my research process, or the art history angle — whichever is most relevant.",
   "I'm set up to answer questions about work, process, and background. What are you trying to figure out?",
+  "I have opinions on most things design-related, but I'm blanking on that one. Try something in the chips below.",
 ];
 
 export const fallbackFollowups: string[] = [
@@ -38,7 +39,7 @@ export const fallbackFollowups: string[] = [
 ];
 
 export const intents: Intent[] = [
-  // ── CASE STUDIES ──────────────────────────────────────────────────────────
+  // ── CASE STUDIES ─────────────────────────────────────────────────────────
 
   {
     id: "qlik",
@@ -62,7 +63,7 @@ export const intents: Intent[] = [
   {
     id: "aws",
     keywords: ["aws", "amazon", "resilience hub", "resiliency", "resiliency score", "disaster recovery", "cloud resilience", "resilience"],
-    weights: { aws: 4, amazon: 3, "resilience hub": 5, "resiliency score": 5, resiliency: 3 },
+    weights: { aws: 4, amazon: 3, "resilience hub": 5, "resiliency score": 5, resiliency: 3, "resilience hub": 4 },
     responses: [
       "AWS Resilience Hub showed customers a number — 13% — and expected them to act on it. They didn't, because the number had nothing to say.",
       "The resiliency score problem was a trust problem before it was a UI problem. Walk through it here.",
@@ -96,7 +97,7 @@ export const intents: Intent[] = [
     ],
   },
 
-  // ── PROCESS & METHODS ─────────────────────────────────────────────────────
+  // ── PROCESS & METHODS ───────────────────────────────────────────────────
 
   {
     id: "research",
@@ -131,16 +132,16 @@ export const intents: Intent[] = [
     ],
   },
 
-  // ── IDENTITY & BACKGROUND ─────────────────────────────────────────────────
+  // ── IDENTITY & BACKGROUND ───────────────────────────────────────────────
 
   {
     id: "background",
-    keywords: ["art history", "background", "leiden", "education", "degree", "academic", "transition", "how did you get into", "museum", "interior design"],
+    keywords: ["art history", "background", "leiden", "education", "degree", "academic", "transition", "how did you get into", "art", "museum", "interior design"],
     weights: { "art history": 5, leiden: 4, museum: 2, background: 1, education: 1, "interior design": 3 },
     responses: [
       "Art history is fundamentally about reading objects — understanding what a thing is communicating, to whom, and why it was made that way. That's UX design. The tools are different; the question is exactly the same.",
       "The clearest example: the AWS resiliency score showed users '13%' with no context. As a number, it's fine. As a communication artifact, it's saying 'we don't think you need to understand this.' That's a very art-history way to read a UI — and the research confirmed that's how users felt.",
-      "MA in Art History from Leiden University, then interior design, then UX. Each step builds the same muscle: reading how designed things communicate to the people who interact with them.",
+      "MA in Art History from Leiden, then interior design, then UX. There are more direct routes into product design. I chose the scenic one — and it turns out reading how objects communicate to people is the whole job, just with a different set of objects.",
     ],
     followups: [
       "How does this show up in your actual work?",
@@ -171,9 +172,9 @@ export const intents: Intent[] = [
     keywords: ["honest", "gap", "weakness", "haven't done", "growth area", "not done", "missing", "what you lack", "don't have", "limitations"],
     weights: { honest: 3, gap: 2, weakness: 3, "haven't done": 4, "growth area": 4, "don't have": 3 },
     responses: [
-      "I haven't managed other designers. I've led cross-functional projects and coordinated across multiple product teams simultaneously, but no direct reports. If that's important to the role, worth naming.",
+      "No direct reports. I've led cross-functional work across four product teams at once, but I've never managed a designer's career. If that's a requirement for the role, better to name it early.",
       "Mobile-first consumer product is something I haven't owned end-to-end. The Menora work touched it — 400K monthly users — but the design constraints were enterprise-shaped even in a consumer context.",
-      "I haven't shipped something that failed publicly. That sounds like a brag, but it's actually a gap — I've never had to do a full post-mortem on a missed feature in production. I'd like to know what that teaches you.",
+      "I haven't shipped something that failed publicly. That sounds like a flex — it's actually a gap. I've never had to run a post-mortem on a feature that missed in production, and I'm curious what that teaches you that success doesn't.",
     ],
     followups: [
       "What makes you different from other senior designers?",
@@ -198,7 +199,7 @@ export const intents: Intent[] = [
     ],
   },
 
-  // ── SKILLS & TOOLS ────────────────────────────────────────────────────────
+  // ── SKILLS & TOOLS ──────────────────────────────────────────────────────
 
   {
     id: "skills",
@@ -295,7 +296,7 @@ export const intents: Intent[] = [
     ],
   },
 
-  // ── AI & DESIGN ───────────────────────────────────────────────────────────
+  // ── AI & DESIGN ────────────────────────────────────────────────────────────
 
   {
     id: "ai_design",
@@ -304,7 +305,7 @@ export const intents: Intent[] = [
     responses: [
       "My honest take: AI is most valuable in product design where the user is stuck in a loop they didn't choose — error states, onboarding, configuration complexity. Places where a human would normally give up or call support.",
       "I think a lot about trust calibration in AI interfaces — when should a user trust an AI suggestion and when should they verify it? That should be a deliberate design decision, not a default.",
-      "The novelty argument for AI worries me. 'Add AI' as a brief tells you nothing about what problem it's solving for the user. I want to know: what would the user have done without it, and is this actually better?",
+      "'Add AI' is the new 'make it pop.' A brief, but not a problem statement. I want to know: what would the user have done without it, and is this version actually better — or just more impressive at a demo?",
     ],
     followups: [
       "Show me the Sprout AI component library",
@@ -364,7 +365,7 @@ export const intents: Intent[] = [
 
   {
     id: "availability",
-    keywords: ["available", "availability", "open to work", "looking for", "opportunity", "when can you start", "actively looking"],
+    keywords: ["available", "availability", "open to work", "looking for", "open to roles", "opportunity", "when can you start", "actively looking"],
     weights: { "open to work": 5, "looking for": 4, availability: 3, "when can you start": 5, "actively looking": 5, opportunity: 2 },
     responses: [
       "Currently at Qlik. Actively exploring what's next — Senior IC or Staff-level, ideally working on a product with real design complexity.",
@@ -396,8 +397,8 @@ export const intents: Intent[] = [
     keywords: ["salary", "compensation", "pay", "rate", "package", "expectations", "how much", "what do you earn"],
     weights: { salary: 5, compensation: 5, "how much": 4, "what do you earn": 5, package: 3, rate: 2 },
     responses: [
-      "Happy to discuss compensation in a conversation — it depends on role, scope, and location. goldanielle@gmail.com is the right place for that.",
-      "That's a conversation for direct contact rather than here. goldanielle@gmail.com — I'll respond.",
+      "That's a conversation for direct contact. goldanielle@gmail.com — I'll respond faster than a recruiter portal.",
+      "Depends on role, scope, and location — happy to discuss over email. goldanielle@gmail.com. More useful than a number without context.",
     ],
     followups: [
       "What roles are you open to?",
@@ -407,11 +408,11 @@ export const intents: Intent[] = [
 
   {
     id: "portfolio_meta",
-    keywords: ["this website", "how is this built", "how does this work", "how did you make", "next.js", "how does the chat work"],
+    keywords: ["this website", "how is this built", "how does this work", "how did you make", "next.js", "no ai", "how does the chat work"],
     weights: { "this website": 5, "how is this built": 5, "how does this work": 5, "how did you make": 5, "next.js": 3, "how does the chat work": 5 },
     responses: [
-      "This portfolio is built in Next.js. The chat runs a local intent-matching system — no AI API calls. Every response is written, not generated. The components (FrameCarousel, SkillsMap, etc.) render from structured case study data.",
-      "The chat here doesn't call an AI model — it's a keyword-scoring system backed by hand-written responses. Faster, cheaper, and more honest about what it is.",
+      "Built in Next.js. The chat runs a local keyword-scoring system — no LLM calls, no hallucinations, no mysterious refusals. Every response is hand-written, which is technically the most labor-intensive way to avoid updating a LinkedIn profile.",
+      "No AI behind this — it's a keyword scorer backed by hand-written response pools. Fast, honest about what it is, and will never confidently tell you something I didn't actually think through. Tradeoffs.",
     ],
     followups: [
       "Tell me about your Sprout design system work",
