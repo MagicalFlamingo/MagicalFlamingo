@@ -33,7 +33,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full bg-[#F7F6F3] md:cursor-none">
+      <body className="min-h-full bg-[#FAF3E7] md:cursor-none">
         <CursorDot />
         {children}
       </body>

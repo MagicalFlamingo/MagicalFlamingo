@@ -102,7 +102,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-[#1A1A1A]/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#211D1D]/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -112,14 +112,14 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 16 }}
         transition={{ duration: 0.25 }}
-        className="relative z-10 w-full max-w-2xl bg-[#F7F6F3] rounded-2xl overflow-hidden shadow-2xl"
+        className="relative z-10 w-full max-w-2xl bg-[#FAF3E7] rounded-2xl overflow-hidden shadow-2xl"
       >
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-[#1A1A1A]/8 hover:bg-[#1A1A1A]/15 flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-[#211D1D]/8 hover:bg-[#211D1D]/15 flex items-center justify-center transition-colors"
         >
-          <X className="h-4 w-4 text-[#1A1A1A]/60" />
+          <X className="h-4 w-4 text-[#211D1D]/60" />
         </button>
 
         {/* Header */}
@@ -127,13 +127,13 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
           className="px-7 pt-7 pb-5"
           style={{ borderTopColor: study.color, borderTopWidth: 4 }}
         >
-          <p className="text-xs font-medium uppercase tracking-wider text-[#1A1A1A]/40">
+          <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
             {study.company}
           </p>
-          <h2 className="mt-1 text-2xl font-bold text-[#1A1A1A] tracking-tight font-serif">
+          <h2 className="mt-1 text-2xl font-bold text-[#211D1D] tracking-tight font-serif">
             {study.title}
           </h2>
-          <p className="mt-1 text-sm text-[#1A1A1A]/50">{study.hook.headline}</p>
+          <p className="mt-1 text-sm text-[#211D1D]/50">{study.hook.headline}</p>
 
           {/* Step pills */}
           <div className="flex gap-2 mt-5 overflow-x-auto pb-0.5 scrollbar-none">
@@ -143,8 +143,8 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                 onClick={() => go(i)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 border ${
                   i === current
-                    ? "border-transparent bg-[#1A1A1A] text-white"
-                    : "border-[#1A1A1A]/12 text-[#1A1A1A]/50 hover:text-[#1A1A1A]/80 bg-white"
+                    ? "border-transparent bg-[#211D1D] text-white"
+                    : "border-[#211D1D]/12 text-[#211D1D]/50 hover:text-[#211D1D]/80 bg-[#FFFDF9]"
                 }`}
               >
                 <span className="text-[10px]">{FRAME_ICONS[f.label] ?? "·"}</span>
@@ -155,7 +155,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
         </div>
 
         {/* Frame */}
-        <div className="relative overflow-hidden bg-white" style={{ minHeight: 260 }}>
+        <div className="relative overflow-hidden bg-[#FFFDF9]" style={{ minHeight: 260 }}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={current}
@@ -167,42 +167,42 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
             >
               {frame.nda ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-[#1A1A1A]/40">
+                  <div className="flex items-center gap-2 text-[#211D1D]/40">
                     <Lock className="h-4 w-4" />
                     <span className="text-xs font-semibold uppercase tracking-wider">
                       NDA applies
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-[#1A1A1A] leading-snug font-serif">
+                  <h3 className="text-xl font-bold text-[#211D1D] leading-snug font-serif">
                     {frame.headline}
                   </h3>
-                  <p className="text-[15px] text-[#1A1A1A]/60 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-[15px] text-[#211D1D]/60 leading-relaxed whitespace-pre-wrap">
                     {frame.body}
                   </p>
                   {frame.extra && (
-                    <p className="text-xs text-[#1A1A1A]/40 italic mt-2">
+                    <p className="text-xs text-[#211D1D]/40 italic mt-2">
                       {frame.extra}
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#C4654A]">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C1502D]">
                     {frame.label}
                   </p>
-                  <h3 className="text-xl font-bold text-[#1A1A1A] leading-snug font-serif">
+                  <h3 className="text-xl font-bold text-[#211D1D] leading-snug font-serif">
                     {frame.headline}
                   </h3>
-                  <p className="text-[15px] text-[#1A1A1A]/60 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-[15px] text-[#211D1D]/60 leading-relaxed whitespace-pre-wrap">
                     {frame.body}
                   </p>
                   {frame.quote && (
-                    <p className="text-sm text-[#1A1A1A]/50 italic border-l-2 border-[#C4654A]/30 pl-3 leading-relaxed">
+                    <p className="text-sm text-[#211D1D]/50 italic border-l-2 border-[#C1502D]/30 pl-3 leading-relaxed">
                       {frame.quote}
                     </p>
                   )}
                   {frame.extra && (
-                    <p className="text-xs text-[#1A1A1A]/45 italic border-t border-[#1A1A1A]/8 pt-3 mt-3">
+                    <p className="text-xs text-[#211D1D]/45 italic border-t border-[#211D1D]/8 pt-3 mt-3">
                       {frame.extra}
                     </p>
                   )}
@@ -213,11 +213,11 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
         </div>
 
         {/* Nav */}
-        <div className="flex items-center justify-between px-7 py-4 border-t border-[#1A1A1A]/8">
+        <div className="flex items-center justify-between px-7 py-4 border-t border-[#211D1D]/8">
           <button
             onClick={() => go(Math.max(0, current - 1))}
             disabled={current === 0}
-            className="flex items-center gap-1.5 text-sm text-[#1A1A1A]/50 hover:text-[#1A1A1A] disabled:opacity-30 transition-colors font-medium"
+            className="flex items-center gap-1.5 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors font-medium"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
           </button>
@@ -229,8 +229,8 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
                 onClick={() => go(i)}
                 className={`rounded-full transition-all duration-150 ${
                   i === current
-                    ? "bg-[#C4654A] w-5 h-1.5"
-                    : "bg-[#1A1A1A]/15 w-1.5 h-1.5"
+                    ? "bg-[#C1502D] w-5 h-1.5"
+                    : "bg-[#211D1D]/15 w-1.5 h-1.5"
                 }`}
               />
             ))}
@@ -239,7 +239,7 @@ export function CaseStudyModal({ project, onClose }: CaseStudyModalProps) {
           <button
             onClick={() => go(Math.min(frames.length - 1, current + 1))}
             disabled={current === frames.length - 1}
-            className="flex items-center gap-1.5 text-sm text-[#1A1A1A]/50 hover:text-[#1A1A1A] disabled:opacity-30 transition-colors font-medium"
+            className="flex items-center gap-1.5 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors font-medium"
           >
             Next <ChevronRight className="h-4 w-4" />
           </button>

@@ -230,7 +230,7 @@ export const knowledge = {
       year: "2025",
       role: "Lead Designer — Design System, AI Component Library",
       ndaLevel: "low" as const,
-      color: "#59CB74",
+      color: "#B08D57",
       accentColor: "#F0FBF2",
 
       hook: {
