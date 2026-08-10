@@ -15,7 +15,12 @@ interface CaseStudyBeatProps {
 type BeatData = {
   label: string;
   headline: string;
-  body: string;
+  paragraphs: string[];
+  // Structured list (Friction's problems, Impact's outcomes) - kept as a
+  // real array instead of a joined "• x\n• y" string, so it can render as
+  // an actual editorial list instead of a bullet-dotted paragraph. See
+  // council round 12: "still a lot of text, make it more editorial."
+  list?: string[];
   nda?: boolean;
   quote?: string;
   extra?: string;
@@ -25,15 +30,24 @@ type BeatData = {
   visual?: FrameVisual;
 };
 
-function clean(s: string) {
-  return s.replace(/[ \t]{2,}/g, " ").replace(/\n[ \t]+/g, "\n").trim();
+function paragraphsOf(s: string): string[] {
+  return s.split(/\n\n+/).map((p) => p.replace(/[ \t]{2,}/g, " ").replace(/\n[ \t]+/g, " ").trim()).filter(Boolean);
+}
+
+// Pulls the first sentence off a paragraph so it can be set larger/bolder
+// as a lede - the classic editorial device that gives an eye somewhere to
+// land instead of one uniform block of body text. Falls back to the whole
+// paragraph if there's no clean sentence break.
+function splitLede(paragraph: string): { lede: string; rest: string } {
+  const match = paragraph.match(/^(.+?[.!?])(\s+|$)/);
+  if (!match) return { lede: paragraph, rest: "" };
+  return { lede: match[1], rest: paragraph.slice(match[0].length) };
 }
 
 // Same renderVisual as before - see the "Visual system" comment above
-// FrameVisual in knowledge.ts. Unchanged by the chat-native rebuild
-// (council round 11): the diagrams themselves tested fine, only the
-// container they lived in (a paginated multi-beat card, then a single
-// long scroll) was ever the problem.
+// FrameVisual in knowledge.ts. Unchanged by the editorial pass: the
+// diagrams themselves already tested well, only the surrounding text
+// needed real typographic hierarchy.
 function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   switch (visual.kind) {
     case "bareStat":
@@ -153,31 +167,67 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   }
 }
 
+// Renders body prose with an editorial "lede" - the first sentence of the
+// first paragraph set larger and bolder, so a scanning reader's eye has
+// somewhere to land before committing to the full paragraph. Subsequent
+// paragraphs stay at normal body size/weight.
+function EditorialProse({ paragraphs }: { paragraphs: string[] }) {
+  if (paragraphs.length === 0) return null;
+  const [first, ...rest] = paragraphs;
+  const { lede, rest: firstRest } = splitLede(first);
+  return (
+    <div className="space-y-3">
+      <p className="text-[15px] leading-relaxed text-[#211D1D]">
+        <span className="font-medium">{lede}</span>
+        {firstRest && <span className="text-[#211D1D]/65"> {firstRest}</span>}
+      </p>
+      {rest.map((p, i) => (
+        <p key={i} className="text-sm leading-relaxed text-[#211D1D]/65">{p}</p>
+      ))}
+    </div>
+  );
+}
+
+// A real editorial list - each point on its own line with room to
+// breathe, a small serif ordinal instead of a bullet dot, rather than a
+// single paragraph of "• x\n• y" that reads as one dense block.
+function EditorialList({ items, color }: { items: string[]; color: string }) {
+  return (
+    <ol className="space-y-3">
+      {items.map((item, i) => (
+        <li key={item} className="flex gap-3">
+          <span className="font-serif text-sm font-semibold shrink-0 w-4" style={{ color }}>{i + 1}</span>
+          <span className="text-sm leading-relaxed text-[#211D1D]/70">{item}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
   switch (beat) {
     case "hook":
-      return { label: "Hook", headline: study.hook.headline, body: clean(study.hook.context), extra: study.hook.scale, image: study.hook.image, visual: study.hook.visual };
+      return { label: "Hook", headline: study.hook.headline, paragraphs: paragraphsOf(study.hook.context), extra: study.hook.scale, image: study.hook.image, visual: study.hook.visual };
     case "friction":
-      return { label: "Friction", headline: study.friction.headline, body: study.friction.problems.slice(0, 4).map((p) => `• ${p}`).join("\n"), quote: study.friction.userVoice?.[0], extra: study.friction.researchMethod, image: study.friction.image, visual: study.friction.visual };
+      return { label: "Friction", headline: study.friction.headline, paragraphs: [], list: study.friction.problems.slice(0, 4), quote: study.friction.userVoice?.[0], extra: study.friction.researchMethod, image: study.friction.image, visual: study.friction.visual };
     case "pivot":
       if (!study.pivot) return null;
-      return { label: "Pivot", headline: study.pivot.headline, body: clean(study.pivot.insight), extra: study.pivot.designDecision, image: study.pivot.image };
+      return { label: "Pivot", headline: study.pivot.headline, paragraphs: paragraphsOf(study.pivot.insight), extra: study.pivot.designDecision, image: study.pivot.image };
     case "solution":
-      return { label: "Solution", headline: study.solution.headline, body: "", features: study.solution.features.slice(0, 2), nda: study.ndaLevel === "partial", image: study.solution.image, visual: study.solution.visual };
+      return { label: "Solution", headline: study.solution.headline, paragraphs: [], features: study.solution.features.slice(0, 2), nda: study.ndaLevel === "partial", image: study.solution.image, visual: study.solution.visual };
     case "impact":
-      return { label: "Impact", headline: study.impact.headline, body: study.impact.outcomes.slice(0, 4).map((o) => `• ${o}`).join("\n"), extra: `What I'd do differently: ${study.impact.whatIDifferently}`, image: study.impact.image, status: study.impact.status, visual: study.impact.visual };
+      return { label: "Impact", headline: study.impact.headline, paragraphs: [], list: study.impact.outcomes.slice(0, 4), extra: `What I'd do differently: ${study.impact.whatIDifferently}`, image: study.impact.image, status: study.impact.status, visual: study.impact.visual };
   }
 }
 
 // Renders exactly ONE narrative beat of a case study, as its own
 // self-contained chat-message attachment - no pagination, no multi-beat
-// card, no "1 of 5" anything. Council round 11: two earlier attempts
-// (a paginated slideshow card, then a single long continuous scroll)
-// were both rejected. The actual fix was structural, not visual - a case
-// study should exist as separate chat turns the way any other multi-part
-// answer in this chat does, each with its own message, its own diagram,
-// its own followups, letting a visitor type a real question or click
-// "continue" at every step instead of consuming a bundled artifact.
+// card. Council round 11 made this chat-native (each beat its own message,
+// same as any other multi-part answer in this chat); round 12 made the
+// prose inside it editorial - a lede sentence set apart from the rest of
+// each paragraph, real numbered lists instead of bullet-dotted blocks, and
+// a genuine pull-quote instead of a quiet italic footnote, so a beat with
+// no diagram doesn't just read as a wall of text.
 export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
   const study = knowledge.caseStudies[project] as CaseStudy;
   const data = buildBeat(study, beat);
@@ -223,11 +273,11 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
             )}
             {data.visual && <div className="w-full -mx-5 mb-4 overflow-hidden" style={{ width: "calc(100% + 2.5rem)" }}>{renderVisual(data.visual, study.color, study.accentColor)}</div>}
             {data.features && (
-              <div className="w-full space-y-2.5 mt-1">
+              <div className="w-full space-y-3.5 mt-1">
                 {data.features.map((f) => (
                   <div key={f.name}>
-                    <p className="text-xs font-semibold text-[#211D1D]/70">{f.name}</p>
-                    <p className="text-sm text-[#211D1D]/60 leading-relaxed">{f.description}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: study.color }}>{f.name}</p>
+                    <p className="text-sm text-[#211D1D]/65 leading-relaxed mt-0.5">{f.description}</p>
                   </div>
                 ))}
               </div>
@@ -254,25 +304,33 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
             )}
             {data.visual && <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
             {data.features ? (
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {data.features.map((f) => (
                   <div key={f.name}>
-                    <p className="text-sm font-semibold text-[#211D1D]/80">{f.name}</p>
-                    <p className="text-sm text-[#211D1D]/60 leading-relaxed">{f.description}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: study.color }}>{f.name}</p>
+                    <p className="text-sm text-[#211D1D]/65 leading-relaxed mt-0.5">{f.description}</p>
                   </div>
                 ))}
               </div>
+            ) : data.list ? (
+              <EditorialList items={data.list} color={study.color} />
             ) : (
-              <p className="text-sm text-[#211D1D]/65 leading-relaxed whitespace-pre-wrap">{data.body}</p>
+              <EditorialProse paragraphs={data.paragraphs} />
             )}
             {data.quote && (
-              <p className="mt-3 text-xs text-[#211D1D]/50 italic border-l-2 border-[#2E9B5C]/30 pl-3 leading-relaxed">{data.quote}</p>
+              // A real pull-quote, not a quiet italic footnote - large
+              // serif, its own visual weight, since a direct user quote
+              // is exactly the kind of concrete, credible detail an
+              // editorial piece would pull out and set apart.
+              <p className="mt-5 font-serif text-lg leading-snug text-[#211D1D]" style={{ borderLeft: `3px solid ${study.color}`, paddingLeft: "1rem" }}>
+                &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
+              </p>
             )}
             {data.extra && (
               data.label === "Hook" ? (
                 <p className="mt-4 text-xs font-medium text-[#211D1D]/75 leading-relaxed bg-[#F2A93C]/12 border-l-2 border-[#F2A93C] rounded-r px-3 py-2">{data.extra}</p>
               ) : (
-                <p className="mt-3 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">{data.extra}</p>
+                <p className="mt-4 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">{data.extra}</p>
               )
             )}
           </div>
