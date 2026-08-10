@@ -82,9 +82,9 @@ export const intents: Intent[] = [
     keywords: ["qlik", "data catalog", "data connection", "data governance", "connections", "unified connections", "platform"],
     weights: { qlik: 4, "data catalog": 3, "data connection": 3, "data governance": 2, "unified connections": 4 },
     responses: [
-      "Qlik is the most complex problem I've worked on - four product lines, no shared way to manage the same data connection, used by data engineers, analysts, automation specialists, and Talend Studio developers across enterprise organizations globally. Here's the full story:",
-      "The Qlik project starts with a question real users were asking without knowing how to ask it: why do I have to connect to the same database three times? This is a platform used globally by data engineers, analysts, and automation specialists, so it's not a small edge case.",
-      "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing - and where getting it wrong affects data engineers and analysts across enterprise organizations, not just one team.",
+      "Qlik is the most complex problem I've worked on - four product lines, no shared way to manage the same data connection. Here's the story:",
+      "The Qlik project starts with a question real users were asking without knowing how to ask it: why do I have to connect to the same database three times?",
+      "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "hook" } },
     // Council round 11: this used to open the full multi-step carousel -
@@ -104,7 +104,7 @@ export const intents: Intent[] = [
     keywords: ["biggest friction", "friction at qlik", "what was the friction", "qlik problems", "qlik pain point"],
     weights: { "biggest friction": 6, "friction at qlik": 6, "what was the friction": 5 },
     responses: [
-      "The concrete one: users were creating the same connection over and over without knowing it. No cross-product search, duplicate connections proliferating with no warning, permission models that varied wildly by product - an admin in Analytics had no visibility in Integration. One user told us: \"I created a duplicate Snowflake connection without realizing an equivalent one already existed.\"",
+      "The concrete one: users were creating the same connection over and over without knowing it.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "friction" } },
     followups: [
@@ -119,7 +119,7 @@ export const intents: Intent[] = [
     keywords: ["research uncover", "qlik pivot", "technical constraint", "what changed the design strategy", "qlik insight"],
     weights: { "research uncover": 6, "qlik pivot": 6, "technical constraint": 5, "what changed the design strategy": 5 },
     responses: [
-      "A real one: a Talend Studio \"connection\" isn't the same technical object as a Qlik Cloud connection - it's a context variable that only resolves when a job actually runs, so there's no live \"test connection\" button for it. That meant the unification vision had a genuine architectural boundary running through it. Rather than pretend the constraint didn't exist, we documented it and built it into the design: Talend Studio connections get visual differentiation within the unified view.",
+      "A real one: a Talend Studio \"connection\" isn't the same technical object as a Qlik Cloud connection.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "pivot" } },
     followups: [
@@ -134,7 +134,7 @@ export const intents: Intent[] = [
     keywords: ["what did you actually build", "qlik solution", "unified browse view", "qlik creation flow", "what did you ship on qlik"],
     weights: { "what did you actually build": 6, "qlik solution": 6, "unified browse view": 5 },
     responses: [
-      "A unified browse view and creation flow that works for both ends of the experience spectrum: one browsable surface for every connection type with an environment selector (Dev/Staging/Prod) as a persistent filter, plus an in-context creation flow you can launch from anywhere in the platform - the use case is pre-filled from where you started, and you land back where you started when you're done.",
+      "A unified browse view and creation flow that works for both ends of the experience spectrum.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "solution" } },
     followups: [
@@ -163,7 +163,7 @@ export const intents: Intent[] = [
     keywords: ["actual impact of this research", "impact of the qlik", "did the qlik research pay off", "impact of this research", "qlik impact", "did it work on qlik"],
     weights: { "actual impact of this research": 6, "impact of the qlik": 5, "impact of this research": 5, "qlik impact": 5 },
     responses: [
-      "It's not shipped yet - still active development - but the signal is real: after Iteration 2, participants sent back detailed, specific written feedback completely unprompted. All three Automation group testers independently named the same missing feature without being asked. And we caught a real architectural gap - no equivalent to an environment selector existed in Data Integration - before it turned into an expensive rework. Research shaping the roadmap before a single screen ships is the actual win here.",
+      "It's not shipped yet - still active development - but the signal is real.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "impact" } },
     // Impact is the terminal node in this chain - a visitor here has
@@ -200,7 +200,7 @@ export const intents: Intent[] = [
     keywords: ["why didn't people trust", "aws trust problem", "aws friction", "trust your evaluation", "aws confused users"],
     weights: { "why didn't people trust": 6, "aws trust problem": 6, "aws friction": 5 },
     responses: [
-      "It undermined its own credibility. No component breakdown, no explanation of how it was calculated, and the one call to action - a documentation link - didn't tell you what to actually do. Real feedback from the research: \"It is not clear to me how Resilience Hub calculated those numbers,\" and \"At best the score was ignored. At worst it undermines the service credibility.\" High support ticket volume confirmed it wasn't just a couple of confused users.",
+      "It undermined its own credibility - no breakdown, no explanation, and the one call to action didn't say what to actually do.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "aws", beat: "friction" } },
     followups: [
@@ -215,7 +215,7 @@ export const intents: Intent[] = [
     keywords: ["actual insight", "aws pivot", "score had nothing to say", "aws design objectives"],
     weights: { "actual insight": 6, "aws pivot": 6, "score had nothing to say": 6 },
     responses: [
-      "The score is a proprietary calculation of four components - RTO/RPO compliance, alarms, SOPs, and FIS experiments. Users didn't need a different score, they needed to see what was inside it and then do something about it. That reframed the brief: build trust through transparency into the calculation, show a trend over time, don't just tell - show actionable next steps, and drop the % framing since \"points\" reads as more honest about there being room to improve.",
+      "Users didn't need a different score - they needed to see what was inside it, and then do something about it.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "aws", beat: "pivot" } },
     followups: [
@@ -230,7 +230,7 @@ export const intents: Intent[] = [
     keywords: ["redesign actually change", "what changed on aws", "aws before and after", "score as points"],
     weights: { "redesign actually change": 6, "what changed on aws": 5 },
     responses: [
-      "Five concrete things: score shown as points (67/100) instead of percentage - 100% implied you were done, points imply there's room to move. A two-tab widget - Action Items with direct links to fix each gap, Score Breakdown showing each component as a fraction. A trend chart with a plain-language callout ('increased by 12% over the past year'). A policy-breach breakdown by layer. And role-aware defaults - a DevOps engineer sees Action Items first, a portfolio manager sees the trend.",
+      "Five concrete things changed, starting with the score itself: points instead of a percentage.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "aws", beat: "solution" } },
     followups: [
@@ -245,7 +245,7 @@ export const intents: Intent[] = [
     keywords: ["measure success on aws", "aws results", "aws outcome", "did it work on aws"],
     weights: { "measure success on aws": 6, "aws results": 4 },
     responses: [
-      "It shipped and is live in AWS Resilience Hub today. Support ticket volume on 'what does my resiliency score mean?' dropped substantially after launch, and adoption of the feature increased - people went from ignoring the score to acting on it. I don't have exact numbers I can share from that employer, but the internal signal was unambiguous. If I did it again, I'd instrument success metrics before launch instead of after - ticket deflection rate and score engagement rate should've been agreed with the PM up front.",
+      "It shipped and is live in AWS Resilience Hub today - and the signal since launch has been unambiguous.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "aws", beat: "impact" } },
     // Terminal node, same treatment as qlik_impact - no backlink to
@@ -280,7 +280,7 @@ export const intents: Intent[] = [
     keywords: ["friction without a design system", "sprout friction", "no shared components", "sprout tokens hardcoded"],
     weights: { "friction without a design system": 6, "sprout friction": 6, "no shared components": 5 },
     responses: [
-      "No shared token set, so colors and spacing were hardcoded per screen and drifted from spec over time - the same 'brand blue' ended up hardcoded five different ways across five screens. Search, filters, and toggles were each built ad hoc with inconsistent radius and focus states. Selection and status states had no single source of truth, and handing off to engineering meant re-explaining the same interaction rules on every new screen.",
+      "No shared token set, so colors and spacing were hardcoded per screen and drifted from spec over time.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "sprout", beat: "friction" } },
     followups: [
@@ -294,7 +294,7 @@ export const intents: Intent[] = [
     keywords: ["components did you rebuild", "sprout components", "which components", "component audit against spec"],
     weights: { "components did you rebuild": 6, "sprout components": 5 },
     responses: [
-      "Search, filter pills, switches, and badges - rebuilt to match the Sprout 2.0 spec exactly: radius, focus states, spacing. Plus a token-first refactor replacing hardcoded hex values with the real token set, and shared shell integration so the wizard and the browse table use one sidebar/topbar instead of each screen owning its own.",
+      "Search, filter pills, switches, and badges - rebuilt to match the Sprout 2.0 spec exactly.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "sprout", beat: "solution" } },
     followups: [
@@ -309,7 +309,7 @@ export const intents: Intent[] = [
     keywords: ["actual impact of the design system", "sprout impact", "did sprout work", "sprout results"],
     weights: { "actual impact of the design system": 6, "sprout impact": 6 },
     responses: [
-      "In progress, same as the connections work it underpins - but already real: hardcoded color and spacing values are gone in favor of an actual token set, component behavior is now consistent across the wizard and the browse table, and handoff to engineering is faster since components are documented against spec instead of re-explained per screen. If I did it again, I'd start the token audit before the first wizard screen was built, not after - retrofitting a design system onto existing screens costs more than building on it from day one.",
+      "In progress, same as the connections work it underpins - but already real.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "sprout", beat: "impact" } },
     followups: [
