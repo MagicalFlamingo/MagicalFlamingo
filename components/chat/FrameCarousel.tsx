@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { knowledge, type CaseStudyId, type CaseStudy, type CaseStudyImage } from "@/content/knowledge";
+import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
+import { knowledge, type CaseStudyId, type CaseStudy, type CaseStudyImage, type FrameVisual } from "@/content/knowledge";
 
 const FRAME_ICONS: Record<string, string> = {
   Hook: "○",
@@ -31,10 +31,48 @@ type FrameData = {
   // a wall of prose. See council round 5.
   features?: { name: string; description: string }[];
   status?: string;
+  visual?: FrameVisual;
 };
 
 function clean(s: string) {
   return s.replace(/[ \t]{2,}/g, " ").replace(/\n[ \t]+/g, "\n").trim();
+}
+
+// Renders a FrameVisual - an honest, real-data diagram for a frame with
+// no usable screenshot, in the site's own visual language (paper card,
+// ink text, green accent). Not styled to resemble the actual product's
+// UI chrome - it should read as "a diagram Danielle made to explain her
+// work," never as a recreated screenshot standing in for a real one.
+function renderVisual(visual: FrameVisual) {
+  if (visual.kind === "bareStat") {
+    return (
+      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9 flex flex-col items-center text-center">
+        <span className="font-serif text-6xl font-bold text-[#211D1D]">{visual.value}</span>
+        <span className="mt-3 text-xs text-[#211D1D]/40 tracking-wide">{visual.caption}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
+      <span className="font-serif text-3xl font-bold text-[#211D1D]">{visual.value}</span>
+      <div className="mt-4 space-y-3">
+        {visual.rows.map((row) => (
+          <div key={row.label}>
+            <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
+              <span>{row.label}</span>
+              <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-[#211D1D]/8 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[#2E9B5C]"
+                style={{ width: `${(row.score / row.max) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function buildFrames(study: CaseStudy): FrameData[] {
@@ -45,6 +83,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       body: clean(study.hook.context),
       extra: study.hook.scale,
       image: study.hook.image,
+      visual: study.hook.visual,
     },
     {
       label: "Friction",
@@ -72,6 +111,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
     features: study.solution.features.slice(0, 2),
     nda: study.ndaLevel === "partial",
     image: study.solution.image,
+    visual: study.solution.visual,
   });
 
   frames.push({
@@ -91,6 +131,22 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
   const frames = buildFrames(study);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
+  // In-page viewer for screenshots, replacing target="_blank". On mobile
+  // web a new tab doesn't fit-to-screen the raw image the way a native
+  // photo viewer would - it opens at native size with no zoom applied,
+  // mostly letterboxed black. This is a plain fixed overlay, not the
+  // Radix Dialog removed as dead code in round 7 - no focus trap needed
+  // for a single non-interactive image, just Escape/backdrop-tap to close.
+  const [lightboxImage, setLightboxImage] = useState<CaseStudyImage | null>(null);
+
+  useEffect(() => {
+    if (!lightboxImage) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxImage(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxImage]);
 
   const go = (idx: number) => {
     setDirection(idx > current ? 1 : -1);
@@ -186,12 +242,11 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                   {frame.headline}
                 </h4>
                 {frame.image && (
-                  <a
-                    href={frame.image.src}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full group/img relative"
-                    aria-label="Open full-size image in a new tab"
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage(frame.image!)}
+                    className="block w-full group/img relative text-left"
+                    aria-label="View full size"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -202,8 +257,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">
                       View full size ↗
                     </span>
-                  </a>
+                  </button>
                 )}
+                {frame.visual && <div className="w-full">{renderVisual(frame.visual)}</div>}
                 {frame.features && (
                   <div className="w-full space-y-2.5 mt-1">
                     {frame.features.map((f) => (
@@ -240,12 +296,11 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                   {frame.headline}
                 </h4>
                 {frame.image && (
-                  <a
-                    href={frame.image.src}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block mb-3 group/img relative"
-                    aria-label="Open full-size image in a new tab"
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImage(frame.image!)}
+                    className="block mb-3 group/img relative w-full text-left"
+                    aria-label="View full size"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -256,8 +311,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">
                       View full size ↗
                     </span>
-                  </a>
+                  </button>
                 )}
+                {frame.visual && renderVisual(frame.visual)}
                 {frame.features ? (
                   <div className="space-y-3">
                     {frame.features.map((f) => (
@@ -328,6 +384,37 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
           Next <ChevronRight className="h-4 w-4" />
         </button>
       </div>
+
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-[#211D1D]/80 flex items-center justify-center p-4"
+            onClick={() => setLightboxImage(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={lightboxImage.alt}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            <button
+              type="button"
+              onClick={() => setLightboxImage(null)}
+              aria-label="Close"
+              className="absolute top-4 right-4 p-2 rounded-full bg-[#FAF3E7]/10 text-[#FAF3E7] hover:bg-[#FAF3E7]/20 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
