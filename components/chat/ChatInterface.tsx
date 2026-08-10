@@ -4,7 +4,7 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { track } from "@vercel/analytics";
 import { PromptChips } from "./PromptChips";
-import { FrameCarousel } from "./FrameCarousel";
+import { CaseStudyBeat } from "./CaseStudyBeat";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
@@ -115,8 +115,8 @@ export function ChatInterface() {
           chips: result.chips,
         };
         setMessages((prev) => [...prev, assistantMsg]);
-        if (result.toolCall?.tool === "showFrameCarousel") {
-          track("case_study_opened", { project: result.toolCall.toolArgs.project });
+        if (result.toolCall?.tool === "showCaseStudyBeat") {
+          track("case_study_opened", { project: result.toolCall.toolArgs.project, beat: result.toolCall.toolArgs.beat });
         }
       }, isFirstMessage ? firstMessagePhrase : undefined);
     },
@@ -125,8 +125,8 @@ export function ChatInterface() {
 
   const renderTool = (toolCall: ChatTool) => {
     switch (toolCall.tool) {
-      case "showFrameCarousel":
-        return <FrameCarousel project={toolCall.toolArgs.project} />;
+      case "showCaseStudyBeat":
+        return <CaseStudyBeat project={toolCall.toolArgs.project} beat={toolCall.toolArgs.beat} />;
       case "showSkillsMap":
         return <SkillsMap />;
       case "showTimelineCard":

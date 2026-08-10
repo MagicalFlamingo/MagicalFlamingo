@@ -168,7 +168,8 @@ export const knowledge = {
           groups: 4,
           perGroup: 2,
           unit: "session",
-          caption: "4 user groups, 2 iterations each - 8 real research sessions.",
+          caption: "8 real research sessions.",
+          groupLabels: ["Analytics", "Automation", "Pipeline", "Talend Studio"],
         },
         outcomes: [
           "Four user groups, two iterations each - Analytics, Automation, Pipeline, and Talend Studio",
@@ -370,7 +371,7 @@ export interface CaseStudyImage {
 //
 // Visual system (council round 8 - "the visuals are super minimal, this
 // is a product designer portfolio, not a UX one"): every kind rendered by
-// renderVisual() in FrameCarousel.tsx follows the same rules so they read
+// renderVisual() in CaseStudyBeat.tsx follows the same rules so they read
 // as siblings and so a new kind added later doesn't have to reinvent
 // craft from scratch:
 //   - Fixed chrome: rounded-lg, border-[#211D1D]/10, bg-[#FFFDF9]. Never a
@@ -394,14 +395,19 @@ export type FrameVisual =
   | { kind: "bareStat"; value: string; caption: string }
   | { kind: "scoreBreakdown"; value: string; rows: { label: string; score: number; max: number }[] }
   // N systems/products with no connection between them - draws each as
-  // its own isolated box, deliberately with no connecting lines.
+  // its own box in a vertical chain, with the gap between each pair
+  // shown as a broken (dashed, x-marked) connector rather than no line
+  // at all. Council round 15: an absence of lines read as neutral, not
+  // broken, once the caption wasn't there to say so.
   | { kind: "nodes"; labels: string[]; caption: string }
   // The same real thing created N times because nothing warned you it
-  // already existed.
+  // already existed - rendered as an irregular, off-kilter stack (not a
+  // clean fan) flagged with a warning badge, not a neutral count.
   | { kind: "duplicateStack"; label: string; count: number; caption: string }
-  // Research scale as a grid - groups x sessions-per-group, one cell
-  // per real session that happened.
-  | { kind: "tally"; groups: number; perGroup: number; unit: string; caption: string }
+  // Research scale as a labeled stat block - a big number stated in
+  // words next to it ("N real research sessions"), plus each group
+  // named outright via groupLabels rather than left as unlabeled dots.
+  | { kind: "tally"; groups: number; perGroup: number; unit: string; caption: string; groupLabels: string[] }
   // Near-duplicate, slightly-drifted color swatches - hardcoded values
   // copy-pasted screen to screen until none of them quite match.
   | { kind: "swatchChaos"; swatches: string[]; caption: string };
