@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { MotionConfig } from "framer-motion";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,7 +35,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full bg-[#FAF3E7]">
-        {children}
+        {/* Respects the OS-level "reduce motion" setting sitewide - one
+            switch instead of auditing every motion.* usage by hand. */}
+        <MotionConfig reducedMotion="user">{children}</MotionConfig>
+        <Analytics />
       </body>
     </html>
   );
