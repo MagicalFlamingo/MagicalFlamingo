@@ -40,128 +40,186 @@ function splitLede(paragraph: string): { lede: string; rest: string } {
   return { lede: match[1], rest: paragraph.slice(match[0].length) };
 }
 
-// Same renderVisual as before - see the "Visual system" comment above
-// FrameVisual in knowledge.ts.
+// Council round 15: the previous nodes/duplicateStack/tally diagrams read
+// fine with their caption attached, but failed the test that actually
+// matters - cropped out of context (as the user's own screenshots did),
+// none of them explained themselves. A diagram that only works with its
+// caption glued on isn't a diagram, it's an illustration waiting for a
+// sentence to do the real work. Each of the three redesigned cases below
+// now has to carry its own meaning: nodes shows the connections literally
+// breaking, duplicateStack flags itself as a mistake instead of a neutral
+// count, tally states its number in words instead of counting dots.
+//
+// Structural fix from the same round: caption rendering used to be a
+// separate <figcaption> mechanism living in CaseStudyBeat, which meant a
+// future visual.caption could silently go unrendered if a new tool call
+// site forgot the figcaption block. renderVisual() now returns the
+// diagram and its caption as one inseparable unit - there's no path that
+// gets one without the other.
 function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
-  switch (visual.kind) {
-    case "bareStat":
-      return (
-        <div className="px-6 py-14 flex flex-col items-center text-center" style={{ background: color }}>
-          <span className="font-serif text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
-          <span className="mt-4 text-xs tracking-wide" style={{ color: "#FAF3E7", opacity: 0.65 }}>{visual.caption}</span>
-        </div>
-      );
-    case "scoreBreakdown":
-      return (
-        <div className="rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
-          <span className="font-serif text-5xl font-bold" style={{ color }}>{visual.value}</span>
-          <div className="mt-5 space-y-3.5">
-            {visual.rows.map((row, i) => (
-              <div key={row.label}>
-                <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
-                  <span>{row.label}</span>
-                  <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
-                </div>
-                <div className={`${i === 0 ? "h-2.5" : "h-2"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
-                  <div className="h-full rounded-full" style={{ width: `${(row.score / row.max) * 100}%`, background: color, opacity: i === 0 ? 1 : 0.65 }} />
-                </div>
-              </div>
-            ))}
+  const diagram = (() => {
+    switch (visual.kind) {
+      case "bareStat":
+        return (
+          <div className="px-6 py-14 flex flex-col items-center text-center" style={{ background: color }}>
+            <span className="font-serif text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
+            <span className="mt-4 text-xs tracking-wide" style={{ color: "#FAF3E7", opacity: 0.65 }}>{visual.caption}</span>
           </div>
-        </div>
-      );
-    case "nodes": {
-      const main = visual.labels.slice(0, -1);
-      const shell = visual.labels[visual.labels.length - 1];
-      return (
-        <div className="py-10 px-6" style={{ background: accentColor }}>
-          <div className="flex flex-wrap gap-4 justify-center">
-            {main.map((label) => (
-              <div key={label} className="rounded-md px-6 py-5 text-center text-base font-semibold" style={{ background: color, color: "#FAF3E7" }}>
-                {label}
-              </div>
-            ))}
-          </div>
-          {shell && (
-            <div className="flex justify-center mt-4">
-              <div className="rounded-md px-4 py-3 text-center text-sm font-semibold opacity-50 translate-y-1" style={{ background: color, color: "#FAF3E7" }}>
-                {shell}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-    case "duplicateStack":
-      return (
-        <div className="py-10 px-6" style={{ background: accentColor }}>
-          <div className="relative h-24 flex items-center justify-center">
-            {Array.from({ length: visual.count }).map((_, idx) => {
-              const isTop = idx === visual.count - 1;
-              return (
-                <div
-                  key={idx}
-                  className="absolute w-56 h-16 rounded-md flex items-center justify-center text-sm font-semibold"
-                  style={{ background: color, opacity: isTop ? 1 : 0.5 - idx * 0.08, color: "#FAF3E7", transform: `translate(${idx * 5}px, ${idx * -5}px)`, zIndex: idx }}
-                >
-                  {isTop ? visual.label : ""}
-                </div>
-              );
-            })}
-            <span className="absolute top-1 right-[calc(50%-6.5rem)] font-serif text-lg font-bold rounded-full w-10 h-10 flex items-center justify-center z-10 shadow-sm" style={{ background: "#FAF3E7", color }}>
-              &times;{visual.count}
-            </span>
-          </div>
-        </div>
-      );
-    case "tally": {
-      const total = visual.groups * visual.perGroup;
-      return (
-        <div className="py-8 px-6" style={{ background: accentColor }}>
-          <div className="flex items-center gap-6">
-            <span className="font-serif text-6xl font-bold shrink-0" style={{ color }}>{total}</span>
-            <div className="flex flex-wrap gap-4">
-              {Array.from({ length: visual.groups }).map((_, g) => (
-                <div key={g} className="flex gap-1.5">
-                  {Array.from({ length: visual.perGroup }).map((_, s) => (
-                    <span key={s} className="w-3.5 h-3.5 rounded-full" style={s === 0 ? { background: color } : { background: "transparent", border: `2px solid ${color}` }} />
-                  ))}
+        );
+      case "scoreBreakdown":
+        return (
+          <div className="rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+            <span className="font-serif text-5xl font-bold" style={{ color }}>{visual.value}</span>
+            <div className="mt-5 space-y-3.5">
+              {visual.rows.map((row, i) => (
+                <div key={row.label}>
+                  <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
+                    <span>{row.label}</span>
+                    <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+                  </div>
+                  <div className={`${i === 0 ? "h-2.5" : "h-2"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
+                    <div className="h-full rounded-full" style={{ width: `${(row.score / row.max) * 100}%`, background: color, opacity: i === 0 ? 1 : 0.65 }} />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      );
-    }
-    case "swatchChaos": {
-      const offsets = [0, 10, -7, 13, -9];
-      const rotations = [0, -6, 4, 0, -5];
-      const sizes = [56, 46, 62, 42, 52];
-      return (
-        <div className="py-12 px-6" style={{ background: accentColor }}>
-          <div className="flex items-end justify-center gap-3">
-            {visual.swatches.map((hex, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-2" style={{ transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)` }}>
-                <div className="rounded-md shadow-sm" style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }} />
-                <span className="text-[10px] font-mono" style={{ color, opacity: 0.55 }}>{hex}</span>
-              </div>
-            ))}
+        );
+      // A vertical chain instead of a wrapped grid - it reads in order
+      // top-to-bottom in a narrow column, and it leaves room for the
+      // thing the old version was missing: a visible break between each
+      // pair. Each product still gets its own labeled box; each gap
+      // between boxes is a dashed line interrupted by a red x, standing
+      // in for "someone tried to connect these and hit a wall" without
+      // needing a caption to say so.
+      case "nodes":
+        return (
+          <div className="py-8 px-6" style={{ background: accentColor }}>
+            <div className="flex flex-col items-center">
+              {visual.labels.map((label, i) => (
+                <div key={label} className="w-full max-w-[240px]">
+                  <div className="rounded-md px-5 py-3.5 text-center text-sm font-semibold" style={{ background: color, color: "#FAF3E7" }}>
+                    {label}
+                  </div>
+                  {i < visual.labels.length - 1 && (
+                    <div className="flex flex-col items-center gap-0.5 py-1.5" aria-hidden="true">
+                      <div className="w-0 h-3 border-l-2 border-dashed" style={{ borderColor: color, opacity: 0.35 }} />
+                      <span className="text-sm font-bold leading-none" style={{ color: "#C23B3B" }}>&times;</span>
+                      <div className="w-0 h-3 border-l-2 border-dashed" style={{ borderColor: color, opacity: 0.35 }} />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      );
+        );
+      // Same irregular-mistake framing for the stack: a clean, evenly-fanned
+      // deck reads as "organized," which is the opposite of what actually
+      // happened. Each card gets its own off-kilter rotation and offset,
+      // and the neutral round badge is now a warning triangle - a
+      // duplicate nobody noticed, not a tidy total.
+      case "duplicateStack": {
+        const rotations = [-7, 4, -3, 6, -5];
+        const shiftX = [-9, 11, -4, 14, 7];
+        const shiftY = [5, -7, 8, -4, 6];
+        return (
+          <div className="py-10 px-6" style={{ background: accentColor }}>
+            <div className="relative h-28 flex items-center justify-center">
+              {Array.from({ length: visual.count }).map((_, idx) => {
+                const isTop = idx === visual.count - 1;
+                return (
+                  <div
+                    key={idx}
+                    className="absolute w-52 h-16 rounded-md flex items-center justify-center text-sm font-semibold shadow-sm"
+                    style={{
+                      background: color,
+                      opacity: isTop ? 1 : 0.45 - idx * 0.07,
+                      color: "#FAF3E7",
+                      transform: `translate(${shiftX[idx % shiftX.length]}px, ${shiftY[idx % shiftY.length]}px) rotate(${rotations[idx % rotations.length]}deg)`,
+                      zIndex: idx,
+                    }}
+                  >
+                    {isTop ? visual.label : ""}
+                  </div>
+                );
+              })}
+              <span className="absolute -top-1 right-[calc(50%-6.25rem)] z-10 flex items-center justify-center w-11 h-11" style={{ filter: "drop-shadow(0 1px 2px rgba(33,29,29,0.2))" }}>
+                <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">
+                  <path d="M12 2.5 L22.5 21 L1.5 21 Z" fill="#FAF3E7" stroke="#C23B3B" strokeWidth="1.75" strokeLinejoin="round" />
+                </svg>
+                <span className="absolute font-serif text-xs font-bold mt-[3px]" style={{ color: "#C23B3B" }}>&times;{visual.count}</span>
+              </span>
+            </div>
+          </div>
+        );
+      }
+      // A stat block, not a dot grid: the number and its unit sit on the
+      // same baseline as one phrase ("8 real research sessions"), and the
+      // four groups are named outright instead of implied by unlabeled
+      // rows of dots. The dots stay, but only as a small tally mark next
+      // to a label that already says what it's counting.
+      case "tally": {
+        const total = visual.groups * visual.perGroup;
+        return (
+          <div className="py-7 px-6" style={{ background: accentColor }}>
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-serif text-6xl font-bold" style={{ color }}>{total}</span>
+              <span className="text-sm font-semibold" style={{ color, opacity: 0.7 }}>real research {visual.unit}s</span>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5">
+              {visual.groupLabels.map((label) => (
+                <div key={label} className="flex items-center gap-2">
+                  <div className="flex gap-1 shrink-0">
+                    {Array.from({ length: visual.perGroup }).map((_, s) => (
+                      <span key={s} className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-medium" style={{ color, opacity: 0.75 }}>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      case "swatchChaos": {
+        const offsets = [0, 10, -7, 13, -9];
+        const rotations = [0, -6, 4, 0, -5];
+        const sizes = [56, 46, 62, 42, 52];
+        return (
+          <div className="py-12 px-6" style={{ background: accentColor }}>
+            <div className="flex items-end justify-center gap-3">
+              {visual.swatches.map((hex, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-2" style={{ transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)` }}>
+                  <div className="rounded-md shadow-sm" style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }} />
+                  <span className="text-[10px] font-mono" style={{ color, opacity: 0.55 }}>{hex}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      default: {
+        const exhaustive: never = visual;
+        return exhaustive;
+      }
     }
-    default: {
-      const exhaustive: never = visual;
-      return exhaustive;
-    }
-  }
-}
+  })();
 
-// The one-line summary a diagram already earns from its own caption -
-// used as the newspaper "figure caption" under the image/diagram instead
-// of repeating it a second time in the body.
-function visualCaption(visual: FrameVisual): string | undefined {
-  return "caption" in visual ? visual.caption : undefined;
+  // bareStat and tally both bake their caption's exact content into the
+  // diagram itself now (the sub-label under the number; the "N real
+  // research sessions" phrase beside the numeral) - appending the same
+  // sentence again below would just repeat it. Every other kind that
+  // carries a caption gets it appended here, once, so there's no second
+  // place in the codebase that has to remember to render it.
+  const bakesOwnCaption = visual.kind === "bareStat" || visual.kind === "tally";
+  const caption = !bakesOwnCaption && "caption" in visual ? visual.caption : undefined;
+
+  return (
+    <>
+      <div className="rounded-sm overflow-hidden">{diagram}</div>
+      {caption && <p className="mt-2 text-xs italic text-[#211D1D]/45">{caption}</p>}
+    </>
+  );
 }
 
 function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
@@ -208,7 +266,6 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
   }, [lightboxImage]);
 
   if (!data) return null;
-  const caption = data.visual ? visualCaption(data.visual) : data.image?.alt;
 
   return (
     <motion.article initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mt-2 max-w-[560px]">
@@ -244,10 +301,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
         </figure>
       )}
       {data.visual && (
-        <figure className="mb-4">
-          <div className="rounded-sm overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>
-          {caption && <figcaption className="mt-2 text-xs italic text-[#211D1D]/45">{caption}</figcaption>}
-        </figure>
+        <figure className="mb-4">{renderVisual(data.visual, study.color, study.accentColor)}</figure>
       )}
 
       {/* Body - serif throughout, a real newspaper column, not a chat
