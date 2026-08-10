@@ -25,6 +25,12 @@ type FrameData = {
   quote?: string;
   extra?: string;
   image?: CaseStudyImage;
+  // Structured feature list for the Solution frame - kept as real
+  // {name, description} pairs instead of joined into one paragraph, so a
+  // frame with no screenshot still reads as a scannable list rather than
+  // a wall of prose. See council round 5.
+  features?: { name: string; description: string }[];
+  status?: string;
 };
 
 function clean(s: string) {
@@ -62,10 +68,8 @@ function buildFrames(study: CaseStudy): FrameData[] {
   frames.push({
     label: "Solution",
     headline: study.solution.headline,
-    body: study.solution.features
-      .slice(0, 2)
-      .map((f) => `${f.name}\n${f.description}`)
-      .join("\n\n"),
+    body: "",
+    features: study.solution.features.slice(0, 2),
     nda: study.ndaLevel === "partial",
     image: study.solution.image,
   });
@@ -76,6 +80,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
     body: study.impact.outcomes.slice(0, 4).map((o) => `• ${o}`).join("\n"),
     extra: `What I'd do differently: ${study.impact.whatIDifferently}`,
     image: study.impact.image,
+    status: study.impact.status,
   });
 
   return frames;
@@ -93,6 +98,12 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
   };
 
   const frame = frames[current];
+  // A text-only frame gets a taller, accent-bordered headline treatment
+  // instead of the same small heading a screenshot frame uses - the
+  // headline itself becomes the visual anchor an image would otherwise
+  // be. See council round 5: no fabricated charts, just real typographic
+  // hierarchy for content that's genuinely screenshot-less.
+  const isTextOnly = !frame.image && !frame.nda;
 
   return (
     <motion.div
@@ -120,7 +131,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
           </span>
         </div>
 
-        {/* Step pills */}
+        {/* Step pills - a filled dot marks frames with a real screenshot,
+            so a visitor can calibrate before clicking instead of feeling
+            baited by a frame that turns out to be text-only. */}
         <div className="flex gap-2 mt-3 overflow-x-auto pb-0.5 scrollbar-none">
           {frames.map((f, i) => (
             <button
@@ -134,6 +147,12 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
             >
               <span className="text-[10px]">{FRAME_ICONS[f.label] ?? "·"}</span>
               {f.label}
+              {f.image && (
+                <span
+                  className={`w-1 h-1 rounded-full ${i === current ? "bg-white/70" : "bg-[#2E9B5C]/60"}`}
+                  aria-hidden="true"
+                />
+              )}
             </button>
           ))}
         </div>
@@ -161,19 +180,59 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                 <h4 className="text-lg font-semibold text-[#211D1D] leading-snug">
                   {frame.headline}
                 </h4>
-                <p className="text-sm text-[#211D1D]/60 leading-relaxed whitespace-pre-wrap">
-                  {frame.body}
-                </p>
+                {frame.image && (
+                  <a
+                    href={frame.image.src}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full group/img relative"
+                    aria-label="Open full-size image in a new tab"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={frame.image.src}
+                      alt={frame.image.alt}
+                      className="w-full rounded-lg border border-[#211D1D]/10"
+                    />
+                    <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">
+                      View full size ↗
+                    </span>
+                  </a>
+                )}
+                {frame.features && (
+                  <div className="w-full space-y-2.5 mt-1">
+                    {frame.features.map((f) => (
+                      <div key={f.name}>
+                        <p className="text-xs font-semibold text-[#211D1D]/70">{f.name}</p>
+                        <p className="text-sm text-[#211D1D]/60 leading-relaxed">{f.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <p className="text-xs text-[#211D1D]/40 mt-1 italic">
                   {study.solution.ndaSafeNote}
                 </p>
               </div>
             ) : (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#2E9B5C] mb-2">
-                  {frame.label}
-                </p>
-                <h4 className="text-lg font-semibold text-[#211D1D] leading-snug mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#2E9B5C]">
+                    {frame.label}
+                  </p>
+                  {frame.status && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#2E9B5C]/10 text-[#2E9B5C]">
+                      {frame.status}
+                    </span>
+                  )}
+                </div>
+                <h4
+                  className={
+                    isTextOnly
+                      ? "text-xl font-semibold text-[#211D1D] leading-snug mb-3 pl-3 border-l-[3px]"
+                      : "text-lg font-semibold text-[#211D1D] leading-snug mb-3"
+                  }
+                  style={isTextOnly ? { borderColor: study.color } : undefined}
+                >
                   {frame.headline}
                 </h4>
                 {frame.image && (
@@ -195,9 +254,20 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </a>
                 )}
-                <p className="text-sm text-[#211D1D]/65 leading-relaxed whitespace-pre-wrap">
-                  {frame.body}
-                </p>
+                {frame.features ? (
+                  <div className="space-y-3">
+                    {frame.features.map((f) => (
+                      <div key={f.name}>
+                        <p className="text-sm font-semibold text-[#211D1D]/80">{f.name}</p>
+                        <p className="text-sm text-[#211D1D]/60 leading-relaxed">{f.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[#211D1D]/65 leading-relaxed whitespace-pre-wrap">
+                    {frame.body}
+                  </p>
+                )}
                 {frame.quote && (
                   <p className="mt-3 text-xs text-[#211D1D]/50 italic border-l-2 border-[#2E9B5C]/30 pl-3 leading-relaxed">
                     {frame.quote}

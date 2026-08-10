@@ -216,6 +216,7 @@ export const knowledge = {
 
       impact: {
         headline: "Shipped. Adoption skyrocketed. Support tickets on resiliency score dropped significantly.",
+        status: "Shipped",
         outcomes: [
           "Design shipped and live in AWS Resilience Hub",
           "Support ticket volume on 'what does my resiliency score mean?' dropped substantially after launch",
@@ -291,10 +292,10 @@ export const knowledge = {
   promptSuggestions: [
     { label: "Show me the AWS resiliency score redesign", intent: "aws" },
     { label: "Walk me through the Qlik connections work", intent: "qlik" },
-    { label: "What makes you different from other designers?", intent: "different" },
-    { label: "How can I get in touch?", intent: "contact" },
-    { label: "How did you end up in product design?", intent: "background" },
     { label: "What would you do in your first 30 days here?", intent: "first30" },
+    { label: "What makes you different from other designers?", intent: "different" },
+    { label: "How did you end up in product design?", intent: "background" },
+    { label: "How can I get in touch?", intent: "contact" },
   ],
 
   skills: {

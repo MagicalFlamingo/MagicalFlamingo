@@ -79,12 +79,12 @@ export const intents: Intent[] = [
     keywords: ["biggest friction", "friction at qlik", "what was the friction", "qlik problems", "qlik pain point"],
     weights: { "biggest friction": 6, "friction at qlik": 6, "what was the friction": 5 },
     responses: [
-      "The concrete one: users were creating the same connection over and over without knowing it. No cross-product search, duplicate connections proliferating with no warning, permission models that varied wildly by product - an admin in Analytics had no visibility into Integration. One user told us: \"I created a duplicate Snowflake connection without realizing an equivalent one already existed.\"",
+      "The concrete one: users were creating the same connection over and over without knowing it. No cross-product search, duplicate connections proliferating with no warning, permission models that varied wildly by product - an admin in Analytics had no visibility in Integration. One user told us: \"I created a duplicate Snowflake connection without realizing an equivalent one already existed.\"",
     ],
     followups: [
+      "What was the actual impact of this research?",
       "What would you do differently on Qlik?",
       "How did you handle the NDA parts?",
-      "Walk me through AWS next",
     ],
   },
 
@@ -93,12 +93,26 @@ export const intents: Intent[] = [
     keywords: ["would you do differently on qlik", "qlik retrospective", "qlik lesson learned", "qlik in hindsight"],
     weights: { "would you do differently on qlik": 6, "qlik retrospective": 5 },
     responses: [
-      "I'd push for the feasibility session with engineering to happen in Iteration 1, not Iteration 2. We got lucky that the Talend developer who flagged a critical technical constraint joined one of our sessions - that should be structured into the research design from the start, not left to chance.",
+      "I'd push for the feasibility session with engineering to happen in Iteration 1, not Iteration 2. We got lucky that the Talend developer who flagged the context-variable constraint joined one of our sessions - that should be a structured part of the research design from the start, not left to chance.",
+    ],
+    followups: [
+      "What was the actual impact of this research?",
+      "What was the biggest friction at Qlik?",
+      "How do you approach research?",
+    ],
+  },
+
+  {
+    id: "qlik_impact",
+    keywords: ["actual impact of this research", "impact of the qlik", "did the qlik research pay off", "impact of this research", "qlik impact", "did it work on qlik"],
+    weights: { "actual impact of this research": 6, "impact of the qlik": 5, "impact of this research": 5, "qlik impact": 5 },
+    responses: [
+      "It's not shipped yet - still active development - but the signal is real: after Iteration 2, participants sent back detailed, specific written feedback completely unprompted. All three Automation group testers independently named the same missing feature without being asked. And we caught a real architectural gap - no equivalent to an environment selector existed in Data Integration - before it turned into an expensive rework. Research shaping the roadmap before a single screen ships is the actual win here.",
     ],
     followups: [
       "What was the biggest friction at Qlik?",
+      "What would you do differently on Qlik?",
       "Walk me through AWS next",
-      "How do you approach research?",
     ],
   },
 
