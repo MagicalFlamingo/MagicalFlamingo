@@ -5,14 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
 import { knowledge, type CaseStudyId, type CaseStudy, type CaseStudyImage, type FrameVisual } from "@/content/knowledge";
 
-const FRAME_ICONS: Record<string, string> = {
-  Hook: "○",
-  Friction: "△",
-  Pivot: "◇",
-  Solution: "□",
-  Impact: "★",
-};
-
 interface FrameCarouselProps {
   project: CaseStudyId;
 }
@@ -39,40 +31,194 @@ function clean(s: string) {
 }
 
 // Renders a FrameVisual - an honest, real-data diagram for a frame with
-// no usable screenshot, in the site's own visual language (paper card,
-// ink text, green accent). Not styled to resemble the actual product's
-// UI chrome - it should read as "a diagram Danielle made to explain her
-// work," never as a recreated screenshot standing in for a real one.
-function renderVisual(visual: FrameVisual) {
-  if (visual.kind === "bareStat") {
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9 flex flex-col items-center text-center">
-        <span className="font-serif text-6xl font-bold text-[#211D1D]">{visual.value}</span>
-        <span className="mt-3 text-xs text-[#211D1D]/40 tracking-wide">{visual.caption}</span>
-      </div>
-    );
-  }
-  return (
-    <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
-      <span className="font-serif text-3xl font-bold text-[#211D1D]">{visual.value}</span>
-      <div className="mt-4 space-y-3">
-        {visual.rows.map((row) => (
-          <div key={row.label}>
-            <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
-              <span>{row.label}</span>
-              <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-[#211D1D]/8 overflow-hidden">
+// no usable screenshot. See the "Visual system" comment above the
+// FrameVisual type in knowledge.ts for the rules every kind below follows
+// (two colors doing different jobs, one serif hero value, exactly one
+// controlled asymmetry). `color` is the case study's own strong accent,
+// `accentColor` its light tint - never resembling the actual product's UI
+// chrome, always reading as "a diagram Danielle made," not a screenshot.
+// Exhaustive switch on purpose: a new FrameVisual kind that isn't handled
+// here is a compile error, not a silent wrong-render at runtime - this
+// repo has no test suite, so that's the only safety net available.
+function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
+  switch (visual.kind) {
+    case "bareStat":
+      // Full color-block, not a tint - the boldest single statement this
+      // set makes on purpose, since this is the Hook frame's one visual
+      // and the first thing a visitor sees of the whole case study.
+      return (
+        <div className="px-6 py-14 flex flex-col items-center text-center" style={{ background: color }}>
+          <span className="font-serif text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
+          <span className="mt-4 text-xs tracking-wide" style={{ color: "#FAF3E7", opacity: 0.65 }}>{visual.caption}</span>
+        </div>
+      );
+
+    case "scoreBreakdown":
+      return (
+        <div className="rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+          <span className="font-serif text-5xl font-bold" style={{ color }}>{visual.value}</span>
+          <div className="mt-5 space-y-3.5">
+            {visual.rows.map((row, i) => (
+              <div key={row.label}>
+                <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
+                  <span>{row.label}</span>
+                  <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+                </div>
+                {/* The lead metric (first row) gets a taller, full-strength
+                    bar; the rest step down slightly - one real hierarchy
+                    instead of four uniform bars. */}
+                <div className={`${i === 0 ? "h-2.5" : "h-2"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${(row.score / row.max) * 100}%`, background: color, opacity: i === 0 ? 1 : 0.65 }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case "nodes": {
+      // Each product as its own filled, saturated block in the study's
+      // own palette - no connecting lines, which is the point. The last
+      // label (the shell/platform meant to unify the others) renders
+      // smaller and dropped a notch: the one that's supposed to connect
+      // everything is itself the most disconnected.
+      const main = visual.labels.slice(0, -1);
+      const shell = visual.labels[visual.labels.length - 1];
+      return (
+        <div className="py-10 px-6" style={{ background: accentColor }}>
+          <div className="flex flex-wrap gap-4 justify-center">
+            {main.map((label) => (
               <div
-                className="h-full rounded-full bg-[#2E9B5C]"
-                style={{ width: `${(row.score / row.max) * 100}%` }}
-              />
+                key={label}
+                className="rounded-md px-6 py-5 text-center text-base font-semibold"
+                style={{ background: color, color: "#FAF3E7" }}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+          {shell && (
+            <div className="flex justify-center mt-4">
+              <div
+                className="rounded-md px-4 py-3 text-center text-sm font-semibold opacity-50 translate-y-1"
+                style={{ background: color, color: "#FAF3E7" }}
+              >
+                {shell}
+              </div>
+            </div>
+          )}
+          <p className="mt-5 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
+        </div>
+      );
+    }
+
+    case "duplicateStack":
+      return (
+        <div className="py-10 px-6" style={{ background: accentColor }}>
+          <div className="relative h-24 flex items-center justify-center">
+            {Array.from({ length: visual.count }).map((_, idx) => {
+              const isTop = idx === visual.count - 1;
+              return (
+                <div
+                  key={idx}
+                  className="absolute w-56 h-16 rounded-md flex items-center justify-center text-sm font-semibold"
+                  style={{
+                    background: color,
+                    opacity: isTop ? 1 : 0.5 - idx * 0.08,
+                    color: "#FAF3E7",
+                    transform: `translate(${idx * 5}px, ${idx * -5}px)`,
+                    zIndex: idx,
+                  }}
+                >
+                  {isTop ? visual.label : ""}
+                </div>
+              );
+            })}
+            {/* The one deliberate break from the container's grid - a
+                serif count badge overlapping the top card's own edge. */}
+            <span
+              className="absolute top-1 right-[calc(50%-6.5rem)] font-serif text-lg font-bold rounded-full w-10 h-10 flex items-center justify-center z-10 shadow-sm"
+              style={{ background: "#FAF3E7", color }}
+            >
+              &times;{visual.count}
+            </span>
+          </div>
+          <p className="mt-6 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
+        </div>
+      );
+
+    case "tally": {
+      const total = visual.groups * visual.perGroup;
+      return (
+        <div className="py-8 px-6" style={{ background: accentColor }}>
+          <div className="flex items-center gap-6">
+            <span className="font-serif text-6xl font-bold shrink-0" style={{ color }}>{total}</span>
+            <div className="flex flex-wrap gap-4">
+              {Array.from({ length: visual.groups }).map((_, g) => (
+                <div key={g} className="flex gap-1.5">
+                  {/* Two-tone per session, not identical dots - a filled
+                      mark for the first session, an outline for the
+                      second, so "2 iterations" is a real distinction. */}
+                  {Array.from({ length: visual.perGroup }).map((_, s) => (
+                    <span
+                      key={s}
+                      className="w-3.5 h-3.5 rounded-full"
+                      style={
+                        s === 0
+                          ? { background: color }
+                          : { background: "transparent", border: `2px solid ${color}` }
+                      }
+                    />
+                  ))}
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
+          <p className="mt-5 text-xs" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
+        </div>
+      );
+    }
+
+    case "swatchChaos": {
+      // Deterministic (index-keyed, not random-per-render) size/rotation/
+      // offset variation - the point being illustrated is drift and
+      // disorder, so the layout itself should look disordered instead of
+      // being the most orderly, gridded diagram in the set.
+      const offsets = [0, 10, -7, 13, -9];
+      const rotations = [0, -6, 4, 0, -5];
+      const sizes = [56, 46, 62, 42, 52];
+      return (
+        <div className="py-12 px-6" style={{ background: accentColor }}>
+          <div className="flex items-end justify-center gap-3">
+            {visual.swatches.map((hex, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-2"
+                style={{
+                  transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)`,
+                }}
+              >
+                <div
+                  className="rounded-md shadow-sm"
+                  style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }}
+                />
+                <span className="text-[10px] font-mono" style={{ color, opacity: 0.55 }}>{hex}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
+        </div>
+      );
+    }
+
+    default: {
+      const exhaustive: never = visual;
+      return exhaustive;
+    }
+  }
 }
 
 function buildFrames(study: CaseStudy): FrameData[] {
@@ -92,6 +238,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       quote: study.friction.userVoice?.[0],
       extra: study.friction.researchMethod,
       image: study.friction.image,
+      visual: study.friction.visual,
     },
   ];
 
@@ -121,6 +268,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
     extra: `What I'd do differently: ${study.impact.whatIDifferently}`,
     image: study.impact.image,
     status: study.impact.status,
+    visual: study.impact.visual,
   });
 
   return frames;
@@ -178,35 +326,40 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         className="px-5 pt-4 pb-3 border-b border-[#211D1D]/8"
         style={{ borderTopColor: study.color, borderTopWidth: 3 }}
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
-              {study.company}
-            </p>
-            <h3 className="text-base font-semibold text-[#211D1D] mt-0.5">
-              {study.title}
-            </h3>
-          </div>
-          <span className="text-xs text-[#211D1D]/40">
-            {current + 1} / {frames.length}
-          </span>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
+            {study.company}
+          </p>
+          <h3 className="text-base font-semibold text-[#211D1D] mt-0.5">
+            {study.title}
+          </h3>
         </div>
+        {/* Step count moved down to sit with Prev/Next instead of living
+            alone up here - one "where am I" signal, at the point where a
+            visitor is actually about to act on it, not two disconnected
+            ones. Council round 9. */}
 
-        {/* Step pills - a filled dot marks frames with a real screenshot,
-            so a visitor can calibrate before clicking instead of feeling
-            baited by a frame that turns out to be text-only. */}
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-0.5 scrollbar-none">
+        {/* Step pills - the only "where am I" control on this card (a
+            redundant dot-progress row used to sit in the footer, calling
+            the exact same go(i) as these pills with zero extra
+            information - cut it, council round 9). Wraps to a second
+            line instead of horizontal-scrolling with a hidden scrollbar:
+            on mobile the old overflow silently clipped 2 of 5 pills with
+            no visible sign more existed, which meant some visitors never
+            saw there was an Impact step at all. A filled dot still marks
+            frames with a real screenshot, so a visitor can calibrate
+            before clicking instead of feeling baited by a text-only one. */}
+        <div className="flex flex-wrap gap-2 mt-3">
           {frames.map((f, i) => (
             <button
               key={f.label}
               onClick={() => go(i)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
                 i === current
                   ? "bg-[#211D1D] text-white"
                   : "bg-[#FAF3E7] text-[#211D1D]/50 hover:text-[#211D1D]/80"
               }`}
             >
-              <span className="text-[10px]">{FRAME_ICONS[f.label] ?? "·"}</span>
               {f.label}
               {f.image && (
                 <span
@@ -219,11 +372,27 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         </div>
       </div>
 
-      {/* Frame content */}
-      <div className="relative overflow-hidden" style={{ minHeight: 200 }}>
+      {/* Frame content. minHeight raised from a bare 200px to match the
+          shorter end of the real height range across frames (they vary
+          464-1047px depending on which diagram kind and how much body
+          text a step has) - a shrink transition into a much shorter frame
+          used to collapse hard, which is part of what read as "hard to
+          navigate": the card's own edges moved on every click, so Prev/
+          Next weren't where your cursor/thumb expected on the next tap.
+          The `layout` prop on the animated wrapper below animates that
+          height change smoothly instead of a hard snap - deliberately
+          NOT capped with an internal max-height/overflow-y-auto, since
+          this card already lives inside a scrolling chat thread and a
+          second, nested scroll region is a well-known bad pattern
+          (ambiguous touch-drag capture on mobile especially). Content
+          stays top-aligned rather than vertically centered - a short
+          frame floating in the middle of empty space reads as more
+          broken than a frame that's honestly shorter. */}
+      <div className="relative overflow-hidden" style={{ minHeight: 420 }}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={current}
+            layout
             initial={{ opacity: 0, x: direction * 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -30 }}
@@ -259,7 +428,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && <div className="w-full">{renderVisual(frame.visual)}</div>}
+                {frame.visual && (
+                  <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(frame.visual, study.color, study.accentColor)}</div>
+                )}
                 {frame.features && (
                   <div className="w-full space-y-2.5 mt-1">
                     {frame.features.map((f) => (
@@ -313,7 +484,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && renderVisual(frame.visual)}
+                {frame.visual && (
+                  <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(frame.visual, study.color, study.accentColor)}</div>
+                )}
                 {frame.features ? (
                   <div className="space-y-3">
                     {frame.features.map((f) => (
@@ -356,30 +529,25 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         </AnimatePresence>
       </div>
 
-      {/* Nav */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-[#211D1D]/8 bg-[#FAF3E7]/50">
+      {/* Nav - was Prev/Next plus a dot-progress row that called the exact
+          same go(i) as the step pills above, communicating nothing the
+          pills didn't already show. Cut the dots (council round 9); Prev/
+          Next grew from a 20px-tall text row to a real ~44px tap target,
+          since they're the only sequential-movement control now and were
+          measured well under standard touch-target size. */}
+      <div className="flex items-center justify-between px-5 py-2 border-t border-[#211D1D]/8 bg-[#FAF3E7]/50">
         <button
           onClick={() => go(Math.max(0, current - 1))}
           disabled={current === 0}
-          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-3 -ml-3 text-sm font-medium text-[#211D1D]/60 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           <ChevronLeft className="h-4 w-4" /> Prev
         </button>
-        <div className="flex gap-1.5">
-          {frames.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => go(i)}
-              className={`h-1.5 rounded-full transition-all duration-150 ${
-                i === current ? "bg-[#2E9B5C] w-4" : "bg-[#211D1D]/20 w-1.5"
-              }`}
-            />
-          ))}
-        </div>
+        <span className="text-xs text-[#211D1D]/35">{current + 1} / {frames.length}</span>
         <button
           onClick={() => go(Math.min(frames.length - 1, current + 1))}
           disabled={current === frames.length - 1}
-          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-3 -mr-3 text-sm font-medium text-[#211D1D]/60 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           Next <ChevronRight className="h-4 w-4" />
         </button>
