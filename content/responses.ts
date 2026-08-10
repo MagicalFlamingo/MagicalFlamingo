@@ -75,6 +75,34 @@ export const intents: Intent[] = [
   },
 
   {
+    id: "qlik_friction",
+    keywords: ["biggest friction", "friction at qlik", "what was the friction", "qlik problems", "qlik pain point"],
+    weights: { "biggest friction": 6, "friction at qlik": 6, "what was the friction": 5 },
+    responses: [
+      "The concrete one: users were creating the same connection over and over without knowing it. No cross-product search, duplicate connections proliferating with no warning, permission models that varied wildly by product - an admin in Analytics had no visibility into Integration. One user told us: \"I created a duplicate Snowflake connection without realizing an equivalent one already existed.\"",
+    ],
+    followups: [
+      "What would you do differently on Qlik?",
+      "How did you handle the NDA parts?",
+      "Walk me through AWS next",
+    ],
+  },
+
+  {
+    id: "qlik_retro",
+    keywords: ["would you do differently on qlik", "qlik retrospective", "qlik lesson learned", "qlik in hindsight"],
+    weights: { "would you do differently on qlik": 6, "qlik retrospective": 5 },
+    responses: [
+      "I'd push for the feasibility session with engineering to happen in Iteration 1, not Iteration 2. We got lucky that the Talend developer who flagged a critical technical constraint joined one of our sessions - that should be structured into the research design from the start, not left to chance.",
+    ],
+    followups: [
+      "What was the biggest friction at Qlik?",
+      "Walk me through AWS next",
+      "How do you approach research?",
+    ],
+  },
+
+  {
     id: "aws",
     keywords: ["aws", "amazon", "resilience hub", "resiliency", "resiliency score", "disaster recovery", "cloud resilience", "resilience"],
     weights: { aws: 4, amazon: 3, "resilience hub": 5, "resiliency score": 5, resiliency: 3 },
@@ -87,6 +115,34 @@ export const intents: Intent[] = [
     followups: [
       "What did the redesign actually change?",
       "How did you measure success on AWS?",
+      "Show me the Qlik project next",
+      "Walk me through the Sprout work",
+    ],
+  },
+
+  {
+    id: "aws_change",
+    keywords: ["redesign actually change", "what changed on aws", "aws before and after", "score as points"],
+    weights: { "redesign actually change": 6, "what changed on aws": 5 },
+    responses: [
+      "Five concrete things: score shown as points (67/100) instead of percentage - 100% implied you were done, points imply there's room to move. A two-tab widget - Action Items with direct links to fix each gap, Score Breakdown showing each component as a fraction. A trend chart with a plain-language callout ('increased by 12% over the past year'). A policy-breach breakdown by layer. And role-aware defaults - a DevOps engineer sees Action Items first, a portfolio manager sees the trend.",
+    ],
+    followups: [
+      "How did you measure success on AWS?",
+      "Show me the Qlik project next",
+      "Walk me through the Sprout work",
+    ],
+  },
+
+  {
+    id: "aws_measure",
+    keywords: ["measure success on aws", "aws results", "aws outcome", "did it work on aws"],
+    weights: { "measure success on aws": 6, "aws results": 4 },
+    responses: [
+      "It shipped and is live in AWS Resilience Hub today. Support ticket volume on 'what does my resiliency score mean?' dropped substantially after launch, and adoption of the feature increased - people went from ignoring the score to acting on it. I don't have exact numbers I can share from that employer, but the internal signal was unambiguous. If I did it again, I'd instrument success metrics before launch instead of after - ticket deflection rate and score engagement rate should've been agreed with the PM up front.",
+    ],
+    followups: [
+      "What did the redesign actually change?",
       "Show me the Qlik project next",
       "Walk me through the Sprout work",
     ],
@@ -109,6 +165,20 @@ export const intents: Intent[] = [
     ],
   },
 
+  {
+    id: "sprout_components",
+    keywords: ["components did you rebuild", "sprout components", "which components", "component audit against spec"],
+    weights: { "components did you rebuild": 6, "sprout components": 5 },
+    responses: [
+      "Search, filter pills, switches, and badges - rebuilt to match the Sprout 2.0 spec exactly: radius, focus states, spacing. Plus a token-first refactor replacing hardcoded hex values with the real token set, and shared shell integration so the wizard and the browse table use one sidebar/topbar instead of each screen owning its own.",
+    ],
+    followups: [
+      "How does this relate to the Qlik connections work?",
+      "Show me your full skills breakdown",
+      "What was the biggest friction at Qlik?",
+    ],
+  },
+
   // ── PROCESS & METHODS ───────────────────────────────────────────────────
 
   {
@@ -123,7 +193,7 @@ export const intents: Intent[] = [
     followups: [
       "Show me the Qlik project - good example of this",
       "What's your process for synthesizing findings?",
-      "How do you do research when you're solo?",
+      "What's it like being a solo designer?",
       "What would you do in your first 30 days?",
     ],
   },
@@ -148,15 +218,14 @@ export const intents: Intent[] = [
 
   {
     id: "background",
-    keywords: ["art history", "background", "leiden", "education", "degree", "academic", "transition", "how did you get into", "art", "museum", "interior design"],
-    weights: { "art history": 5, leiden: 4, museum: 2, background: 1, education: 1, "interior design": 3 },
+    keywords: ["art history", "background", "leiden", "education", "degree", "academic", "transition", "how did you get into", "how did you end up", "art", "museum", "interior design"],
+    weights: { "art history": 5, leiden: 4, museum: 2, background: 1, education: 1, "interior design": 3, "how did you end up": 4 },
     responses: [
       "Art history is fundamentally about reading objects - understanding what a thing is communicating, to whom, and why it was made that way. That's UX design. The tools are different; the question is exactly the same.",
       "The clearest example: the AWS resiliency score showed users '13%' with no context. As a number, it's fine. As a communication artifact, it's saying 'we don't think you need to understand this.' That's a very art-history way to read a UI - and the research confirmed that's how users felt.",
       "MA in Art History from Leiden, then interior design, then UX. There are more direct routes into product design. I chose the scenic one - and it turns out reading how objects communicate to people is the whole job, just with a different set of objects.",
     ],
     followups: [
-      "How does this show up in your actual work?",
       "Walk me through AWS - good example of this lens",
       "Show me your career timeline",
       "What's your research approach?",
@@ -321,8 +390,27 @@ export const intents: Intent[] = [
     ],
     followups: [
       "Show me the Sprout 2.0 design system work",
-      "How does this show up in your actual work?",
       "What's your design process?",
+    ],
+  },
+
+  // ── SMALL TALK ────────────────────────────────────────────────────────────
+
+  {
+    id: "greeting",
+    keywords: ["hey", "hello", "how are you", "how's it going", "what's up", "howdy", "good morning", "good afternoon", "good evening", "yo,", "yo!", "yo "],
+    weights: { hey: 5, hello: 5, "how are you": 6, "how's it going": 6, "what's up": 5, howdy: 5 },
+    responses: [
+      "Hey. I skip small talk faster than most humans - what do you actually want to know?",
+      "Hello. I'm the version of a portfolio that talks back. Ask me something with a real answer attached.",
+      "Doing fine, for a keyword matcher. More useful question: what are you actually trying to figure out about me?",
+      "Hi there. I've got opinions on enterprise design, art history, and one AWS percentage that used to be wrong. Pick a direction.",
+      "I'm well - thanks for asking a chat interface how it's doing. Genuinely though, what brought you here?",
+    ],
+    followups: [
+      "Show me the AWS resiliency score redesign",
+      "What makes you different from other designers?",
+      "How can I get in touch?",
     ],
   },
 
@@ -343,7 +431,7 @@ export const intents: Intent[] = [
     followups: [
       "Show me what you can from the Qlik project",
       "Walk me through AWS - more I can show there",
-      "How do you handle NDA work in interviews?",
+      "What's actually shipped and public?",
     ],
   },
 
@@ -367,11 +455,10 @@ export const intents: Intent[] = [
     keywords: ["contact", "reach out", "email", "hire", "get in touch", "connect", "talk", "meeting", "apply", "how do i"],
     weights: { hire: 4, "get in touch": 5, contact: 3, email: 3, meeting: 3, apply: 3 },
     responses: [
-      "goldanielle@gmail.com - I respond faster than a recruiter portal. Or keep asking here and I can go deeper than a CV would.",
-      "Best way to reach me is goldanielle@gmail.com. If you want to go deeper on a specific project first, ask here - I can usually say more in conversation than the portfolio shows.",
+      "Fastest way is my mobile: 050-6404745. Email works too - goldanielle@gmail.com - but I actually pick up the phone. Or keep asking here first, I can usually say more in conversation than the portfolio shows.",
+      "Call or text is quickest: 050-6404745. Email if you'd rather - goldanielle@gmail.com. If you want to go deeper on a specific project before reaching out, ask here.",
     ],
     followups: [
-      "What roles are you open to?",
       "What would you do in your first 30 days?",
       "What are you honest about not having yet?",
     ],
@@ -401,8 +488,8 @@ export const intents: Intent[] = [
       "Tel Aviv-based. AWS involved regular coordination with US teams, so I'm comfortable across timezones. Remote is my default, relocation is a conversation.",
     ],
     followups: [
-      "What roles are you open to?",
       "How can I contact you?",
+      "What would you do in your first 30 days?",
     ],
   },
 
@@ -415,8 +502,8 @@ export const intents: Intent[] = [
       "Depends on role, scope, and location - happy to discuss over email. goldanielle@gmail.com. More useful than a number without context.",
     ],
     followups: [
-      "What roles are you open to?",
       "How can I contact you?",
+      "What would you do in your first 30 days?",
     ],
   },
 
@@ -431,7 +518,7 @@ export const intents: Intent[] = [
     followups: [
       "Tell me about your Sprout design system work",
       "How do you approach AI in product design?",
-      "Show me the case studies",
+      "Show me the AWS resiliency score redesign",
     ],
   },
 ];
