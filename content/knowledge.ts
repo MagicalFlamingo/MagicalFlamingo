@@ -370,7 +370,7 @@ export interface CaseStudyImage {
 //
 // Visual system (council round 8 - "the visuals are super minimal, this
 // is a product designer portfolio, not a UX one"): every kind rendered by
-// renderVisual() in FrameCarousel.tsx follows the same rules so they read
+// renderVisual() in CaseStudyBeat.tsx follows the same rules so they read
 // as siblings and so a new kind added later doesn't have to reinvent
 // craft from scratch:
 //   - Fixed chrome: rounded-lg, border-[#211D1D]/10, bg-[#FFFDF9]. Never a
