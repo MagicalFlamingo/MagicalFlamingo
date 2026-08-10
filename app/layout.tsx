@@ -9,10 +9,23 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const TITLE = "Danielle Goldberg - Senior Product Designer";
+const DESCRIPTION =
+  "Senior product designer, 8 years enterprise B2B (Qlik, AWS). This portfolio is a real chat agent, not a slideshow - ask it anything.";
+
 export const metadata: Metadata = {
-  title: "Danielle Goldberg - Senior Product Designer",
-  description:
-    "Portfolio of Danielle Goldberg, Senior Product Designer. Research-first, systems-thinking design for complex enterprise and AI products.",
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "profile",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

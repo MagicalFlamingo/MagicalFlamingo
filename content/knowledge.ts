@@ -289,10 +289,10 @@ export const knowledge = {
   ],
 
   promptSuggestions: [
-    { label: "What makes you different from other designers?", intent: "different" },
-    { label: "How can I get in touch?", intent: "contact" },
     { label: "Show me the AWS resiliency score redesign", intent: "aws" },
     { label: "Walk me through the Qlik connections work", intent: "qlik" },
+    { label: "What makes you different from other designers?", intent: "different" },
+    { label: "How can I get in touch?", intent: "contact" },
     { label: "How did you end up in product design?", intent: "background" },
     { label: "What would you do in your first 30 days here?", intent: "first30" },
   ],

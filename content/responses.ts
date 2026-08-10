@@ -1,18 +1,25 @@
 // Intent-matching response library. Add new intents here - no code change needed.
 
-export type ToolName =
-  | "showFrameCarousel"
-  | "showSkillsMap"
-  | "showTimelineCard"
-  | "showNDASafeNote";
+import type { CaseStudyId } from "@/content/knowledge";
+
+// A closed set of rich components a reply can trigger, with each tool's
+// args shape tied to its name - `renderTool()` narrows this with an
+// exhaustive switch, so a wrong-shaped payload is a compile error instead
+// of a runtime crash with no test suite to catch it.
+export type ChatTool =
+  | { tool: "showFrameCarousel"; toolArgs: { project: CaseStudyId } }
+  | { tool: "showSkillsMap" }
+  | { tool: "showTimelineCard" }
+  | { tool: "showNDASafeNote"; toolArgs: { context: string } };
+
+export type ToolName = ChatTool["tool"];
 
 export type Intent = {
   id: string;
   keywords: string[];
   weights?: Record<string, number>;
   responses: string[];
-  tool?: ToolName;
-  toolArgs?: Record<string, unknown>;
+  toolCall?: ChatTool;
   followups: string[];
 };
 
@@ -61,8 +68,7 @@ export const intents: Intent[] = [
       "The Qlik project starts with a question users were asking without knowing how to ask it: why do I have to connect to the same database three times?",
       "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing.",
     ],
-    tool: "showFrameCarousel",
-    toolArgs: { project: "qlik" },
+    toolCall: { tool: "showFrameCarousel", toolArgs: { project: "qlik" } },
     followups: [
       "What was the biggest friction at Qlik?",
       "How did you handle the NDA parts?",
@@ -80,8 +86,7 @@ export const intents: Intent[] = [
       "The resiliency score problem was a trust problem before it was a UI problem. Walk through it here.",
       "That one's my clearest example of a design problem that looked like a display issue but was actually a communication problem - the score wasn't wrong, it just had nothing to say.",
     ],
-    tool: "showFrameCarousel",
-    toolArgs: { project: "aws" },
+    toolCall: { tool: "showFrameCarousel", toolArgs: { project: "aws" } },
     followups: [
       "What did the redesign actually change?",
       "How did you measure success on AWS?",
@@ -99,8 +104,7 @@ export const intents: Intent[] = [
       "Design systems work is often invisible when it's working well. This one's about making sure the wizard and the browse table look and behave like the same product instead of two screens that happen to sit next to each other.",
       "The Sprout work is about removing myself from being the bottleneck - if I'm the only one who knows the token set, that doesn't scale past this one project.",
     ],
-    tool: "showFrameCarousel",
-    toolArgs: { project: "sprout" },
+    toolCall: { tool: "showFrameCarousel", toolArgs: { project: "sprout" } },
     followups: [
       "What components did you rebuild?",
       "How does this relate to the Qlik connections work?",
@@ -170,7 +174,7 @@ export const intents: Intent[] = [
       "Eight years in product design - enterprise B2B the whole way. AWS for two and a half years, Menora Insurance before that, Qlik now.",
       "The arc: military photographer → art history MA → interior design → UX architecture → senior product design. Each step built the same skill from a different angle.",
     ],
-    tool: "showTimelineCard",
+    toolCall: { tool: "showTimelineCard" },
     followups: [
       "Tell me more about the Amazon AWS work",
       "Show me the Qlik project",
@@ -220,7 +224,7 @@ export const intents: Intent[] = [
       "Figma is home base. Beyond tools: longitudinal research, information architecture, interaction design, design systems. Domains: enterprise B2B, data infrastructure, cloud services, AI product interfaces.",
       "I'm comfortable in AWS CloudScape - their design system - which matters more than it sounds. Building to a mature design system with real constraints is a different skill from starting from scratch.",
     ],
-    tool: "showSkillsMap",
+    toolCall: { tool: "showSkillsMap" },
     followups: [
       "Tell me about your enterprise experience",
       "How do you approach design systems?",
@@ -335,8 +339,10 @@ export const intents: Intent[] = [
       "For Qlik specifically: the research process, design decisions, and what we learned are all fair game. I'm not showing internal screens because it's still in active development. In an interview I can go deeper.",
       "NDA work I talk about by explaining the thinking rather than showing artifacts. I've found that's usually more useful anyway - you see how someone thinks, not just what they produced.",
     ],
-    tool: "showNDASafeNote",
-    toolArgs: { context: "The Qlik project is under partial NDA - active development, not yet shipped. I can discuss research methodology, design decisions, and outcomes in full. Internal screens and specific metrics I'm keeping off the portfolio." },
+    toolCall: {
+      tool: "showNDASafeNote",
+      toolArgs: { context: "The Qlik project is under partial NDA - active development, not yet shipped. I can discuss research methodology, design decisions, and outcomes in full. Internal screens and specific metrics I'm keeping off the portfolio." },
+    },
     followups: [
       "Show me what you can from the Qlik project",
       "Walk me through AWS - more I can show there",

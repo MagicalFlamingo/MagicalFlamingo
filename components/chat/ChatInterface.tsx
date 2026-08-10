@@ -8,9 +8,9 @@ import { FrameCarousel } from "./FrameCarousel";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
-import { knowledge, type CaseStudyId } from "@/content/knowledge";
+import { knowledge } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases, introMessage, type ToolName } from "@/content/responses";
+import { pick, thinkingPhrases, introMessage, type ChatTool } from "@/content/responses";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
@@ -30,8 +30,7 @@ type AppMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
-  tool?: ToolName;
-  toolArgs?: Record<string, unknown>;
+  toolCall?: ChatTool;
   chips?: string[];
 };
 
@@ -105,35 +104,28 @@ export function ChatInterface() {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           text: result.response,
-          tool: result.tool,
-          toolArgs: result.toolArgs,
+          toolCall: result.toolCall,
           chips: result.chips,
         };
         setMessages((prev) => [...prev, assistantMsg]);
-        if (result.tool === "showFrameCarousel" && result.toolArgs?.project) {
-          track("case_study_opened", { project: String(result.toolArgs.project) });
+        if (result.toolCall?.tool === "showFrameCarousel") {
+          track("case_study_opened", { project: result.toolCall.toolArgs.project });
         }
       });
     },
     [isThinking, think]
   );
 
-  const renderTool = (tool: ToolName, args: Record<string, unknown>) => {
-    switch (tool) {
+  const renderTool = (toolCall: ChatTool) => {
+    switch (toolCall.tool) {
       case "showFrameCarousel":
-        return args.project ? (
-          <FrameCarousel project={args.project as CaseStudyId} />
-        ) : null;
+        return <FrameCarousel project={toolCall.toolArgs.project} />;
       case "showSkillsMap":
         return <SkillsMap />;
       case "showTimelineCard":
         return <TimelineCard />;
       case "showNDASafeNote":
-        return args.context ? (
-          <NDASafeNote context={args.context as string} />
-        ) : null;
-      default:
-        return null;
+        return <NDASafeNote context={toolCall.toolArgs.context} />;
     }
   };
 
@@ -171,8 +163,7 @@ export function ChatInterface() {
                     <p className="text-sm text-[#211D1D] leading-[1.75]">
                       {message.text}
                     </p>
-                    {message.tool &&
-                      renderTool(message.tool, message.toolArgs ?? {})}
+                    {message.toolCall && renderTool(message.toolCall)}
                     {message.chips && message.chips.length > 0 && (
                       <PromptChips
                         suggestions={message.chips}
