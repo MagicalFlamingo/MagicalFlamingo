@@ -5,14 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Lock, X } from "lucide-react";
 import { knowledge, type CaseStudyId, type CaseStudy, type CaseStudyImage, type FrameVisual } from "@/content/knowledge";
 
-const FRAME_ICONS: Record<string, string> = {
-  Hook: "○",
-  Friction: "△",
-  Pivot: "◇",
-  Solution: "□",
-  Impact: "★",
-};
-
 interface FrameCarouselProps {
   project: CaseStudyId;
 }
@@ -334,35 +326,40 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         className="px-5 pt-4 pb-3 border-b border-[#211D1D]/8"
         style={{ borderTopColor: study.color, borderTopWidth: 3 }}
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
-              {study.company}
-            </p>
-            <h3 className="text-base font-semibold text-[#211D1D] mt-0.5">
-              {study.title}
-            </h3>
-          </div>
-          <span className="text-xs text-[#211D1D]/40">
-            {current + 1} / {frames.length}
-          </span>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">
+            {study.company}
+          </p>
+          <h3 className="text-base font-semibold text-[#211D1D] mt-0.5">
+            {study.title}
+          </h3>
         </div>
+        {/* Step count moved down to sit with Prev/Next instead of living
+            alone up here - one "where am I" signal, at the point where a
+            visitor is actually about to act on it, not two disconnected
+            ones. Council round 9. */}
 
-        {/* Step pills - a filled dot marks frames with a real screenshot,
-            so a visitor can calibrate before clicking instead of feeling
-            baited by a frame that turns out to be text-only. */}
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-0.5 scrollbar-none">
+        {/* Step pills - the only "where am I" control on this card (a
+            redundant dot-progress row used to sit in the footer, calling
+            the exact same go(i) as these pills with zero extra
+            information - cut it, council round 9). Wraps to a second
+            line instead of horizontal-scrolling with a hidden scrollbar:
+            on mobile the old overflow silently clipped 2 of 5 pills with
+            no visible sign more existed, which meant some visitors never
+            saw there was an Impact step at all. A filled dot still marks
+            frames with a real screenshot, so a visitor can calibrate
+            before clicking instead of feeling baited by a text-only one. */}
+        <div className="flex flex-wrap gap-2 mt-3">
           {frames.map((f, i) => (
             <button
               key={f.label}
               onClick={() => go(i)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-150 ${
                 i === current
                   ? "bg-[#211D1D] text-white"
                   : "bg-[#FAF3E7] text-[#211D1D]/50 hover:text-[#211D1D]/80"
               }`}
             >
-              <span className="text-[10px]">{FRAME_ICONS[f.label] ?? "·"}</span>
               {f.label}
               {f.image && (
                 <span
@@ -375,11 +372,27 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         </div>
       </div>
 
-      {/* Frame content */}
-      <div className="relative overflow-hidden" style={{ minHeight: 200 }}>
+      {/* Frame content. minHeight raised from a bare 200px to match the
+          shorter end of the real height range across frames (they vary
+          464-1047px depending on which diagram kind and how much body
+          text a step has) - a shrink transition into a much shorter frame
+          used to collapse hard, which is part of what read as "hard to
+          navigate": the card's own edges moved on every click, so Prev/
+          Next weren't where your cursor/thumb expected on the next tap.
+          The `layout` prop on the animated wrapper below animates that
+          height change smoothly instead of a hard snap - deliberately
+          NOT capped with an internal max-height/overflow-y-auto, since
+          this card already lives inside a scrolling chat thread and a
+          second, nested scroll region is a well-known bad pattern
+          (ambiguous touch-drag capture on mobile especially). Content
+          stays top-aligned rather than vertically centered - a short
+          frame floating in the middle of empty space reads as more
+          broken than a frame that's honestly shorter. */}
+      <div className="relative overflow-hidden" style={{ minHeight: 420 }}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={current}
+            layout
             initial={{ opacity: 0, x: direction * 30 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -30 }}
@@ -516,30 +529,25 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
         </AnimatePresence>
       </div>
 
-      {/* Nav */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-[#211D1D]/8 bg-[#FAF3E7]/50">
+      {/* Nav - was Prev/Next plus a dot-progress row that called the exact
+          same go(i) as the step pills above, communicating nothing the
+          pills didn't already show. Cut the dots (council round 9); Prev/
+          Next grew from a 20px-tall text row to a real ~44px tap target,
+          since they're the only sequential-movement control now and were
+          measured well under standard touch-target size. */}
+      <div className="flex items-center justify-between px-5 py-2 border-t border-[#211D1D]/8 bg-[#FAF3E7]/50">
         <button
           onClick={() => go(Math.max(0, current - 1))}
           disabled={current === 0}
-          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-3 -ml-3 text-sm font-medium text-[#211D1D]/60 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           <ChevronLeft className="h-4 w-4" /> Prev
         </button>
-        <div className="flex gap-1.5">
-          {frames.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => go(i)}
-              className={`h-1.5 rounded-full transition-all duration-150 ${
-                i === current ? "bg-[#2E9B5C] w-4" : "bg-[#211D1D]/20 w-1.5"
-              }`}
-            />
-          ))}
-        </div>
+        <span className="text-xs text-[#211D1D]/35">{current + 1} / {frames.length}</span>
         <button
           onClick={() => go(Math.min(frames.length - 1, current + 1))}
           disabled={current === frames.length - 1}
-          className="flex items-center gap-1 text-sm text-[#211D1D]/50 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-3 -mr-3 text-sm font-medium text-[#211D1D]/60 hover:text-[#211D1D] disabled:opacity-30 transition-colors"
         >
           Next <ChevronRight className="h-4 w-4" />
         </button>
