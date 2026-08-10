@@ -177,12 +177,23 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                   {frame.headline}
                 </h4>
                 {frame.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={frame.image.src}
-                    alt={frame.image.alt}
-                    className="w-full rounded-lg border border-[#211D1D]/10 mb-3"
-                  />
+                  <a
+                    href={frame.image.src}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mb-3 group/img relative"
+                    aria-label="Open full-size image in a new tab"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={frame.image.src}
+                      alt={frame.image.alt}
+                      className="w-full rounded-lg border border-[#211D1D]/10"
+                    />
+                    <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">
+                      View full size ↗
+                    </span>
+                  </a>
                 )}
                 <p className="text-sm text-[#211D1D]/65 leading-relaxed whitespace-pre-wrap">
                   {frame.body}
