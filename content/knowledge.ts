@@ -291,7 +291,6 @@ export const knowledge = {
     { label: "What makes you different from other designers?", intent: "different" },
     { label: "How can I get in touch?", intent: "contact" },
     { label: "How did you end up in product design?", intent: "background" },
-    { label: "Are you open to new roles right now?", intent: "availability" },
     { label: "What are you honest about not having yet?", intent: "growth" },
     { label: "What would you do in your first 30 days here?", intent: "first30" },
   ],
