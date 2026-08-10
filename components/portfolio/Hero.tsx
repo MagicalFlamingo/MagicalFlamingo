@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { track } from "@vercel/analytics";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { knowledge } from "@/content/knowledge";
@@ -70,15 +70,26 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2A93C] opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
             </span>
-            <a
-              href={`tel:${identity.phone.replace(/-/g, "")}`}
-              onClick={() => track("phone_tapped")}
-              aria-label="Call Danielle"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
-            >
-              <Phone className="h-3 w-3" />
-              {identity.phone}
-            </a>
+            <div className="flex items-center gap-1">
+              <a
+                href={`mailto:${identity.email}`}
+                onClick={() => track("email_tapped")}
+                aria-label="Email Danielle"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+              >
+                <Mail className="h-3 w-3" />
+                Email
+              </a>
+              <a
+                href={`tel:${identity.phone.replace(/-/g, "")}`}
+                onClick={() => track("phone_tapped")}
+                aria-label="Call Danielle"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+              >
+                <Phone className="h-3 w-3" />
+                {identity.phone}
+              </a>
+            </div>
           </div>
           <h1 className="mt-2 text-[28px] font-bold text-[#211D1D] font-serif tracking-tight leading-tight">
             {identity.name}
@@ -87,7 +98,7 @@ export function Hero() {
             {identity.title}
           </p>
           <p className="mt-2 text-sm text-[#211D1D]/50">
-            This is her portfolio, set up so you can ask it questions directly.
+            Yes, this is really how you talk to my portfolio - ask it something.
           </p>
         </motion.div>
 
@@ -103,18 +114,29 @@ export function Hero() {
                 Ask anything
               </p>
             </div>
-            <a
-              href={`tel:${identity.phone.replace(/-/g, "")}`}
-              onClick={() => track("phone_tapped")}
-              aria-label="Call Danielle"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
-            >
-              <Phone className="h-3 w-3" />
-              {identity.phone}
-            </a>
+            <div className="flex items-center gap-1">
+              <a
+                href={`mailto:${identity.email}`}
+                onClick={() => track("email_tapped")}
+                aria-label="Email Danielle"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+              >
+                <Mail className="h-3 w-3" />
+                Email
+              </a>
+              <a
+                href={`tel:${identity.phone.replace(/-/g, "")}`}
+                onClick={() => track("phone_tapped")}
+                aria-label="Call Danielle"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+              >
+                <Phone className="h-3 w-3" />
+                {identity.phone}
+              </a>
+            </div>
           </div>
           <p className="mt-1.5 text-sm text-[#211D1D]/45">
-            Ask me about my work, process, or background.
+            No LLM, no filler - just answers.
           </p>
         </div>
 

@@ -1,9 +1,8 @@
-import { intents, fallbackResponses, fallbackFollowups, pick, type ToolName } from "@/content/responses";
+import { intents, fallbackResponses, fallbackFollowups, pick, type ChatTool } from "@/content/responses";
 
 export type MatchResult = {
   response: string;
-  tool?: ToolName;
-  toolArgs?: Record<string, unknown>;
+  toolCall?: ChatTool;
   chips: string[];
 };
 
@@ -35,8 +34,7 @@ export function matchIntent(input: string): MatchResult {
 
   return {
     response: pick(best.responses),
-    tool: best.tool,
-    toolArgs: best.toolArgs,
+    toolCall: best.toolCall,
     chips: best.followups,
   };
 }
