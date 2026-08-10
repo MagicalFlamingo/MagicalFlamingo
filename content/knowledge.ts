@@ -367,6 +367,29 @@ export interface CaseStudyImage {
 // must trace back to real source material, same bar as any other fact
 // on this site - see the aws.solution.visual below for where the
 // breakdown numbers came from.
+//
+// Visual system (council round 8 - "the visuals are super minimal, this
+// is a product designer portfolio, not a UX one"): every kind rendered by
+// renderVisual() in FrameCarousel.tsx follows the same rules so they read
+// as siblings and so a new kind added later doesn't have to reinvent
+// craft from scratch:
+//   - Fixed chrome: rounded-lg, border-[#211D1D]/10, bg-[#FFFDF9]. Never a
+//     shadow, gradient, or icon - those are exactly the "decorated to
+//     look impressive" pattern this site has rejected repeatedly.
+//   - Two colors doing different jobs, not one accent at flat opacity
+//     everywhere: the case study's own `color` for the one element that
+//     matters most, its lighter `accentColor` as a fill/wash for
+//     supporting shapes.
+//   - One hero value per diagram (if there is a number) set in font-serif
+//     at a size that dominates the card - the same "moment" language
+//     already established for Hook/Impact headlines. Everything else
+//     stays small Inter.
+//   - Exactly one controlled asymmetry per diagram - a deliberate size,
+//     rotation, or position break from whatever grid the rest of the
+//     layout implies. Never decorative jitter, always tied to something
+//     real (see nodes: the shell product renders smaller and offset,
+//     because it's the one that's supposed to unify the others and
+//     doesn't).
 export type FrameVisual =
   | { kind: "bareStat"; value: string; caption: string }
   | { kind: "scoreBreakdown"; value: string; rows: { label: string; score: number; max: number }[] }

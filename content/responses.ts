@@ -75,9 +75,14 @@ export const intents: Intent[] = [
       "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing.",
     ],
     toolCall: { tool: "showFrameCarousel", toolArgs: { project: "qlik" } },
+    // Council round 8: this used to offer NDA as one of only 4 top-level
+    // options - a visitor who clicks once has real odds of landing on a
+    // legal disclaimer instead of outcome evidence. Impact belongs at the
+    // top level, reachable in one click, not gated behind friction/retro.
+    // NDA still has its own dedicated intent for anyone who actually asks.
     followups: [
       "What was the biggest friction at Qlik?",
-      "How did you handle the NDA parts?",
+      "What was the actual impact of this research?",
       "Walk me through AWS next",
       "What would you do differently on Qlik?",
     ],
@@ -90,10 +95,15 @@ export const intents: Intent[] = [
     responses: [
       "The concrete one: users were creating the same connection over and over without knowing it. No cross-product search, duplicate connections proliferating with no warning, permission models that varied wildly by product - an admin in Analytics had no visibility in Integration. One user told us: \"I created a duplicate Snowflake connection without realizing an equivalent one already existed.\"",
     ],
+    // Was a closed triangle with qlik_retro/qlik_impact (each offered the
+    // other two - click any one and you're handed back the same 2-3
+    // topics forever). Now a one-way chain: friction -> retro -> impact,
+    // no backward links, so two clicks never returns you to where you
+    // started.
     followups: [
-      "What was the actual impact of this research?",
       "What would you do differently on Qlik?",
       "How did you handle the NDA parts?",
+      "Walk me through AWS next",
     ],
   },
 
@@ -106,8 +116,8 @@ export const intents: Intent[] = [
     ],
     followups: [
       "What was the actual impact of this research?",
-      "What was the biggest friction at Qlik?",
       "How do you approach research?",
+      "Walk me through AWS next",
     ],
   },
 
@@ -118,10 +128,14 @@ export const intents: Intent[] = [
     responses: [
       "It's not shipped yet - still active development - but the signal is real: after Iteration 2, participants sent back detailed, specific written feedback completely unprompted. All three Automation group testers independently named the same missing feature without being asked. And we caught a real architectural gap - no equivalent to an environment selector existed in Data Integration - before it turned into an expensive rework. Research shaping the roadmap before a single screen ships is the actual win here.",
     ],
+    // Impact is the terminal node in this chain - a visitor here has
+    // already heard friction and/or the retrospective. No backlinks;
+    // forward exits only, including a direct path to contact for whoever
+    // just finished the loop instead of handing them back to the start.
     followups: [
-      "What was the biggest friction at Qlik?",
-      "What would you do differently on Qlik?",
+      "How can I get in touch?",
       "Walk me through AWS next",
+      "Walk me through the Sprout work",
     ],
   },
 
@@ -164,8 +178,11 @@ export const intents: Intent[] = [
     responses: [
       "It shipped and is live in AWS Resilience Hub today. Support ticket volume on 'what does my resiliency score mean?' dropped substantially after launch, and adoption of the feature increased - people went from ignoring the score to acting on it. I don't have exact numbers I can share from that employer, but the internal signal was unambiguous. If I did it again, I'd instrument success metrics before launch instead of after - ticket deflection rate and score engagement rate should've been agreed with the PM up front.",
     ],
+    // Terminal node, same treatment as qlik_impact - no backlink to
+    // aws_change, a direct path to contact for whoever's just heard the
+    // outcome instead of handing them back to the start.
     followups: [
-      "What did the redesign actually change?",
+      "How can I get in touch?",
       "Show me the Qlik project next",
       "Walk me through the Sprout work",
     ],

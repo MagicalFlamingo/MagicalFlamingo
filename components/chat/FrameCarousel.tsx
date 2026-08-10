@@ -39,122 +39,195 @@ function clean(s: string) {
 }
 
 // Renders a FrameVisual - an honest, real-data diagram for a frame with
-// no usable screenshot, in the site's own visual language (paper card,
-// ink text, green accent). Not styled to resemble the actual product's
-// UI chrome - it should read as "a diagram Danielle made to explain her
-// work," never as a recreated screenshot standing in for a real one.
-function renderVisual(visual: FrameVisual, accentColor: string) {
-  if (visual.kind === "bareStat") {
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9 flex flex-col items-center text-center">
-        <span className="font-serif text-6xl font-bold text-[#211D1D]">{visual.value}</span>
-        <span className="mt-3 text-xs text-[#211D1D]/40 tracking-wide">{visual.caption}</span>
-      </div>
-    );
-  }
+// no usable screenshot. See the "Visual system" comment above the
+// FrameVisual type in knowledge.ts for the rules every kind below follows
+// (two colors doing different jobs, one serif hero value, exactly one
+// controlled asymmetry). `color` is the case study's own strong accent,
+// `accentColor` its light tint - never resembling the actual product's UI
+// chrome, always reading as "a diagram Danielle made," not a screenshot.
+// Exhaustive switch on purpose: a new FrameVisual kind that isn't handled
+// here is a compile error, not a silent wrong-render at runtime - this
+// repo has no test suite, so that's the only safety net available.
+function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
+  switch (visual.kind) {
+    case "bareStat":
+      return (
+        <div
+          className="mb-3 rounded-lg border border-[#211D1D]/10 px-6 py-9 flex flex-col items-center text-center"
+          style={{ background: accentColor }}
+        >
+          <span className="font-serif text-6xl font-bold" style={{ color }}>{visual.value}</span>
+          <span className="mt-3 text-xs text-[#211D1D]/50 tracking-wide">{visual.caption}</span>
+        </div>
+      );
 
-  if (visual.kind === "scoreBreakdown") {
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
-        <span className="font-serif text-3xl font-bold text-[#211D1D]">{visual.value}</span>
-        <div className="mt-4 space-y-3">
-          {visual.rows.map((row) => (
-            <div key={row.label}>
-              <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
-                <span>{row.label}</span>
-                <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+    case "scoreBreakdown":
+      return (
+        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
+          <span className="font-serif text-4xl font-bold" style={{ color }}>{visual.value}</span>
+          <div className="mt-4 space-y-3">
+            {visual.rows.map((row, i) => (
+              <div key={row.label}>
+                <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
+                  <span>{row.label}</span>
+                  <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+                </div>
+                {/* The lead metric (first row) gets a taller, full-strength
+                    bar; the rest step down slightly - one real hierarchy
+                    instead of four uniform bars. */}
+                <div className={`${i === 0 ? "h-2" : "h-1.5"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${(row.score / row.max) * 100}%`, background: color, opacity: i === 0 ? 1 : 0.65 }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 rounded-full bg-[#211D1D]/8 overflow-hidden">
+            ))}
+          </div>
+        </div>
+      );
+
+    case "nodes": {
+      // Each product as its own filled box in the study's own palette -
+      // no connecting lines, which is the point. The last label (the
+      // shell/platform that's supposed to unify the others) renders
+      // smaller and dropped down a notch: the one that's meant to connect
+      // everything is itself the most disconnected.
+      const main = visual.labels.slice(0, -1);
+      const shell = visual.labels[visual.labels.length - 1];
+      return (
+        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+          <div className="flex flex-wrap gap-3 justify-center">
+            {main.map((label) => (
+              <div
+                key={label}
+                className="rounded-md px-4 py-3 text-center text-sm font-medium"
+                style={{ background: accentColor, color, border: `1px solid ${color}33` }}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+          {shell && (
+            <div className="flex justify-center mt-3">
+              <div
+                className="rounded-md px-3 py-2 text-center text-xs font-medium opacity-60 translate-y-1"
+                style={{ background: accentColor, color, border: `1px solid ${color}33` }}
+              >
+                {shell}
+              </div>
+            </div>
+          )}
+          <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+        </div>
+      );
+    }
+
+    case "duplicateStack":
+      return (
+        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
+          <div className="relative h-16 flex items-center justify-center">
+            {Array.from({ length: visual.count }).map((_, idx) => {
+              const isTop = idx === visual.count - 1;
+              return (
                 <div
-                  className="h-full rounded-full bg-[#2E9B5C]"
-                  style={{ width: `${(row.score / row.max) * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (visual.kind === "nodes") {
-    // Each product/system as its own isolated box - no connecting lines
-    // at all, which is the actual point being illustrated.
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
-        <div className="grid grid-cols-2 gap-3">
-          {visual.labels.map((label) => (
-            <div
-              key={label}
-              className="rounded-md border-2 border-dashed px-3 py-4 text-center text-sm font-medium text-[#211D1D]/75"
-              style={{ borderColor: `${accentColor}66` }}
+                  key={idx}
+                  className="absolute w-44 h-12 rounded-md flex items-center justify-center text-xs font-medium"
+                  style={{
+                    background: accentColor,
+                    opacity: isTop ? 1 : 0.55 - idx * 0.08,
+                    border: `1px solid ${color}40`,
+                    color,
+                    transform: `translate(${idx * 4}px, ${idx * -4}px)`,
+                    zIndex: idx,
+                  }}
+                >
+                  {isTop ? visual.label : ""}
+                </div>
+              );
+            })}
+            {/* The one deliberate break from the container's grid - a
+                serif count badge overlapping the card's own edge. */}
+            <span
+              className="absolute -top-2 -right-2 font-serif text-base font-bold rounded-full w-8 h-8 flex items-center justify-center z-10"
+              style={{ background: color, color: "#FAF3E7" }}
             >
-              {label}
-            </div>
-          ))}
+              &times;{visual.count}
+            </span>
+          </div>
+          <p className="mt-6 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
         </div>
-        <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
-      </div>
-    );
-  }
+      );
 
-  if (visual.kind === "duplicateStack") {
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
-        <div className="relative h-20 flex items-center justify-center">
-          {Array.from({ length: visual.count }).map((_, idx) => (
-            <div
-              key={idx}
-              className="absolute w-40 h-14 rounded-md border border-[#211D1D]/15 bg-[#FAF3E7] flex items-center justify-center text-xs font-medium text-[#211D1D]/70 shadow-sm"
-              style={{
-                transform: `translate(${idx * 14 - ((visual.count - 1) * 14) / 2}px, ${idx * -6}px)`,
-                zIndex: idx,
-              }}
-            >
-              {visual.label}
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
-      </div>
-    );
-  }
-
-  if (visual.kind === "tally") {
-    return (
-      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
-        <div className="flex flex-wrap gap-4 justify-center">
-          {Array.from({ length: visual.groups }).map((_, g) => (
-            <div key={g} className="flex gap-1.5">
-              {Array.from({ length: visual.perGroup }).map((_, s) => (
-                <span
-                  key={s}
-                  className="w-3 h-3 rounded-full"
-                  style={{ background: accentColor }}
-                />
+    case "tally": {
+      const total = visual.groups * visual.perGroup;
+      return (
+        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-5">
+          <div className="flex items-center gap-5">
+            <span className="font-serif text-4xl font-bold shrink-0" style={{ color }}>{total}</span>
+            <div className="flex flex-wrap gap-3">
+              {Array.from({ length: visual.groups }).map((_, g) => (
+                <div key={g} className="flex gap-1">
+                  {/* Two-tone per session, not identical dots - a filled
+                      mark for the first session, an outline for the
+                      second, so "2 iterations" is a real distinction. */}
+                  {Array.from({ length: visual.perGroup }).map((_, s) => (
+                    <span
+                      key={s}
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={
+                        s === 0
+                          ? { background: color }
+                          : { background: "transparent", border: `1.5px solid ${color}` }
+                      }
+                    />
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
-        </div>
-        <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
-      </div>
-    );
-  }
-
-  // swatchChaos
-  return (
-    <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
-      <div className="flex justify-center gap-3">
-        {visual.swatches.map((hex, idx) => (
-          <div key={idx} className="flex flex-col items-center gap-1.5">
-            <div className="w-10 h-10 rounded-md border border-[#211D1D]/10" style={{ background: hex }} />
-            <span className="text-[9px] text-[#211D1D]/35 font-mono">{hex}</span>
           </div>
-        ))}
-      </div>
-      <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
-    </div>
-  );
+          <p className="mt-4 text-xs text-[#211D1D]/40">{visual.caption}</p>
+        </div>
+      );
+    }
+
+    case "swatchChaos": {
+      // Deterministic (index-keyed, not random-per-render) size/rotation/
+      // offset variation - the point being illustrated is drift and
+      // disorder, so the layout itself should look disordered instead of
+      // being the most orderly, gridded diagram in the set.
+      const offsets = [0, 7, -5, 9, -6];
+      const rotations = [0, -5, 3, 0, -4];
+      const sizes = [40, 33, 45, 31, 38];
+      return (
+        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9">
+          <div className="flex items-end justify-center gap-2">
+            {visual.swatches.map((hex, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-1.5"
+                style={{
+                  transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)`,
+                }}
+              >
+                <div
+                  className="rounded-md border border-[#211D1D]/10"
+                  style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }}
+                />
+                <span className="text-[9px] text-[#211D1D]/35 font-mono">{hex}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+        </div>
+      );
+    }
+
+    default: {
+      const exhaustive: never = visual;
+      return exhaustive;
+    }
+  }
 }
 
 function buildFrames(study: CaseStudy): FrameData[] {
@@ -343,7 +416,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && <div className="w-full">{renderVisual(frame.visual, study.color)}</div>}
+                {frame.visual && <div className="w-full">{renderVisual(frame.visual, study.color, study.accentColor)}</div>}
                 {frame.features && (
                   <div className="w-full space-y-2.5 mt-1">
                     {frame.features.map((f) => (
@@ -397,7 +470,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && renderVisual(frame.visual, study.color)}
+                {frame.visual && renderVisual(frame.visual, study.color, study.accentColor)}
                 {frame.features ? (
                   <div className="space-y-3">
                     {frame.features.map((f) => (
