@@ -14,13 +14,21 @@ import { pick, thinkingPhrases, introMessage, type ChatTool } from "@/content/re
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
-// Single source of truth for the fake-latency pause - was duplicated as a
-// literal in two places (intro + submitText), tuned by hand five times.
-// Deliberately short: a cold first-time visitor's patience is the actual
-// budget here, not a slower "feels more thoughtful" pace - a design
-// council round found the previous 1500ms was pure dead time before
-// anything happens on load, the opposite of a good first impression.
-const THINKING_DELAY_MS = 500;
+// The very first thing a visitor sees stays fast on purpose - a design
+// council round found a longer delay here was pure dead time before
+// anything happens on a cold load, the opposite of a good first impression.
+const INTRO_DELAY_MS = 500;
+
+// Every reply after that gets a length-aware pause instead of one fixed
+// number for every message. A flat delay is one of the most obvious
+// "this is a script" tells - a real person answering "how can I get in
+// touch" takes less time than answering a full case-study question.
+// Small random jitter keeps it from feeling metronomic on repeat use.
+function estimateReplyDelay(text: string): number {
+  const words = text.trim().split(/\s+/).length;
+  const jitter = Math.random() * 220 - 60;
+  return Math.min(1600, Math.max(450, 380 + words * 45 + jitter));
+}
 
 const dotVariants: Variants = {
   animate: (i: number) => ({
@@ -60,14 +68,15 @@ export function ChatInterface() {
 
   // One shared "think, then reveal" transition - the intro and every
   // real reply both go through this instead of duplicating the
-  // pick-phrase/set-thinking/timeout/clear sequence.
-  const think = useCallback((reveal: () => void) => {
+  // pick-phrase/set-thinking/timeout/clear sequence. Delay is passed in
+  // per-call rather than fixed, so pacing can vary by what's coming.
+  const think = useCallback((delayMs: number, reveal: () => void) => {
     setThinkingPhrase(pick(thinkingPhrases));
     setIsThinking(true);
     const t = setTimeout(() => {
       reveal();
       setIsThinking(false);
-    }, THINKING_DELAY_MS);
+    }, delayMs);
     return () => clearTimeout(t);
   }, []);
 
@@ -77,7 +86,7 @@ export function ChatInterface() {
     if (hasIntroed.current) return;
     hasIntroed.current = true;
     track("agent_intro_shown");
-    return think(() => {
+    return think(INTRO_DELAY_MS, () => {
       setMessages([
         {
           id: "intro",
@@ -102,8 +111,12 @@ export function ChatInterface() {
       };
       setMessages((prev) => [...prev, userMsg]);
 
-      think(() => {
-        const result = matchIntent(text);
+      // Matching is synchronous and instant either way - computing the
+      // result up front just lets the pause length reflect what she's
+      // actually about to say, like a person pausing longer mid-thought
+      // for a longer answer instead of a stopwatch-perfect fixed beat.
+      const result = matchIntent(text);
+      think(estimateReplyDelay(result.response), () => {
         const assistantMsg: AppMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
