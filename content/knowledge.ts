@@ -11,7 +11,7 @@ export const knowledge = {
     email: "goldanielle@gmail.com",
 
     oneLiner:
-      "I turn complex, messy enterprise systems into things people actually understand - and I can explain exactly why every decision was made.",
+      "Eight years making enterprise software make sense - and I can explain exactly why every decision was made.",
 
     positioning: `I'm a senior product designer who specializes in the hard stuff: enterprise B2B systems where the users are experts, the constraints are real, and "just make it simpler" isn't actually an option.\n\nEight years in product design, with stints at Amazon AWS, a major Israeli insurance company, and currently Qlik - where I'm running a multi-team research initiative to unify how data connections work across their entire platform.\n\nMy background is unusual: I started in art history and spent years studying how objects communicate meaning - how a painting earns trust, how a designed space guides behavior without signage. I use that lens constantly. The question I always come back to is: what is this actually saying to the person looking at it?`,
 
@@ -290,8 +290,9 @@ export const knowledge = {
   promptSuggestions: [
     { label: "What makes you different from other designers?", intent: "different" },
     { label: "How can I get in touch?", intent: "contact" },
+    { label: "Show me the AWS resiliency score redesign", intent: "aws" },
+    { label: "Walk me through the Qlik connections work", intent: "qlik" },
     { label: "How did you end up in product design?", intent: "background" },
-    { label: "What are you honest about not having yet?", intent: "growth" },
     { label: "What would you do in your first 30 days here?", intent: "first30" },
   ],
 
