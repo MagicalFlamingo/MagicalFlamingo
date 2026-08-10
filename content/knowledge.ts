@@ -111,10 +111,21 @@ export const knowledge = {
         headline: "One platform. Four products. No shared way to connect to data.",
         context: `Qlik is a data analytics and integration platform. Under the hood, it runs four distinct product lines: Analytics, Automation, Pipelines (formerly Talend), and the Cloud Data Integration shell. Each one had its own interface for creating and managing data connections - and none of them talked to each other.\n\nA user who needed the same Snowflake connection for an analytics app, an automation workflow, and a data pipeline had to create it three separate times, in three separate interfaces, with no way to reuse, share, or even discover what already existed.`,
         scale: "Used by data engineers, analysts, automation specialists, and Talend Studio developers across enterprise organizations globally.",
+        visual: {
+          kind: "nodes",
+          labels: ["Analytics", "Automation", "Pipelines", "Data Integration"],
+          caption: "Four real product lines. Zero connections between them.",
+        },
       },
 
       friction: {
         headline: "Users were creating the same connection over and over - and didn't even know it.",
+        visual: {
+          kind: "duplicateStack",
+          label: "Snowflake connection",
+          count: 3,
+          caption: "Same connection, three separate interfaces, no warning any of them already existed.",
+        },
         problems: [
           "No cross-product connection search - you had to navigate each product separately",
           "Duplicate connections proliferating, with no warning before you created another",
@@ -152,6 +163,13 @@ export const knowledge = {
       impact: {
         headline: "Research directly shaped roadmap decisions. Prototype generated detailed written feedback from real users - unprompted.",
         status: "In progress - not yet shipped",
+        visual: {
+          kind: "tally",
+          groups: 4,
+          perGroup: 2,
+          unit: "session",
+          caption: "4 user groups, 2 iterations each - 8 real research sessions.",
+        },
         outcomes: [
           "Four user groups, two iterations each - Analytics, Automation, Pipeline, and Talend Studio",
           "Identified a critical technical constraint before design handoff - avoided a costly rework cycle",
@@ -253,7 +271,7 @@ export const knowledge = {
       id: "sprout",
       title: "Sprout 2.0 - Qlik's Design System",
       company: "Qlik",
-      year: "2025 - Present",
+      year: "2025 – Present",
       role: "Senior Product Designer - Design System, Component Library",
       ndaLevel: "partial" as const,
       color: "#2E9B5C",
@@ -266,6 +284,11 @@ export const knowledge = {
 
       friction: {
         headline: "Without shared components, every screen reinvents the same buttons, inputs, and states.",
+        visual: {
+          kind: "swatchChaos",
+          swatches: ["#4A6FA5", "#4E72AB", "#4870A6", "#5175AD", "#496EA2"],
+          caption: "The same 'brand blue,' hardcoded five different ways across five screens.",
+        },
         problems: [
           "No shared token set - colors and spacing were hardcoded per screen, drifting from spec over time",
           "Search, filters, and toggles were each built ad hoc, with inconsistent radius, focus states, and spacing",
@@ -346,7 +369,19 @@ export interface CaseStudyImage {
 // breakdown numbers came from.
 export type FrameVisual =
   | { kind: "bareStat"; value: string; caption: string }
-  | { kind: "scoreBreakdown"; value: string; rows: { label: string; score: number; max: number }[] };
+  | { kind: "scoreBreakdown"; value: string; rows: { label: string; score: number; max: number }[] }
+  // N systems/products with no connection between them - draws each as
+  // its own isolated box, deliberately with no connecting lines.
+  | { kind: "nodes"; labels: string[]; caption: string }
+  // The same real thing created N times because nothing warned you it
+  // already existed.
+  | { kind: "duplicateStack"; label: string; count: number; caption: string }
+  // Research scale as a grid - groups x sessions-per-group, one cell
+  // per real session that happened.
+  | { kind: "tally"; groups: number; perGroup: number; unit: string; caption: string }
+  // Near-duplicate, slightly-drifted color swatches - hardcoded values
+  // copy-pasted screen to screen until none of them quite match.
+  | { kind: "swatchChaos"; swatches: string[]; caption: string };
 
 export interface CaseStudy {
   id: string;
@@ -358,8 +393,8 @@ export interface CaseStudy {
   color: string;
   accentColor: string;
   hook: { headline: string; context: string; scale?: string; image?: CaseStudyImage; visual?: FrameVisual };
-  friction: { headline: string; problems: string[]; userVoice?: string[]; researchMethod?: string; image?: CaseStudyImage };
+  friction: { headline: string; problems: string[]; userVoice?: string[]; researchMethod?: string; image?: CaseStudyImage; visual?: FrameVisual };
   pivot?: { headline: string; insight: string; designDecision?: string; image?: CaseStudyImage };
   solution: { headline: string; features: { name: string; description: string }[]; ndaSafeNote?: string; image?: CaseStudyImage; visual?: FrameVisual };
-  impact: { headline: string; status?: string; outcomes: string[]; whatIDifferently: string; image?: CaseStudyImage };
+  impact: { headline: string; status?: string; outcomes: string[]; whatIDifferently: string; image?: CaseStudyImage; visual?: FrameVisual };
 }

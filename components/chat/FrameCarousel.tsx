@@ -43,7 +43,7 @@ function clean(s: string) {
 // ink text, green accent). Not styled to resemble the actual product's
 // UI chrome - it should read as "a diagram Danielle made to explain her
 // work," never as a recreated screenshot standing in for a real one.
-function renderVisual(visual: FrameVisual) {
+function renderVisual(visual: FrameVisual, accentColor: string) {
   if (visual.kind === "bareStat") {
     return (
       <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9 flex flex-col items-center text-center">
@@ -52,25 +52,107 @@ function renderVisual(visual: FrameVisual) {
       </div>
     );
   }
+
+  if (visual.kind === "scoreBreakdown") {
+    return (
+      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
+        <span className="font-serif text-3xl font-bold text-[#211D1D]">{visual.value}</span>
+        <div className="mt-4 space-y-3">
+          {visual.rows.map((row) => (
+            <div key={row.label}>
+              <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
+                <span>{row.label}</span>
+                <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-[#211D1D]/8 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#2E9B5C]"
+                  style={{ width: `${(row.score / row.max) * 100}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (visual.kind === "nodes") {
+    // Each product/system as its own isolated box - no connecting lines
+    // at all, which is the actual point being illustrated.
+    return (
+      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+        <div className="grid grid-cols-2 gap-3">
+          {visual.labels.map((label) => (
+            <div
+              key={label}
+              className="rounded-md border-2 border-dashed px-3 py-4 text-center text-sm font-medium text-[#211D1D]/75"
+              style={{ borderColor: `${accentColor}66` }}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+      </div>
+    );
+  }
+
+  if (visual.kind === "duplicateStack") {
+    return (
+      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
+        <div className="relative h-20 flex items-center justify-center">
+          {Array.from({ length: visual.count }).map((_, idx) => (
+            <div
+              key={idx}
+              className="absolute w-40 h-14 rounded-md border border-[#211D1D]/15 bg-[#FAF3E7] flex items-center justify-center text-xs font-medium text-[#211D1D]/70 shadow-sm"
+              style={{
+                transform: `translate(${idx * 14 - ((visual.count - 1) * 14) / 2}px, ${idx * -6}px)`,
+                zIndex: idx,
+              }}
+            >
+              {visual.label}
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+      </div>
+    );
+  }
+
+  if (visual.kind === "tally") {
+    return (
+      <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+        <div className="flex flex-wrap gap-4 justify-center">
+          {Array.from({ length: visual.groups }).map((_, g) => (
+            <div key={g} className="flex gap-1.5">
+              {Array.from({ length: visual.perGroup }).map((_, s) => (
+                <span
+                  key={s}
+                  className="w-3 h-3 rounded-full"
+                  style={{ background: accentColor }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+      </div>
+    );
+  }
+
+  // swatchChaos
   return (
-    <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
-      <span className="font-serif text-3xl font-bold text-[#211D1D]">{visual.value}</span>
-      <div className="mt-4 space-y-3">
-        {visual.rows.map((row) => (
-          <div key={row.label}>
-            <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
-              <span>{row.label}</span>
-              <span className="font-medium text-[#211D1D]/80">{row.score}/{row.max}</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-[#211D1D]/8 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-[#2E9B5C]"
-                style={{ width: `${(row.score / row.max) * 100}%` }}
-              />
-            </div>
+    <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
+      <div className="flex justify-center gap-3">
+        {visual.swatches.map((hex, idx) => (
+          <div key={idx} className="flex flex-col items-center gap-1.5">
+            <div className="w-10 h-10 rounded-md border border-[#211D1D]/10" style={{ background: hex }} />
+            <span className="text-[9px] text-[#211D1D]/35 font-mono">{hex}</span>
           </div>
         ))}
       </div>
+      <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
     </div>
   );
 }
@@ -92,6 +174,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
       quote: study.friction.userVoice?.[0],
       extra: study.friction.researchMethod,
       image: study.friction.image,
+      visual: study.friction.visual,
     },
   ];
 
@@ -121,6 +204,7 @@ function buildFrames(study: CaseStudy): FrameData[] {
     extra: `What I'd do differently: ${study.impact.whatIDifferently}`,
     image: study.impact.image,
     status: study.impact.status,
+    visual: study.impact.visual,
   });
 
   return frames;
@@ -259,7 +343,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && <div className="w-full">{renderVisual(frame.visual)}</div>}
+                {frame.visual && <div className="w-full">{renderVisual(frame.visual, study.color)}</div>}
                 {frame.features && (
                   <div className="w-full space-y-2.5 mt-1">
                     {frame.features.map((f) => (
@@ -313,7 +397,7 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && renderVisual(frame.visual)}
+                {frame.visual && renderVisual(frame.visual, study.color)}
                 {frame.features ? (
                   <div className="space-y-3">
                     {frame.features.map((f) => (
