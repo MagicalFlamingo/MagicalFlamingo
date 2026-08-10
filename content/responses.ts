@@ -36,6 +36,15 @@ export const thinkingPhrases: string[] = [
   "connecting this to something real",
 ];
 
+// Shown once - for the very first message a visitor ever sends in a
+// session, instead of one of the generic thinkingPhrases above. Council
+// round 7: the moment someone stops browsing chips and actually types or
+// clicks something is the one beat in the whole flow with real stakes -
+// it's where they stop watching the site and start participating. A
+// dedicated line here is the smallest possible acknowledgment of that,
+// through the same mechanism (thinking phrase) rather than new UI.
+export const firstMessagePhrase = "okay, an actual question - let's see";
+
 export const fallbackResponses: string[] = [
   "I can cover the case studies, research approach, working style, or career background. What's most relevant to what you're evaluating?",
   "That's a bit outside what I can answer here - try asking about a specific project, how I work, or what I'd do in the first 30 days.",

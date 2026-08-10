@@ -10,7 +10,7 @@ import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { knowledge } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases, type ChatTool } from "@/content/responses";
+import { pick, thinkingPhrases, firstMessagePhrase, type ChatTool } from "@/content/responses";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
@@ -71,8 +71,10 @@ export function ChatInterface() {
   // real reply both go through this instead of duplicating the
   // pick-phrase/set-thinking/timeout/clear sequence. Delay is passed in
   // per-call rather than fixed, so pacing can vary by what's coming.
-  const think = useCallback((delayMs: number, reveal: () => void) => {
-    setThinkingPhrase(pick(thinkingPhrases));
+  // `phraseOverride` lets a specific call skip the random pick - used for
+  // the first-message moment below.
+  const think = useCallback((delayMs: number, reveal: () => void, phraseOverride?: string) => {
+    setThinkingPhrase(phraseOverride ?? pick(thinkingPhrases));
     setIsThinking(true);
     const t = setTimeout(() => {
       reveal();
@@ -86,6 +88,11 @@ export function ChatInterface() {
       if (!text.trim() || isThinking) return;
       setInputValue("");
       track("agent_question_asked", { text });
+
+      // No new state - `messages` already tells us if this is the very
+      // first thing a visitor has sent this session, before we push the
+      // new user message onto it.
+      const isFirstMessage = messages.length === 0;
 
       const userMsg: AppMessage = {
         id: Date.now().toString(),
@@ -111,9 +118,9 @@ export function ChatInterface() {
         if (result.toolCall?.tool === "showFrameCarousel") {
           track("case_study_opened", { project: result.toolCall.toolArgs.project });
         }
-      });
+      }, isFirstMessage ? firstMessagePhrase : undefined);
     },
-    [isThinking, think]
+    [isThinking, think, messages.length]
   );
 
   const renderTool = (toolCall: ChatTool) => {
