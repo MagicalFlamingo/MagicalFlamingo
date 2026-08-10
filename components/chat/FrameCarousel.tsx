@@ -98,12 +98,17 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
   };
 
   const frame = frames[current];
-  // A text-only frame gets a taller, accent-bordered headline treatment
-  // instead of the same small heading a screenshot frame uses - the
-  // headline itself becomes the visual anchor an image would otherwise
-  // be. See council round 5: no fabricated charts, just real typographic
-  // hierarchy for content that's genuinely screenshot-less.
-  const isTextOnly = !frame.image && !frame.nda;
+  // Council round 6: "bigger sans headline + colored border" (round 5)
+  // still read as one undifferentiated text block - same font throughout,
+  // emphasis instead of a real mode-switch. The fix isn't decorating every
+  // frame, it's concentrating typographic weight on the two frames that
+  // are actual narrative beats - the open and the landing - and leaving
+  // Friction/Pivot/Solution quiet, so the loud ones read as loud. Hook and
+  // Impact reuse the site's one existing serif flourish (currently only
+  // Danielle's name in the hero) - not a new typeface, just a second,
+  // disciplined use of the one the site already committed to. This is
+  // independent of whether the frame also has a real screenshot.
+  const isMoment = frame.label === "Hook" || frame.label === "Impact";
 
   return (
     <motion.div
@@ -227,11 +232,10 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                 </div>
                 <h4
                   className={
-                    isTextOnly
-                      ? "text-xl font-semibold text-[#211D1D] leading-snug mb-3 pl-3 border-l-[3px]"
+                    isMoment
+                      ? "font-serif text-2xl md:text-3xl font-semibold text-[#211D1D] leading-snug mb-4"
                       : "text-lg font-semibold text-[#211D1D] leading-snug mb-3"
                   }
-                  style={isTextOnly ? { borderColor: study.color } : undefined}
                 >
                   {frame.headline}
                 </h4>
@@ -274,9 +278,21 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                   </p>
                 )}
                 {frame.extra && (
-                  <p className="mt-3 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">
-                    {frame.extra}
-                  </p>
+                  frame.label === "Hook" ? (
+                    // The Hook's "extra" is real-world scale/credibility
+                    // (who actually uses this) - the most concrete,
+                    // trust-bearing line in the frame, previously styled
+                    // to look like the least important one (gray italic
+                    // footnote). Marigold is otherwise unused inside a
+                    // case-study card - give it this one functional job.
+                    <p className="mt-4 text-xs font-medium text-[#211D1D]/75 leading-relaxed bg-[#F2A93C]/12 border-l-2 border-[#F2A93C] rounded-r px-3 py-2">
+                      {frame.extra}
+                    </p>
+                  ) : (
+                    <p className="mt-3 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">
+                      {frame.extra}
+                    </p>
+                  )
                 )}
               </div>
             )}
