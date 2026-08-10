@@ -109,7 +109,7 @@ export const knowledge = {
 
       hook: {
         headline: "One platform. Four products. No shared way to connect to data.",
-        context: `Qlik is a data analytics and integration platform. Under the hood, it runs four distinct product lines: Analytics, Automation, Pipelines (formerly Talend), and the Cloud Data Integration shell. Each one had its own interface for creating and managing data connections - and none of them talked to each other.\n\nA user who needed the same Snowflake connection for an analytics app, an automation workflow, and a data pipeline had to create it three separate times, in three separate interfaces, with no way to reuse, share, or even discover what already existed.`,
+        context: `Qlik is a data analytics and integration platform. Under the hood, it runs four distinct product lines: Analytics, Automation, Pipelines (formerly Talend), and the Cloud Data Integration shell. Each one had its own interface for creating and managing data connections - and none of them talked to each other.`,
         scale: "Used by data engineers, analysts, automation specialists, and Talend Studio developers across enterprise organizations globally.",
         visual: {
           kind: "nodes",
@@ -194,7 +194,7 @@ export const knowledge = {
 
       hook: {
         headline: "AWS showed customers a number - 13% - and expected them to trust it.",
-        context: `AWS Resilience Hub is a service that helps teams define, validate, and track the resiliency of applications running on AWS.\n\nThe platform calculated a "Resiliency Score" - a proprietary aggregation of assessments - and displayed it as a single percentage in a small corner of the application summary page. No breakdown. No explanation of what went into it. No guidance on what to do next.`,
+        context: `AWS Resilience Hub is a service that helps teams define, validate, and track the resiliency of applications running on AWS.\n\nThe platform calculated a "Resiliency Score" - a proprietary aggregation of assessments - and displayed it as a single percentage in a small corner of the application summary page.`,
         // No image here on purpose - the only available screenshot has
         // hand-drawn review-annotation arrows baked into the pixels
         // pointing at the exact number this frame is about. Cropping

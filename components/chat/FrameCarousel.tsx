@@ -51,21 +51,21 @@ function clean(s: string) {
 function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   switch (visual.kind) {
     case "bareStat":
+      // Full color-block, not a tint - the boldest single statement this
+      // set makes on purpose, since this is the Hook frame's one visual
+      // and the first thing a visitor sees of the whole case study.
       return (
-        <div
-          className="mb-3 rounded-lg border border-[#211D1D]/10 px-6 py-9 flex flex-col items-center text-center"
-          style={{ background: accentColor }}
-        >
-          <span className="font-serif text-6xl font-bold" style={{ color }}>{visual.value}</span>
-          <span className="mt-3 text-xs text-[#211D1D]/50 tracking-wide">{visual.caption}</span>
+        <div className="px-6 py-14 flex flex-col items-center text-center" style={{ background: color }}>
+          <span className="font-serif text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
+          <span className="mt-4 text-xs tracking-wide" style={{ color: "#FAF3E7", opacity: 0.65 }}>{visual.caption}</span>
         </div>
       );
 
     case "scoreBreakdown":
       return (
-        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-4">
-          <span className="font-serif text-4xl font-bold" style={{ color }}>{visual.value}</span>
-          <div className="mt-4 space-y-3">
+        <div className="rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
+          <span className="font-serif text-5xl font-bold" style={{ color }}>{visual.value}</span>
+          <div className="mt-5 space-y-3.5">
             {visual.rows.map((row, i) => (
               <div key={row.label}>
                 <div className="flex items-center justify-between text-xs text-[#211D1D]/65 mb-1">
@@ -75,7 +75,7 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
                 {/* The lead metric (first row) gets a taller, full-strength
                     bar; the rest step down slightly - one real hierarchy
                     instead of four uniform bars. */}
-                <div className={`${i === 0 ? "h-2" : "h-1.5"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
+                <div className={`${i === 0 ? "h-2.5" : "h-2"} rounded-full overflow-hidden`} style={{ background: accentColor }}>
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${(row.score / row.max) * 100}%`, background: color, opacity: i === 0 ? 1 : 0.65 }}
@@ -88,57 +88,56 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
       );
 
     case "nodes": {
-      // Each product as its own filled box in the study's own palette -
-      // no connecting lines, which is the point. The last label (the
-      // shell/platform that's supposed to unify the others) renders
-      // smaller and dropped down a notch: the one that's meant to connect
+      // Each product as its own filled, saturated block in the study's
+      // own palette - no connecting lines, which is the point. The last
+      // label (the shell/platform meant to unify the others) renders
+      // smaller and dropped a notch: the one that's supposed to connect
       // everything is itself the most disconnected.
       const main = visual.labels.slice(0, -1);
       const shell = visual.labels[visual.labels.length - 1];
       return (
-        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
-          <div className="flex flex-wrap gap-3 justify-center">
+        <div className="py-10 px-6" style={{ background: accentColor }}>
+          <div className="flex flex-wrap gap-4 justify-center">
             {main.map((label) => (
               <div
                 key={label}
-                className="rounded-md px-4 py-3 text-center text-sm font-medium"
-                style={{ background: accentColor, color, border: `1px solid ${color}33` }}
+                className="rounded-md px-6 py-5 text-center text-base font-semibold"
+                style={{ background: color, color: "#FAF3E7" }}
               >
                 {label}
               </div>
             ))}
           </div>
           {shell && (
-            <div className="flex justify-center mt-3">
+            <div className="flex justify-center mt-4">
               <div
-                className="rounded-md px-3 py-2 text-center text-xs font-medium opacity-60 translate-y-1"
-                style={{ background: accentColor, color, border: `1px solid ${color}33` }}
+                className="rounded-md px-4 py-3 text-center text-sm font-semibold opacity-50 translate-y-1"
+                style={{ background: color, color: "#FAF3E7" }}
               >
                 {shell}
               </div>
             </div>
           )}
-          <p className="mt-4 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+          <p className="mt-5 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
         </div>
       );
     }
 
     case "duplicateStack":
       return (
-        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-8">
-          <div className="relative h-16 flex items-center justify-center">
+        <div className="py-10 px-6" style={{ background: accentColor }}>
+          <div className="relative h-24 flex items-center justify-center">
             {Array.from({ length: visual.count }).map((_, idx) => {
               const isTop = idx === visual.count - 1;
               return (
                 <div
                   key={idx}
-                  className="absolute w-44 h-12 rounded-md flex items-center justify-center text-xs font-medium"
+                  className="absolute w-56 h-16 rounded-md flex items-center justify-center text-sm font-semibold"
                   style={{
-                    background: accentColor,
-                    opacity: isTop ? 1 : 0.55 - idx * 0.08,
-                    border: `1px solid ${color}40`,
-                    color,
-                    transform: `translate(${idx * 4}px, ${idx * -4}px)`,
+                    background: color,
+                    opacity: isTop ? 1 : 0.5 - idx * 0.08,
+                    color: "#FAF3E7",
+                    transform: `translate(${idx * 5}px, ${idx * -5}px)`,
                     zIndex: idx,
                   }}
                 >
@@ -147,38 +146,38 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
               );
             })}
             {/* The one deliberate break from the container's grid - a
-                serif count badge overlapping the card's own edge. */}
+                serif count badge overlapping the top card's own edge. */}
             <span
-              className="absolute -top-2 -right-2 font-serif text-base font-bold rounded-full w-8 h-8 flex items-center justify-center z-10"
-              style={{ background: color, color: "#FAF3E7" }}
+              className="absolute top-1 right-[calc(50%-6.5rem)] font-serif text-lg font-bold rounded-full w-10 h-10 flex items-center justify-center z-10 shadow-sm"
+              style={{ background: "#FAF3E7", color }}
             >
               &times;{visual.count}
             </span>
           </div>
-          <p className="mt-6 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+          <p className="mt-6 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
         </div>
       );
 
     case "tally": {
       const total = visual.groups * visual.perGroup;
       return (
-        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-5">
-          <div className="flex items-center gap-5">
-            <span className="font-serif text-4xl font-bold shrink-0" style={{ color }}>{total}</span>
-            <div className="flex flex-wrap gap-3">
+        <div className="py-8 px-6" style={{ background: accentColor }}>
+          <div className="flex items-center gap-6">
+            <span className="font-serif text-6xl font-bold shrink-0" style={{ color }}>{total}</span>
+            <div className="flex flex-wrap gap-4">
               {Array.from({ length: visual.groups }).map((_, g) => (
-                <div key={g} className="flex gap-1">
+                <div key={g} className="flex gap-1.5">
                   {/* Two-tone per session, not identical dots - a filled
                       mark for the first session, an outline for the
                       second, so "2 iterations" is a real distinction. */}
                   {Array.from({ length: visual.perGroup }).map((_, s) => (
                     <span
                       key={s}
-                      className="w-2.5 h-2.5 rounded-full"
+                      className="w-3.5 h-3.5 rounded-full"
                       style={
                         s === 0
                           ? { background: color }
-                          : { background: "transparent", border: `1.5px solid ${color}` }
+                          : { background: "transparent", border: `2px solid ${color}` }
                       }
                     />
                   ))}
@@ -186,7 +185,7 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
               ))}
             </div>
           </div>
-          <p className="mt-4 text-xs text-[#211D1D]/40">{visual.caption}</p>
+          <p className="mt-5 text-xs" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
         </div>
       );
     }
@@ -196,29 +195,29 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
       // offset variation - the point being illustrated is drift and
       // disorder, so the layout itself should look disordered instead of
       // being the most orderly, gridded diagram in the set.
-      const offsets = [0, 7, -5, 9, -6];
-      const rotations = [0, -5, 3, 0, -4];
-      const sizes = [40, 33, 45, 31, 38];
+      const offsets = [0, 10, -7, 13, -9];
+      const rotations = [0, -6, 4, 0, -5];
+      const sizes = [56, 46, 62, 42, 52];
       return (
-        <div className="mb-3 rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-9">
-          <div className="flex items-end justify-center gap-2">
+        <div className="py-12 px-6" style={{ background: accentColor }}>
+          <div className="flex items-end justify-center gap-3">
             {visual.swatches.map((hex, idx) => (
               <div
                 key={idx}
-                className="flex flex-col items-center gap-1.5"
+                className="flex flex-col items-center gap-2"
                 style={{
                   transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)`,
                 }}
               >
                 <div
-                  className="rounded-md border border-[#211D1D]/10"
+                  className="rounded-md shadow-sm"
                   style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }}
                 />
-                <span className="text-[9px] text-[#211D1D]/35 font-mono">{hex}</span>
+                <span className="text-[10px] font-mono" style={{ color, opacity: 0.55 }}>{hex}</span>
               </div>
             ))}
           </div>
-          <p className="mt-5 text-xs text-[#211D1D]/40 text-center">{visual.caption}</p>
+          <p className="mt-6 text-xs text-center" style={{ color, opacity: 0.7 }}>{visual.caption}</p>
         </div>
       );
     }
@@ -416,7 +415,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && <div className="w-full">{renderVisual(frame.visual, study.color, study.accentColor)}</div>}
+                {frame.visual && (
+                  <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(frame.visual, study.color, study.accentColor)}</div>
+                )}
                 {frame.features && (
                   <div className="w-full space-y-2.5 mt-1">
                     {frame.features.map((f) => (
@@ -470,7 +471,9 @@ export function FrameCarousel({ project }: FrameCarouselProps) {
                     </span>
                   </button>
                 )}
-                {frame.visual && renderVisual(frame.visual, study.color, study.accentColor)}
+                {frame.visual && (
+                  <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(frame.visual, study.color, study.accentColor)}</div>
+                )}
                 {frame.features ? (
                   <div className="space-y-3">
                     {frame.features.map((f) => (
