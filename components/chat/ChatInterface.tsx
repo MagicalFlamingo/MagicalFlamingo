@@ -10,16 +10,18 @@ import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { knowledge } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases, introMessage, type ChatTool } from "@/content/responses";
+import { pick, thinkingPhrases, type ChatTool } from "@/content/responses";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
-// The very first thing a visitor sees stays fast on purpose - a design
-// council round found a longer delay here was pure dead time before
-// anything happens on a cold load, the opposite of a good first impression.
-const INTRO_DELAY_MS = 500;
+// No auto-playing intro: a design council round found that a chat opening
+// with thinking-dots + a first-person message before anyone asked
+// anything reads as a performed "chatbot demo," not a dry, direct person.
+// The chips just sit there, ready, until she's actually asked something -
+// the first reply goes through the exact same think()/submitText() path
+// as every later one instead of being a scripted special case.
 
-// Every reply after that gets a length-aware pause instead of one fixed
+// Every reply gets a length-aware pause instead of one fixed
 // number for every message. A flat delay is one of the most obvious
 // "this is a script" tells - a real person answering "how can I get in
 // touch" takes less time than answering a full case-study question.
@@ -53,7 +55,6 @@ export function ChatInterface() {
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
   const hasMounted = useRef(false);
-  const hasIntroed = useRef(false);
 
   useEffect(() => {
     if (!hasMounted.current) {
@@ -79,24 +80,6 @@ export function ChatInterface() {
     }, delayMs);
     return () => clearTimeout(t);
   }, []);
-
-  // Agent greets first: thinking indicator, then a first-person intro
-  // with chips to pick where to dig in - nothing sits static on load.
-  useEffect(() => {
-    if (hasIntroed.current) return;
-    hasIntroed.current = true;
-    track("agent_intro_shown");
-    return think(INTRO_DELAY_MS, () => {
-      setMessages([
-        {
-          id: "intro",
-          role: "assistant",
-          text: introMessage,
-          chips: INITIAL_CHIPS,
-        },
-      ]);
-    });
-  }, [think]);
 
   const submitText = useCallback(
     (text: string) => {
@@ -155,6 +138,19 @@ export function ChatInterface() {
         aria-label="Conversation with Danielle"
         className="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-thin"
       >
+        {messages.length === 0 && !isThinking && (
+          <div>
+            <p className="text-sm text-[#211D1D]/40 mb-1 font-medium">
+              Start with a question, or pick one:
+            </p>
+            <PromptChips
+              suggestions={INITIAL_CHIPS}
+              onSelect={submitText}
+              highlightFirst
+            />
+          </div>
+        )}
+
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div

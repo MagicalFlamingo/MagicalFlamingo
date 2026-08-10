@@ -36,9 +36,6 @@ export const thinkingPhrases: string[] = [
   "connecting this to something real",
 ];
 
-export const introMessage =
-  "Hi, I'm Danielle. Eight years making enterprise software make sense - currently doing that at Qlik. Ask me why any decision was made and I'll have a real answer, not a guess.\n\nPick a place to start, or ask me anything.";
-
 export const fallbackResponses: string[] = [
   "I can cover the case studies, research approach, working style, or career background. What's most relevant to what you're evaluating?",
   "That's a bit outside what I can answer here - try asking about a specific project, how I work, or what I'd do in the first 30 days.",
