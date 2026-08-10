@@ -2,7 +2,6 @@
 
 export type ToolName =
   | "showFrameCarousel"
-  | "showCaseStudyCard"
   | "showSkillsMap"
   | "showTimelineCard"
   | "showNDASafeNote";
@@ -47,7 +46,7 @@ export const fallbackFollowups: string[] = [
   "Walk me through AWS Resilience Hub",
   "How do you approach research?",
   "Show me your career timeline",
-  "What are you honest about not having yet?",
+  "How can I get in touch?",
 ];
 
 export const intents: Intent[] = [

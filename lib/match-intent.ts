@@ -1,8 +1,8 @@
-import { intents, fallbackResponses, fallbackFollowups, pick } from "@/content/responses";
+import { intents, fallbackResponses, fallbackFollowups, pick, type ToolName } from "@/content/responses";
 
 export type MatchResult = {
   response: string;
-  tool?: string;
+  tool?: ToolName;
   toolArgs?: Record<string, unknown>;
   chips: string[];
 };

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
+import { track } from "@vercel/analytics";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { knowledge } from "@/content/knowledge";
 
@@ -13,18 +14,6 @@ export function Hero() {
     <section className="flex flex-col lg:flex-row">
       {/* Left - identity (desktop only) */}
       <div className="hidden lg:flex lg:w-[42%] flex-col justify-center px-14 border-r border-[#211D1D]/8 relative overflow-hidden">
-        <motion.div
-          className="absolute -top-24 -left-16 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(46,155,92,0.16) 0%, transparent 70%)", filter: "blur(10px)" }}
-          animate={{ x: [0, 40, -10, 0], y: [0, 30, 60, 0], scale: [1, 1.15, 0.95, 1] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-32 -right-10 w-80 h-80 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(242,169,60,0.14) 0%, transparent 70%)", filter: "blur(10px)" }}
-          animate={{ x: [0, -30, 20, 0], y: [0, -20, -50, 0], scale: [1, 0.9, 1.1, 1] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
         <div className="relative">
           {/* Name - character by character */}
           <motion.div
@@ -77,12 +66,13 @@ export function Hero() {
           className="lg:hidden px-6 pt-10 pb-5 border-b border-[#211D1D]/8"
         >
           <div className="flex items-center justify-between">
-            <span className="relative flex h-2 w-2 shrink-0">
+            <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2A93C] opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
             </span>
             <a
               href={`tel:${identity.phone.replace(/-/g, "")}`}
+              onClick={() => track("phone_tapped")}
               aria-label="Call Danielle"
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
             >
@@ -96,13 +86,16 @@ export function Hero() {
           <p className="mt-1 text-sm text-[#211D1D]/40 font-medium tracking-[0.04em]">
             {identity.title}
           </p>
+          <p className="mt-2 text-sm text-[#211D1D]/50">
+            This is her portfolio, set up so you can ask it questions directly.
+          </p>
         </motion.div>
 
         {/* Desktop header */}
         <div className="hidden lg:block px-10 pt-14 pb-4 border-b border-[#211D1D]/8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2 shrink-0">
+              <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2A93C] opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
               </span>
@@ -112,6 +105,7 @@ export function Hero() {
             </div>
             <a
               href={`tel:${identity.phone.replace(/-/g, "")}`}
+              onClick={() => track("phone_tapped")}
               aria-label="Call Danielle"
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
             >

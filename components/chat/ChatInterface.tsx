@@ -1,24 +1,36 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { track } from "@vercel/analytics";
 import { PromptChips } from "./PromptChips";
-import { CaseStudyCard } from "./CaseStudyCard";
 import { FrameCarousel } from "./FrameCarousel";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases, introMessage } from "@/content/responses";
+import { pick, thinkingPhrases, introMessage, type ToolName } from "@/content/responses";
 
 const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
+
+// Single source of truth for the fake-latency pause - was duplicated as a
+// literal in two places (intro + submitText), tuned by hand five times.
+const THINKING_DELAY_MS = 1500;
+
+const dotVariants: Variants = {
+  animate: (i: number) => ({
+    y: [0, -6, 0],
+    opacity: [0.35, 1, 0.35],
+    transition: { duration: 0.7, delay: i * 0.14, repeat: Infinity, ease: "easeInOut" },
+  }),
+};
 
 type AppMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
-  tool?: string;
+  tool?: ToolName;
   toolArgs?: Record<string, unknown>;
   chips?: string[];
 };
@@ -43,14 +55,26 @@ export function ChatInterface() {
     }
   }, [messages, isThinking]);
 
+  // One shared "think, then reveal" transition - the intro and every
+  // real reply both go through this instead of duplicating the
+  // pick-phrase/set-thinking/timeout/clear sequence.
+  const think = useCallback((reveal: () => void) => {
+    setThinkingPhrase(pick(thinkingPhrases));
+    setIsThinking(true);
+    const t = setTimeout(() => {
+      reveal();
+      setIsThinking(false);
+    }, THINKING_DELAY_MS);
+    return () => clearTimeout(t);
+  }, []);
+
   // Agent greets first: thinking indicator, then a first-person intro
   // with chips to pick where to dig in - nothing sits static on load.
   useEffect(() => {
     if (hasIntroed.current) return;
     hasIntroed.current = true;
-    setThinkingPhrase(pick(thinkingPhrases));
-    setIsThinking(true);
-    const t = setTimeout(() => {
+    track("agent_intro_shown");
+    return think(() => {
       setMessages([
         {
           id: "intro",
@@ -59,15 +83,14 @@ export function ChatInterface() {
           chips: INITIAL_CHIPS,
         },
       ]);
-      setIsThinking(false);
-    }, 1500);
-    return () => clearTimeout(t);
-  }, []);
+    });
+  }, [think]);
 
   const submitText = useCallback(
     (text: string) => {
       if (!text.trim() || isThinking) return;
       setInputValue("");
+      track("agent_question_asked", { text });
 
       const userMsg: AppMessage = {
         id: Date.now().toString(),
@@ -75,10 +98,8 @@ export function ChatInterface() {
         text,
       };
       setMessages((prev) => [...prev, userMsg]);
-      setThinkingPhrase(pick(thinkingPhrases));
-      setIsThinking(true);
 
-      setTimeout(() => {
+      think(() => {
         const result = matchIntent(text);
         const assistantMsg: AppMessage = {
           id: (Date.now() + 1).toString(),
@@ -89,28 +110,19 @@ export function ChatInterface() {
           chips: result.chips,
         };
         setMessages((prev) => [...prev, assistantMsg]);
-        setIsThinking(false);
-      }, 1500);
+        if (result.tool === "showFrameCarousel" && result.toolArgs?.project) {
+          track("case_study_opened", { project: String(result.toolArgs.project) });
+        }
+      });
     },
-    [isThinking]
+    [isThinking, think]
   );
 
-  const renderTool = (tool: string, args: Record<string, unknown>) => {
+  const renderTool = (tool: ToolName, args: Record<string, unknown>) => {
     switch (tool) {
       case "showFrameCarousel":
         return args.project ? (
           <FrameCarousel project={args.project as CaseStudyId} />
-        ) : null;
-      case "showCaseStudyCard":
-        return args.project ? (
-          <CaseStudyCard
-            project={args.project as CaseStudyId}
-            onExpand={(p) =>
-              submitText(
-                `Walk me through the full ${knowledge.caseStudies[p].title} case study`
-              )
-            }
-          />
         ) : null;
       case "showSkillsMap":
         return <SkillsMap />;
@@ -129,6 +141,9 @@ export function ChatInterface() {
     <div className="flex flex-col h-full">
       <div
         ref={scrollContainerRef}
+        role="log"
+        aria-live="polite"
+        aria-label="Conversation with Danielle"
         className="flex-1 overflow-y-auto px-5 py-6 space-y-5 scrollbar-thin"
       >
         <AnimatePresence initial={false}>
@@ -183,14 +198,10 @@ export function ChatInterface() {
                 {[0, 1, 2].map((i) => (
                   <motion.span
                     key={i}
+                    custom={i}
+                    variants={dotVariants}
+                    animate="animate"
                     className="w-2 h-2 rounded-full bg-[#2E9B5C]"
-                    animate={{ y: [0, -6, 0], opacity: [0.35, 1, 0.35] }}
-                    transition={{
-                      duration: 0.7,
-                      delay: i * 0.14,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
                   />
                 ))}
               </div>
@@ -218,7 +229,8 @@ export function ChatInterface() {
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask me anything…"
+            placeholder="Type a question - I'll actually answer it…"
+            aria-label="Message"
             className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
             disabled={isThinking}
           />
