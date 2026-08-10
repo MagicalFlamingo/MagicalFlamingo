@@ -39,9 +39,9 @@ export function Hero() {
               ))}
             </h1>
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.7, ease: [0.25, 0, 0.1, 1] }}
               className="mt-2 text-sm text-[#211D1D]/40 font-medium tracking-[0.06em]"
             >
               {identity.title}
@@ -135,9 +135,6 @@ export function Hero() {
               </a>
             </div>
           </div>
-          <p className="mt-1.5 text-sm text-[#211D1D]/45">
-            No LLM, no filler - just answers.
-          </p>
         </div>
 
         <div className="flex-1 overflow-hidden min-h-0">
