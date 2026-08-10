@@ -177,7 +177,12 @@ export const knowledge = {
       hook: {
         headline: "AWS showed customers a number - 13% - and expected them to trust it.",
         context: `AWS Resilience Hub is a service that helps teams define, validate, and track the resiliency of applications running on AWS.\n\nThe platform calculated a "Resiliency Score" - a proprietary aggregation of assessments - and displayed it as a single percentage in a small corner of the application summary page. No breakdown. No explanation of what went into it. No guidance on what to do next.`,
-        image: { src: "/case-studies/aws/problem-13-percent.jpg", alt: "AWS Resilience Hub showing a bare 13% resiliency score with no breakdown or explanation" },
+        // No image here on purpose - the only available screenshot has
+        // hand-drawn review-annotation arrows baked into the pixels
+        // pointing at the exact number this frame is about. Cropping
+        // around them isn't possible without also cropping out the "13%"
+        // itself. Swap in a clean, unannotated capture when one exists.
+        visual: { kind: "bareStat", value: "13%", caption: "No breakdown. No explanation. No next step." },
       },
 
       friction: {
@@ -211,7 +216,23 @@ export const knowledge = {
           { name: "Policy breach breakdown", description: "Expandable section showing breaches by layer (Application / Infrastructure / Availability Zone / Region) plus outstanding recommendations by type." },
           { name: "Role-aware views", description: "DevOps engineer sees Score Breakdown by default. Portfolio manager sees the trend chart first - posture across applications." },
         ],
-        image: { src: "/case-studies/aws/solution-67-100.jpg", alt: "Redesigned resiliency score: 67/100 with Action Items and Score Breakdown tabs" },
+        // Same issue as the hook frame - the only capture of this screen
+        // is a full presentation slide (dark background, "Final design"
+        // title, annotation dots sitting directly on the score and the
+        // tab it's describing) rather than a clean product screenshot.
+        // Real numbers below, transcribed directly from that same
+        // screenshot before it was pulled - 37+18+10+2 over 40+20+20+20
+        // is exactly 67/100.
+        visual: {
+          kind: "scoreBreakdown",
+          value: "67/100",
+          rows: [
+            { label: "RTO/RPO compliance", score: 37, max: 40 },
+            { label: "Alarms implemented", score: 18, max: 20 },
+            { label: "SOPs implemented", score: 10, max: 20 },
+            { label: "FIS experiments implemented", score: 2, max: 20 },
+          ],
+        },
       },
 
       impact: {
@@ -316,6 +337,17 @@ export interface CaseStudyImage {
   alt: string;
 }
 
+// An honest, real-data illustration for a frame that has no usable
+// screenshot - not a recreated/fake product screenshot (that would
+// misrepresent what it is), a diagram in the site's own visual language
+// that happens to be about a real product. Every number in a diagram
+// must trace back to real source material, same bar as any other fact
+// on this site - see the aws.solution.visual below for where the
+// breakdown numbers came from.
+export type FrameVisual =
+  | { kind: "bareStat"; value: string; caption: string }
+  | { kind: "scoreBreakdown"; value: string; rows: { label: string; score: number; max: number }[] };
+
 export interface CaseStudy {
   id: string;
   title: string;
@@ -325,9 +357,9 @@ export interface CaseStudy {
   ndaLevel: "low" | "partial" | "high";
   color: string;
   accentColor: string;
-  hook: { headline: string; context: string; scale?: string; image?: CaseStudyImage };
+  hook: { headline: string; context: string; scale?: string; image?: CaseStudyImage; visual?: FrameVisual };
   friction: { headline: string; problems: string[]; userVoice?: string[]; researchMethod?: string; image?: CaseStudyImage };
   pivot?: { headline: string; insight: string; designDecision?: string; image?: CaseStudyImage };
-  solution: { headline: string; features: { name: string; description: string }[]; ndaSafeNote?: string; image?: CaseStudyImage };
+  solution: { headline: string; features: { name: string; description: string }[]; ndaSafeNote?: string; image?: CaseStudyImage; visual?: FrameVisual };
   impact: { headline: string; status?: string; outcomes: string[]; whatIDifferently: string; image?: CaseStudyImage };
 }
