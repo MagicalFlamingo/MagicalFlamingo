@@ -82,9 +82,9 @@ export const intents: Intent[] = [
     keywords: ["qlik", "data catalog", "data connection", "data governance", "connections", "unified connections", "platform"],
     weights: { qlik: 4, "data catalog": 3, "data connection": 3, "data governance": 2, "unified connections": 4 },
     responses: [
-      "Qlik is the most complex problem I've worked on - four product lines, no shared way to manage the same data connection. Here's the full story:",
-      "The Qlik project starts with a question users were asking without knowing how to ask it: why do I have to connect to the same database three times?",
-      "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing.",
+      "Qlik is the most complex problem I've worked on - four product lines, no shared way to manage the same data connection, used by data engineers, analysts, automation specialists, and Talend Studio developers across enterprise organizations globally. Here's the full story:",
+      "The Qlik project starts with a question real users were asking without knowing how to ask it: why do I have to connect to the same database three times? This is a platform used globally by data engineers, analysts, and automation specialists, so it's not a small edge case.",
+      "That project is where I learned that 'unify the experience' is easy to say and genuinely hard when the technical objects underneath aren't the same thing - and where getting it wrong affects data engineers and analysts across enterprise organizations, not just one team.",
     ],
     toolCall: { tool: "showCaseStudyBeat", toolArgs: { project: "qlik", beat: "hook" } },
     // Council round 11: this used to open the full multi-step carousel -

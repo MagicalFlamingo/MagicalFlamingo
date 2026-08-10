@@ -13,41 +13,13 @@ interface CaseStudyBeatProps {
 }
 
 type BeatData = {
-  label: string;
-  headline: string;
-  paragraphs: string[];
-  // Structured list (Friction's problems, Impact's outcomes) - kept as a
-  // real array instead of a joined "• x\n• y" string, so it can render as
-  // an actual editorial list instead of a bullet-dotted paragraph. See
-  // council round 12: "still a lot of text, make it more editorial."
-  list?: string[];
-  nda?: boolean;
-  quote?: string;
-  extra?: string;
   image?: CaseStudyImage;
-  features?: { name: string; description: string }[];
-  status?: string;
   visual?: FrameVisual;
+  nda?: boolean;
 };
 
-function paragraphsOf(s: string): string[] {
-  return s.split(/\n\n+/).map((p) => p.replace(/[ \t]{2,}/g, " ").replace(/\n[ \t]+/g, " ").trim()).filter(Boolean);
-}
-
-// Pulls the first sentence off a paragraph so it can be set larger/bolder
-// as a lede - the classic editorial device that gives an eye somewhere to
-// land instead of one uniform block of body text. Falls back to the whole
-// paragraph if there's no clean sentence break.
-function splitLede(paragraph: string): { lede: string; rest: string } {
-  const match = paragraph.match(/^(.+?[.!?])(\s+|$)/);
-  if (!match) return { lede: paragraph, rest: "" };
-  return { lede: match[1], rest: paragraph.slice(match[0].length) };
-}
-
 // Same renderVisual as before - see the "Visual system" comment above
-// FrameVisual in knowledge.ts. Unchanged by the editorial pass: the
-// diagrams themselves already tested well, only the surrounding text
-// needed real typographic hierarchy.
+// FrameVisual in knowledge.ts.
 function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   switch (visual.kind) {
     case "bareStat":
@@ -167,67 +139,38 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   }
 }
 
-// Renders body prose with an editorial "lede" - the first sentence of the
-// first paragraph set larger and bolder, so a scanning reader's eye has
-// somewhere to land before committing to the full paragraph. Subsequent
-// paragraphs stay at normal body size/weight.
-function EditorialProse({ paragraphs }: { paragraphs: string[] }) {
-  if (paragraphs.length === 0) return null;
-  const [first, ...rest] = paragraphs;
-  const { lede, rest: firstRest } = splitLede(first);
-  return (
-    <div className="space-y-3">
-      <p className="text-[15px] leading-relaxed text-[#211D1D]">
-        <span className="font-medium">{lede}</span>
-        {firstRest && <span className="text-[#211D1D]/65"> {firstRest}</span>}
-      </p>
-      {rest.map((p, i) => (
-        <p key={i} className="text-sm leading-relaxed text-[#211D1D]/65">{p}</p>
-      ))}
-    </div>
-  );
-}
-
-// A real editorial list - each point on its own line with room to
-// breathe, a small serif ordinal instead of a bullet dot, rather than a
-// single paragraph of "• x\n• y" that reads as one dense block.
-function EditorialList({ items, color }: { items: string[]; color: string }) {
-  return (
-    <ol className="space-y-3">
-      {items.map((item, i) => (
-        <li key={item} className="flex gap-3">
-          <span className="font-serif text-sm font-semibold shrink-0 w-4" style={{ color }}>{i + 1}</span>
-          <span className="text-sm leading-relaxed text-[#211D1D]/70">{item}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
+  const nda = study.ndaLevel === "partial";
   switch (beat) {
     case "hook":
-      return { label: "Hook", headline: study.hook.headline, paragraphs: paragraphsOf(study.hook.context), extra: study.hook.scale, image: study.hook.image, visual: study.hook.visual };
+      return study.hook.image || study.hook.visual ? { image: study.hook.image, visual: study.hook.visual } : null;
     case "friction":
-      return { label: "Friction", headline: study.friction.headline, paragraphs: [], list: study.friction.problems.slice(0, 4), quote: study.friction.userVoice?.[0], extra: study.friction.researchMethod, image: study.friction.image, visual: study.friction.visual };
+      return study.friction.image || study.friction.visual ? { image: study.friction.image, visual: study.friction.visual } : null;
     case "pivot":
-      if (!study.pivot) return null;
-      return { label: "Pivot", headline: study.pivot.headline, paragraphs: paragraphsOf(study.pivot.insight), extra: study.pivot.designDecision, image: study.pivot.image };
+      return study.pivot?.image ? { image: study.pivot.image } : null;
     case "solution":
-      return { label: "Solution", headline: study.solution.headline, paragraphs: [], features: study.solution.features.slice(0, 2), nda: study.ndaLevel === "partial", image: study.solution.image, visual: study.solution.visual };
+      return study.solution.image || study.solution.visual ? { image: study.solution.image, visual: study.solution.visual, nda } : null;
     case "impact":
-      return { label: "Impact", headline: study.impact.headline, paragraphs: [], list: study.impact.outcomes.slice(0, 4), extra: `What I'd do differently: ${study.impact.whatIDifferently}`, image: study.impact.image, status: study.impact.status, visual: study.impact.visual };
+      return study.impact.image || study.impact.visual ? { image: study.impact.image, visual: study.impact.visual } : null;
   }
 }
 
-// Renders exactly ONE narrative beat of a case study, as its own
-// self-contained chat-message attachment - no pagination, no multi-beat
-// card. Council round 11 made this chat-native (each beat its own message,
-// same as any other multi-part answer in this chat); round 12 made the
-// prose inside it editorial - a lede sentence set apart from the rest of
-// each paragraph, real numbered lists instead of bullet-dotted blocks, and
-// a genuine pull-quote instead of a quiet italic footnote, so a beat with
-// no diagram doesn't just read as a wall of text.
+// Renders exactly ONE narrative beat of a case study - not as a document
+// (headline, body, list, quote, all restating what the reply already
+// said), just the one honest visual that goes with it, the same way a
+// photo attaches to a text message. Council round 13: "the composition is
+// still the same, text, sketch - doesn't feel intuitive and part of the
+// agent." The actual bug was duplication - every one of these intents'
+// chat responses (content/responses.ts) already says the headline, the
+// list items, and the quote as natural prose; the attachment was saying
+// the same facts again in a second, document-shaped format stacked under
+// it. Cutting the attachment down to just the visual removes the second
+// answer instead of trying to make it look more integrated - there's
+// nothing left to feel disconnected from the chat around it.
+//
+// If a beat has no real image or diagram (several Pivot frames don't),
+// this renders nothing at all and the reply is plain chat text, same as
+// any other intent in this app that doesn't happen to have a visual.
 export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
   const study = knowledge.caseStudies[project] as CaseStudy;
   const data = buildBeat(study, beat);
@@ -243,108 +186,22 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
   }, [lightboxImage]);
 
   if (!data) return null;
-  const isMoment = data.label === "Hook" || data.label === "Impact";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mt-2 pl-4"
-      style={{ borderLeft: `3px solid ${study.color}` }}
-    >
-      {/* No bordered "card" surface anymore - a beat is a message
-          attachment, not an artifact. It used to reuse the same
-          bordered-box-with-header chrome the old multi-step carousel had
-          (only the pagination and the pill row were ever removed), which
-          is exactly why it still read as "the old thing" even after the
-          structural rebuild and the editorial type pass - the container
-          itself never actually changed. A colored spine is the only
-          shell now; everything else sits directly in the message. */}
-      <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40 mb-3">{study.company} · {study.title}</p>
-      <div>
-        {data.nda ? (
-          <div className="flex flex-col items-start gap-2">
-            <div className="flex items-center gap-2 text-[#211D1D]/40">
-              <Lock className="h-4 w-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">NDA applies to specifics</span>
-            </div>
-            <h4 className="text-lg font-semibold text-[#211D1D] leading-snug">{data.headline}</h4>
-            {data.image && (
-              <button type="button" onClick={() => setLightboxImage(data.image!)} className="block w-full group/img relative text-left">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={data.image.src} alt={data.image.alt} className="w-full rounded-lg border border-[#211D1D]/10" />
-                <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">View full size ↗</span>
-              </button>
-            )}
-            {data.visual && <div className="w-full mb-4 rounded-lg overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
-            {data.features && (
-              <div className="w-full space-y-3.5 mt-1">
-                {data.features.map((f) => (
-                  <div key={f.name}>
-                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: study.color }}>{f.name}</p>
-                    <p className="text-sm text-[#211D1D]/65 leading-relaxed mt-0.5">{f.description}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <p className="text-xs text-[#211D1D]/40 mt-1 italic">{study.solution.ndaSafeNote}</p>
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: study.color }}>{data.label}</p>
-              {data.status && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#2E9B5C]/10 text-[#2E9B5C]">{data.status}</span>
-              )}
-            </div>
-            <h4 className={isMoment ? "font-serif text-2xl font-semibold text-[#211D1D] leading-snug mb-4" : "text-lg font-semibold text-[#211D1D] leading-snug mb-3"}>
-              {data.headline}
-            </h4>
-            {data.image && (
-              <button type="button" onClick={() => setLightboxImage(data.image!)} className="block mb-3 group/img relative w-full text-left">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={data.image.src} alt={data.image.alt} className="w-full rounded-lg border border-[#211D1D]/10" />
-                <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">View full size ↗</span>
-              </button>
-            )}
-            {data.visual && <div className="mb-4 rounded-lg overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
-            {data.features ? (
-              <div className="space-y-3.5">
-                {data.features.map((f) => (
-                  <div key={f.name}>
-                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: study.color }}>{f.name}</p>
-                    <p className="text-sm text-[#211D1D]/65 leading-relaxed mt-0.5">{f.description}</p>
-                  </div>
-                ))}
-              </div>
-            ) : data.list ? (
-              <EditorialList items={data.list} color={study.color} />
-            ) : (
-              <EditorialProse paragraphs={data.paragraphs} />
-            )}
-            {data.quote && (
-              // A real pull-quote, not a quiet italic footnote - large
-              // serif, its own visual weight, since a direct user quote
-              // is exactly the kind of concrete, credible detail an
-              // editorial piece would pull out and set apart. No border
-              // here (the outer spine already uses study.color for that
-              // job) - the quotation mark itself and the type jump do
-              // the work instead.
-              <p className="mt-5 font-serif text-lg leading-snug text-[#211D1D]">
-                &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
-              </p>
-            )}
-            {data.extra && (
-              data.label === "Hook" ? (
-                <p className="mt-4 text-xs font-medium text-[#211D1D]/75 leading-relaxed bg-[#F2A93C]/12 border-l-2 border-[#F2A93C] rounded-r px-3 py-2">{data.extra}</p>
-              ) : (
-                <p className="mt-4 pt-3 border-t border-[#211D1D]/8 text-xs text-[#211D1D]/40 italic leading-relaxed">{data.extra}</p>
-              )
-            )}
-          </div>
-        )}
-      </div>
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mt-2">
+      {data.image && (
+        <button type="button" onClick={() => setLightboxImage(data.image!)} className="block mb-2 group/img relative w-full text-left">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={data.image.src} alt={data.image.alt} className="w-full rounded-lg border border-[#211D1D]/10" />
+          {data.nda && (
+            <span className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium">
+              <Lock className="h-3 w-3" /> NDA - in-progress prototype
+            </span>
+          )}
+          <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">View full size ↗</span>
+        </button>
+      )}
+      {data.visual && <div className="rounded-lg overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
 
       <AnimatePresence>
         {lightboxImage && (
