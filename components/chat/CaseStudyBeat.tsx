@@ -250,13 +250,19 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="mt-2 rounded-lg overflow-hidden border border-[#211D1D]/10 bg-[#FFFDF9]"
-      style={{ borderTopColor: study.color, borderTopWidth: 3 }}
+      className="mt-2 pl-4"
+      style={{ borderLeft: `3px solid ${study.color}` }}
     >
-      <div className="px-5 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">{study.company} · {study.title}</p>
-      </div>
-      <div className="p-5">
+      {/* No bordered "card" surface anymore - a beat is a message
+          attachment, not an artifact. It used to reuse the same
+          bordered-box-with-header chrome the old multi-step carousel had
+          (only the pagination and the pill row were ever removed), which
+          is exactly why it still read as "the old thing" even after the
+          structural rebuild and the editorial type pass - the container
+          itself never actually changed. A colored spine is the only
+          shell now; everything else sits directly in the message. */}
+      <p className="text-xs font-medium uppercase tracking-wider text-[#211D1D]/40 mb-3">{study.company} · {study.title}</p>
+      <div>
         {data.nda ? (
           <div className="flex flex-col items-start gap-2">
             <div className="flex items-center gap-2 text-[#211D1D]/40">
@@ -271,7 +277,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
                 <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">View full size ↗</span>
               </button>
             )}
-            {data.visual && <div className="w-full -mx-5 mb-4 overflow-hidden" style={{ width: "calc(100% + 2.5rem)" }}>{renderVisual(data.visual, study.color, study.accentColor)}</div>}
+            {data.visual && <div className="w-full mb-4 rounded-lg overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
             {data.features && (
               <div className="w-full space-y-3.5 mt-1">
                 {data.features.map((f) => (
@@ -302,7 +308,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
                 <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-[#211D1D]/70 text-[#FAF3E7] text-[10px] font-medium opacity-0 group-hover/img:opacity-100 transition-opacity">View full size ↗</span>
               </button>
             )}
-            {data.visual && <div className="-mx-5 mb-4 overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
+            {data.visual && <div className="mb-4 rounded-lg overflow-hidden">{renderVisual(data.visual, study.color, study.accentColor)}</div>}
             {data.features ? (
               <div className="space-y-3.5">
                 {data.features.map((f) => (
@@ -321,8 +327,11 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
               // A real pull-quote, not a quiet italic footnote - large
               // serif, its own visual weight, since a direct user quote
               // is exactly the kind of concrete, credible detail an
-              // editorial piece would pull out and set apart.
-              <p className="mt-5 font-serif text-lg leading-snug text-[#211D1D]" style={{ borderLeft: `3px solid ${study.color}`, paddingLeft: "1rem" }}>
+              // editorial piece would pull out and set apart. No border
+              // here (the outer spine already uses study.color for that
+              // job) - the quotation mark itself and the type jump do
+              // the work instead.
+              <p className="mt-5 font-serif text-lg leading-snug text-[#211D1D]">
                 &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
               </p>
             )}
