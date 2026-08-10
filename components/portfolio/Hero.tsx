@@ -49,6 +49,11 @@ export function Hero() {
           </motion.div>
         </div>
 
+        {/* Intentionally static after mount. Ambient/looping motion here
+            (gradient blobs) was tried and removed - it read as generic
+            AI-SaaS chrome and fought the "not an LLM" positioning. See
+            CLAUDE.md. Don't re-add ambient decorative motion without a
+            real reason - council round 7 re-confirmed this on request. */}
       </div>
 
       {/* Right - chat (full-screen on mobile) */}
