@@ -9,6 +9,7 @@ export const knowledge = {
     title: "Senior Product Designer",
     location: "Tel Aviv, Israel",
     email: "goldanielle@gmail.com",
+    phone: "050-6404745",
 
     oneLiner:
       "Eight years making enterprise software make sense - and I can explain exactly why every decision was made.",
