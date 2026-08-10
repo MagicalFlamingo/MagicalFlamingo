@@ -16,7 +16,11 @@ const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label
 
 // Single source of truth for the fake-latency pause - was duplicated as a
 // literal in two places (intro + submitText), tuned by hand five times.
-const THINKING_DELAY_MS = 1500;
+// Deliberately short: a cold first-time visitor's patience is the actual
+// budget here, not a slower "feels more thoughtful" pace - a design
+// council round found the previous 1500ms was pure dead time before
+// anything happens on load, the opposite of a good first impression.
+const THINKING_DELAY_MS = 500;
 
 const dotVariants: Variants = {
   animate: (i: number) => ({
