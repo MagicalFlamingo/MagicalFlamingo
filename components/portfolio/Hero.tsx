@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
+import { Phone } from "lucide-react";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 import { knowledge } from "@/content/knowledge";
 
@@ -13,6 +13,18 @@ export function Hero() {
     <section className="flex flex-col lg:flex-row">
       {/* Left - identity (desktop only) */}
       <div className="hidden lg:flex lg:w-[42%] flex-col justify-center px-14 border-r border-[#211D1D]/8 relative overflow-hidden">
+        <motion.div
+          className="absolute -top-24 -left-16 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(46,155,92,0.16) 0%, transparent 70%)", filter: "blur(10px)" }}
+          animate={{ x: [0, 40, -10, 0], y: [0, 30, 60, 0], scale: [1, 1.15, 0.95, 1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-32 -right-10 w-80 h-80 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(242,169,60,0.14) 0%, transparent 70%)", filter: "blur(10px)" }}
+          animate={{ x: [0, -30, 20, 0], y: [0, -20, -50, 0], scale: [1, 0.9, 1.1, 1] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
         <div className="relative">
           {/* Name - character by character */}
           <motion.div
@@ -70,11 +82,12 @@ export function Hero() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
             </span>
             <a
-              href={`mailto:${identity.email}`}
-              aria-label="Email Danielle"
-              className="flex items-center justify-center w-7 h-7 rounded-full text-[#211D1D]/35 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors"
+              href={`tel:${identity.phone.replace(/-/g, "")}`}
+              aria-label="Call Danielle"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
             >
-              <Mail className="h-3.5 w-3.5" />
+              <Phone className="h-3 w-3" />
+              {identity.phone}
             </a>
           </div>
           <h1 className="mt-2 text-[28px] font-bold text-[#211D1D] font-serif tracking-tight leading-tight">
@@ -98,11 +111,12 @@ export function Hero() {
               </p>
             </div>
             <a
-              href={`mailto:${identity.email}`}
-              aria-label="Email Danielle"
-              className="flex items-center justify-center w-7 h-7 rounded-full text-[#211D1D]/35 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors"
+              href={`tel:${identity.phone.replace(/-/g, "")}`}
+              aria-label="Call Danielle"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
             >
-              <Mail className="h-3.5 w-3.5" />
+              <Phone className="h-3 w-3" />
+              {identity.phone}
             </a>
           </div>
           <p className="mt-1.5 text-sm text-[#211D1D]/45">
