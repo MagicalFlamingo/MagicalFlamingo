@@ -12,7 +12,7 @@ import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import { matchIntent } from "@/lib/match-intent";
 import { pick, thinkingPhrases, introMessage } from "@/content/responses";
 
-const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 5).map((p) => p.label);
+const INITIAL_CHIPS = knowledge.promptSuggestions.slice(0, 6).map((p) => p.label);
 
 type AppMessage = {
   id: string;
@@ -60,7 +60,7 @@ export function ChatInterface() {
         },
       ]);
       setIsThinking(false);
-    }, 900);
+    }, 1500);
     return () => clearTimeout(t);
   }, []);
 
@@ -90,7 +90,7 @@ export function ChatInterface() {
         };
         setMessages((prev) => [...prev, assistantMsg]);
         setIsThinking(false);
-      }, 900);
+      }, 1500);
     },
     [isThinking]
   );
