@@ -12,7 +12,12 @@ interface CaseStudyBeatProps {
   beat: BeatId;
 }
 
-type BeatData = {
+// Exported (redesign, confirmed pivot): the new full-screen CaseStudyModal
+// reuses this exact shape and buildBeat()/renderVisual() below rather
+// than re-modeling case-study content a second time - one real
+// representation of "what is beat X of project Y," two different shells
+// around it (inline chat message here, paginated modal there).
+export type BeatData = {
   label: string;
   headline: string;
   paragraphs: string[];
@@ -56,7 +61,7 @@ function splitLede(paragraph: string): { lede: string; rest: string } {
 // site forgot the figcaption block. renderVisual() now returns the
 // diagram and its caption as one inseparable unit - there's no path that
 // gets one without the other.
-function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
+export function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   const diagram = (() => {
     switch (visual.kind) {
       case "bareStat":
@@ -222,7 +227,7 @@ function renderVisual(visual: FrameVisual, color: string, accentColor: string) {
   );
 }
 
-function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
+export function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
   switch (beat) {
     case "hook":
       return { label: "Hook", headline: study.hook.headline, paragraphs: paragraphsOf(study.hook.context), extra: study.hook.scale, image: study.hook.image, visual: study.hook.visual };

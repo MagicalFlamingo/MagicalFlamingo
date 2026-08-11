@@ -1,166 +1,133 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone, Mail } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { track } from "@vercel/analytics";
-import { ChatInterface } from "@/components/chat/ChatInterface";
 import { knowledge } from "@/content/knowledge";
+
+// Redesign (full-page pivot, confirmed explicitly): work has to be visible
+// with zero clicks before any chat interaction. This replaces the old
+// two-pane identity+chat hero with a real above-the-fold hero, followed
+// by a case-study grid (CaseStudyGrid) and the chat further down the
+// page (see app/page.tsx). Real screenshots, real company names, real
+// LinkedIn URL - nothing here is placeholder content.
+const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
 
 export function Hero() {
   const { identity } = knowledge;
-  const chars = identity.name.split("");
 
   return (
-    <section className="flex flex-col lg:flex-row">
-      {/* Left - identity (desktop only) */}
-      <div className="hidden lg:flex lg:w-[42%] flex-col justify-center px-14 border-r border-[#211D1D]/8 relative overflow-hidden">
-        <div className="relative">
-          {/* Name - character by character */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
+    <section className="relative min-h-screen flex flex-col justify-center px-6 lg:px-16 py-20">
+      <div className="flex flex-col-reverse lg:flex-row items-center gap-14 lg:gap-16 max-w-6xl mx-auto w-full">
+        {/* Left - identity */}
+        <div className="flex-1 max-w-xl text-center lg:text-left">
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.1 }}
+            transition={{ duration: 0.5 }}
+            className="font-serif text-[42px] sm:text-[56px] font-bold text-[#211D1D] tracking-tight leading-[1.08]"
           >
-            <h1 className="text-[52px] font-bold text-[#211D1D] tracking-tight leading-[1.15] font-serif overflow-hidden pb-1">
-              {chars.map((char, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: "60%" }}
-                  animate={{ opacity: 1, y: "0%" }}
-                  transition={{
-                    duration: 0.4,
-                    delay: 0.16 + i * 0.028,
-                    ease: [0.25, 0, 0.1, 1],
-                  }}
-                  className={char === " " ? "inline-block w-[0.28em]" : "inline-block"}
-                >
-                  {char !== " " ? char : null}
-                </motion.span>
-              ))}
-            </h1>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.7, ease: [0.25, 0, 0.1, 1] }}
-              className="mt-2 text-sm text-[#211D1D]/40 font-medium tracking-[0.06em]"
+            {identity.name}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="mt-2 text-base text-[#211D1D]/45 font-medium tracking-[0.04em]"
+          >
+            {identity.title}
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.18 }}
+            className="mt-5 text-lg text-[#211D1D]/75 leading-relaxed mx-auto lg:mx-0 max-w-md"
+          >
+            {identity.oneLiner}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.26 }}
+            className="mt-6 flex items-center justify-center lg:justify-start gap-3 text-sm font-medium"
+          >
+            <a
+              href={`mailto:${identity.email}`}
+              onClick={() => track("email_tapped")}
+              className="text-[#211D1D]/60 hover:text-[#7A5C12] transition-colors"
             >
-              {identity.title}
-            </motion.p>
-            {/* Council round 16/18: this used to be empty space below the
-                title - the only "evidence" of real seniority lived behind
-                a typed question nobody had asked yet. Real facts already
-                in knowledge.ts (no new claims). Wording fixed in round 18
-                - the first draft used "making... make" back to back. */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.85, ease: [0.25, 0, 0.1, 1] }}
-              className="mt-3 text-[13px] text-[#211D1D]/45 leading-relaxed max-w-[300px]"
+              Email
+            </a>
+            <span className="text-[#211D1D]/20" aria-hidden="true">
+              &middot;
+            </span>
+            <a
+              href={identity.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("linkedin_tapped")}
+              className="text-[#211D1D]/60 hover:text-[#7A5C12] transition-colors"
             >
-              Eight years designing enterprise software that actually makes sense - at Amazon AWS, Qlik, and a 400K-customer insurance platform.
-            </motion.p>
+              LinkedIn
+            </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.34 }}
+            className="mt-8 flex items-center justify-center lg:justify-start gap-2.5 text-xs font-semibold uppercase tracking-wider text-[#211D1D]/35"
+          >
+            {COMPANY_BADGES.map((company, i) => (
+              <span key={company} className="flex items-center gap-2.5">
+                {i > 0 && <span aria-hidden="true">&middot;</span>}
+                {company}
+              </span>
+            ))}
           </motion.div>
         </div>
 
-        {/* Intentionally static after mount. Ambient/looping motion here
-            (gradient blobs) was tried and removed - it read as generic
-            AI-SaaS chrome and fought the "not an LLM" positioning. See
-            CLAUDE.md. Don't re-add ambient decorative motion without a
-            real reason - council round 7 re-confirmed this on request. */}
+        {/* Right - stacked real screenshots, one-time entrance only */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="flex-1 relative h-[280px] sm:h-[380px] w-full max-w-md"
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/case-studies/qlik/wizard-configure-step.jpg"
+              alt="Qlik connection wizard, built on Sprout 2.0 components"
+              className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg -rotate-[5deg] -translate-x-[8%] translate-y-2"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/case-studies/qlik/browse-connections.jpg"
+              alt="Unified connections browse table, all connection types in one view"
+              className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg rotate-[4deg] translate-x-[8%] -translate-y-1"
+            />
+          </div>
+        </motion.div>
       </div>
 
-      {/* Right - chat (full-screen on mobile) */}
+      {/* Scroll indicator - functional wayfinding for the new scrollable
+          page, not ambient decoration; respects reduced-motion via the
+          sitewide MotionConfig wrapper. */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="flex-1 flex flex-col h-[100dvh]"
+        transition={{ duration: 0.4, delay: 0.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        aria-hidden="true"
       >
-        {/* Mobile header - name + title as agent identity */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="lg:hidden px-6 pt-10 pb-5 border-b border-[#211D1D]/8"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <div className="flex items-center justify-between">
-            <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2A93C] opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
-            </span>
-            <div className="flex items-center gap-1">
-              <a
-                href={`mailto:${identity.email}`}
-                onClick={() => track("email_tapped")}
-                aria-label="Email Danielle"
-                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
-              >
-                <Mail className="h-3 w-3" />
-                Email
-              </a>
-              <a
-                href={`tel:${identity.phone.replace(/-/g, "")}`}
-                onClick={() => track("phone_tapped")}
-                aria-label="Call Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
-              >
-                <Phone className="h-3 w-3" />
-                {identity.phone}
-              </a>
-            </div>
-          </div>
-          <h1 className="mt-2 text-[28px] font-bold text-[#211D1D] font-serif tracking-tight leading-tight">
-            {identity.name}
-          </h1>
-          <p className="mt-1 text-sm text-[#211D1D]/40 font-medium tracking-[0.04em]">
-            {identity.title}
-          </p>
-          <p className="mt-2 text-xs text-[#211D1D]/45 leading-relaxed">
-            Eight years designing enterprise software that actually makes sense - at Amazon AWS, Qlik, and a 400K-customer insurance platform.
-          </p>
-          <p className="mt-2 text-sm text-[#211D1D]/50">
-            Yes, this is really how you talk to my portfolio - ask it something.
-          </p>
+          <ChevronDown className="h-5 w-5 text-[#211D1D]/30" />
         </motion.div>
-
-        {/* Desktop header */}
-        <div className="hidden lg:block px-10 pt-14 pb-4 border-b border-[#211D1D]/8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F2A93C] opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F2A93C]" />
-              </span>
-              <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-[#211D1D]/35">
-                Ask anything
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <a
-                href={`mailto:${identity.email}`}
-                onClick={() => track("email_tapped")}
-                aria-label="Email Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
-              >
-                <Mail className="h-3 w-3" />
-                Email
-              </a>
-              <a
-                href={`tel:${identity.phone.replace(/-/g, "")}`}
-                onClick={() => track("phone_tapped")}
-                aria-label="Call Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
-              >
-                <Phone className="h-3 w-3" />
-                {identity.phone}
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-hidden min-h-0">
-          <ChatInterface />
-        </div>
       </motion.div>
     </section>
   );
