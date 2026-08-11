@@ -3,11 +3,24 @@
 import { motion } from "framer-motion";
 import { knowledge } from "@/content/knowledge";
 
+// Council round 19: these were also being used directly as text color
+// (below) - measured contrast on the real cream background: tools
+// (marigold) 1.81:1, core (green) 3.19:1, languages (purple) 3.39:1, all
+// failing the 4.5:1 floor for text this size. Fill/border stays bright
+// (only needs the 3:1 UI-component floor); SECTION_TEXT is a darkened,
+// same-hue variant used only where the color is the text itself.
 const SECTION_COLORS: Record<string, string> = {
   core: "#2E9B5C",
   tools: "#F2A93C",
   domains: "#4A6FA5",
   languages: "#9B72CF",
+};
+
+const SECTION_TEXT: Record<string, string> = {
+  core: "#1F6B45",
+  tools: "#7A5C12",
+  domains: "#4A6FA5",
+  languages: "#6B3FA0",
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -30,7 +43,7 @@ export function SkillsMap() {
       <div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {sections.map(([key, items], groupIdx) => (
           <motion.div key={key} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 * groupIdx, duration: 0.25 }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: SECTION_COLORS[key] ?? "#211D1D" }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: SECTION_TEXT[key] ?? "#211D1D" }}>
               {SECTION_LABELS[key] ?? key}
             </p>
             <div className="flex flex-wrap gap-1.5">

@@ -27,9 +27,16 @@ export function PromptChips({ suggestions, onSelect, highlightFirst }: PromptChi
             whileTap={{ scale: 0.96 }}
             onClick={() => onSelect(s)}
             className={
+              // Council round 19: promoted marigold to the primary accent
+              // (was green) - real 2026-trend research plus the site's
+              // own screenshots said green reads "verified/corporate,"
+              // not "fresh." Ink text on the marigold fill instead of
+              // cream text on green fixes a real contrast bug in the
+              // same move: cream-on-green measured 3.19:1 (fails the
+              // 4.5:1 floor for text this size), ink-on-marigold is 8:1+.
               primary
-                ? "px-3.5 py-1.5 text-[12px] rounded bg-[#2E9B5C] text-[#FAF3E7] hover:bg-[#227A46] transition-colors duration-150 cursor-pointer tracking-wide font-medium"
-                : "px-3 py-1.5 text-[12px] rounded border border-[#211D1D]/12 bg-[#FFFDF9]/80 text-[#211D1D]/60 hover:border-[#2E9B5C]/35 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/5 transition-colors duration-150 cursor-pointer tracking-wide"
+                ? "px-3.5 py-1.5 text-[12px] rounded bg-[#F2A93C] text-[#211D1D] hover:bg-[#E0972E] transition-colors duration-150 cursor-pointer tracking-wide font-semibold"
+                : "px-3 py-1.5 text-[12px] rounded border border-[#211D1D]/12 bg-[#FFFDF9]/80 text-[#211D1D]/60 hover:border-[#F2A93C]/50 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors duration-150 cursor-pointer tracking-wide"
             }
           >
             {s}

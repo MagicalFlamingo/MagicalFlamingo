@@ -212,7 +212,7 @@ export function ChatInterface() {
                     custom={i}
                     variants={dotVariants}
                     animate="animate"
-                    className="w-2 h-2 rounded-full bg-[#2E9B5C]"
+                    className="w-2 h-2 rounded-full bg-[#F2A93C]"
                   />
                 ))}
               </div>
@@ -235,7 +235,7 @@ export function ChatInterface() {
             e.preventDefault();
             submitText(inputValue);
           }}
-          className="flex items-center gap-3 bg-[#FFFDF9] rounded-xl border border-[#211D1D]/15 px-4 py-3 shadow-sm focus-within:border-[#2E9B5C]/50 focus-within:shadow-md transition-all"
+          className="flex items-center gap-3 bg-[#FFFDF9] rounded-xl border border-[#211D1D]/15 px-4 py-3 shadow-sm focus-within:border-[#F2A93C]/60 focus-within:shadow-md transition-all"
         >
           <input
             value={inputValue}
