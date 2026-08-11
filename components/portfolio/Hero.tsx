@@ -46,6 +46,19 @@ export function Hero() {
             >
               {identity.title}
             </motion.p>
+            {/* Council round 16/18: this used to be empty space below the
+                title - the only "evidence" of real seniority lived behind
+                a typed question nobody had asked yet. Real facts already
+                in knowledge.ts (no new claims). Wording fixed in round 18
+                - the first draft used "making... make" back to back. */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.85, ease: [0.25, 0, 0.1, 1] }}
+              className="mt-3 text-[13px] text-[#211D1D]/45 leading-relaxed max-w-[300px]"
+            >
+              Eight years designing enterprise software that actually makes sense - at Amazon AWS, Qlik, and a 400K-customer insurance platform.
+            </motion.p>
           </motion.div>
         </div>
 
@@ -101,6 +114,9 @@ export function Hero() {
           </h1>
           <p className="mt-1 text-sm text-[#211D1D]/40 font-medium tracking-[0.04em]">
             {identity.title}
+          </p>
+          <p className="mt-2 text-xs text-[#211D1D]/45 leading-relaxed">
+            Eight years designing enterprise software that actually makes sense - at Amazon AWS, Qlik, and a 400K-customer insurance platform.
           </p>
           <p className="mt-2 text-sm text-[#211D1D]/50">
             Yes, this is really how you talk to my portfolio - ask it something.
