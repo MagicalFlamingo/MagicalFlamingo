@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { track } from "@vercel/analytics";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyBeat } from "./CaseStudyBeat";
 import { SkillsMap } from "./SkillsMap";
@@ -10,34 +12,26 @@ import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { QuoteCard } from "./QuoteCard";
 import { StatCard } from "./StatCard";
-import { matchIntent } from "@/lib/match-intent";
-import { pick, thinkingPhrases, firstMessagePhrase, type ChatTool } from "@/content/responses";
+import { pick, thinkingPhrases, firstMessagePhrase } from "@/content/responses";
+import type { CaseStudyId } from "@/content/knowledge";
+import type { BeatId } from "./CaseStudyBeat";
 
-// Redesign (confirmed pivot): the chat moved from being the whole
-// right-hand pane of a fixed-height two-pane hero to a normal section
-// further down a single scrollable page - real work now shows up above
-// it with zero clicks (Hero + CaseStudyGrid). Curated to 4 chips instead
-// of 6 per the new brief; these 4 specifically surface QuoteCard (via
-// "research process") and the art-history background angle, since a
-// cold visitor won't otherwise discover those without already knowing
-// to ask.
+// Redesign (confirmed pivot, step 5): the chat now calls the real LLM
+// route (app/api/chat) via @ai-sdk/react's useChat instead of the local
+// keyword-matching engine (lib/match-intent.ts, content/responses.ts
+// intents) - that engine is left in the repo untouched in case of
+// rollback, but is no longer imported here. `pick`/`thinkingPhrases`/
+// `firstMessagePhrase` are just personality-phrase pools, unrelated to
+// the matching logic itself, and are still real content worth reusing.
+//
+// Curated to 4 starter chips (was 6); these specifically surface
+// QuoteCard/art-history angles a cold visitor wouldn't otherwise find.
 const INITIAL_CHIPS = [
   "What makes you different from other designers?",
   "How does art history show up in your work?",
   "Walk me through your research process",
   "What would you do in your first 30 days here?",
 ];
-
-// Every reply gets a length-aware pause instead of one fixed
-// number for every message. A flat delay is one of the most obvious
-// "this is a script" tells - a real person answering "how can I get in
-// touch" takes less time than answering a full case-study question.
-// Small random jitter keeps it from feeling metronomic on repeat use.
-function estimateReplyDelay(text: string): number {
-  const words = text.trim().split(/\s+/).length;
-  const jitter = Math.random() * 220 - 60;
-  return Math.min(1600, Math.max(450, 380 + words * 45 + jitter));
-}
 
 const dotVariants: Variants = {
   animate: (i: number) => ({
@@ -47,124 +41,90 @@ const dotVariants: Variants = {
   }),
 };
 
-// Council round 18: "I'm missing some movement... animation on the
-// screen, eye candy - something that shows it's live." Not a typewriter
-// (an open-ended, slowly-generating reveal reads as "an LLM is composing
-// this," which fights the whole "no LLM to blame" positioning) - a fast,
-// bounded stagger instead. Every word is already fully "there," it just
-// arrives in a quick ripple instead of one flat instant block.
-function RevealText({ text }: { text: string }) {
-  const words = text.split(" ");
-  return (
-    <p className="text-sm text-[#211D1D] leading-[1.75]">
-      {words.map((w, i) => (
-        <span key={i}>
-          <motion.span
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, delay: i * 0.014, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-block"
-          >
-            {w}
-          </motion.span>
-          {i < words.length - 1 ? " " : ""}
-        </span>
-      ))}
-    </p>
-  );
-}
-
-type AppMessage = {
-  id: string;
-  role: "user" | "assistant";
-  text: string;
-  toolCall?: ChatTool;
-  chips?: string[];
-};
-
 interface ChatInterfaceProps {
   // Handoff from the case-study modal's mini "Ask about this project..."
-  // input (redesign) - a real question lands here and gets submitted
-  // through the exact same submitText() path as anything typed directly.
+  // input - a real question lands here and gets sent through the exact
+  // same sendMessage() path as anything typed directly.
   initialQuestion?: string | null;
   onConsumeInitialQuestion?: () => void;
+}
+
+// Loosely-typed tool-part narrowing rather than full generic inference
+// across the client/server boundary (InferUITools<ChatTools> etc.) - a
+// reasonable simplification for a first real wiring pass in a repo with
+// no test suite; the exhaustive switch below still catches a genuinely
+// unknown tool name by falling through to null, and every args shape is
+// read directly from the AI SDK's own `part.input`, not re-declared here.
+type ToolPart = {
+  type: string;
+  toolCallId: string;
+  input?: unknown;
+};
+
+function renderToolPart(part: ToolPart) {
+  const input = part.input as Record<string, unknown> | undefined;
+  if (!input) return null;
+  switch (part.type) {
+    case "tool-showCaseStudyBeat":
+      return <CaseStudyBeat key={part.toolCallId} project={input.project as CaseStudyId} beat={input.beat as BeatId} />;
+    case "tool-showSkillsMap":
+      return <SkillsMap key={part.toolCallId} />;
+    case "tool-showTimelineCard":
+      return <TimelineCard key={part.toolCallId} />;
+    case "tool-showNDASafeNote":
+      return <NDASafeNote key={part.toolCallId} context={input.context as string} />;
+    case "tool-showQuoteCard":
+      return <QuoteCard key={part.toolCallId} quote={input.quote as string} attribution={input.attribution as string} />;
+    case "tool-showStatCard":
+      return <StatCard key={part.toolCallId} value={input.value as string} label={input.label as string} />;
+    default:
+      return null;
+  }
 }
 
 export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: ChatInterfaceProps = {}) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<AppMessage[]>([]);
-  const [isThinking, setIsThinking] = useState(false);
   const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
+  const trackedCaseStudyOpens = useRef(new Set<string>());
+  const [transport] = useState(() => new DefaultChatTransport({ api: "/api/chat" }));
+
+  const { messages, sendMessage, status, regenerate } = useChat({ transport });
+  const isThinking = status === "submitted" || status === "streaming";
 
   useEffect(() => {
-    // Guarded on real content, not a "first render" ref flag - a ref-based
-    // guard doesn't survive React Strict Mode's double-effect-invocation
-    // in dev, which was silently scrolling the whole page to the (still
-    // empty) chat section on every load once this component stopped
-    // owning its own bounded overflow-y-auto pane (redesign).
-    if (messages.length === 0 && !isThinking) return;
-    // The chat now lives in a normal, page-scrolling section rather than
-    // owning a fixed-height pane - scroll the newest message into view
-    // within the page instead of scrolling an inner container.
+    if (messages.length === 0) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isThinking]);
 
-  // One shared "think, then reveal" transition - the intro and every
-  // real reply both go through this instead of duplicating the
-  // pick-phrase/set-thinking/timeout/clear sequence. Delay is passed in
-  // per-call rather than fixed, so pacing can vary by what's coming.
-  // `phraseOverride` lets a specific call skip the random pick - used for
-  // the first-message moment below.
-  const think = useCallback((delayMs: number, reveal: () => void, phraseOverride?: string) => {
-    setThinkingPhrase(phraseOverride ?? pick(thinkingPhrases));
-    setIsThinking(true);
-    const t = setTimeout(() => {
-      reveal();
-      setIsThinking(false);
-    }, delayMs);
-    return () => clearTimeout(t);
-  }, []);
+  useEffect(() => {
+    if (status === "submitted") {
+      setThinkingPhrase(messages.length === 0 ? firstMessagePhrase : pick(thinkingPhrases));
+    }
+  }, [status, messages.length]);
 
-  const submitText = useCallback(
-    (text: string) => {
-      if (!text.trim() || isThinking) return;
-      setInputValue("");
-      track("agent_question_asked", { text });
+  // Analytics parity with the old renderTool switch - fires once per
+  // real showCaseStudyBeat tool call, not once per re-render.
+  useEffect(() => {
+    for (const message of messages) {
+      for (const part of message.parts) {
+        if (part.type !== "tool-showCaseStudyBeat") continue;
+        const toolPart = part as unknown as ToolPart;
+        if (trackedCaseStudyOpens.current.has(toolPart.toolCallId)) continue;
+        const input = toolPart.input as { project?: string; beat?: string } | undefined;
+        if (!input?.project || !input?.beat) continue;
+        trackedCaseStudyOpens.current.add(toolPart.toolCallId);
+        track("case_study_opened", { project: input.project, beat: input.beat });
+      }
+    }
+  }, [messages]);
 
-      // No new state - `messages` already tells us if this is the very
-      // first thing a visitor has sent this session, before we push the
-      // new user message onto it.
-      const isFirstMessage = messages.length === 0;
-
-      const userMsg: AppMessage = {
-        id: Date.now().toString(),
-        role: "user",
-        text,
-      };
-      setMessages((prev) => [...prev, userMsg]);
-
-      // Matching is synchronous and instant either way - computing the
-      // result up front just lets the pause length reflect what she's
-      // actually about to say, like a person pausing longer mid-thought
-      // for a longer answer instead of a stopwatch-perfect fixed beat.
-      const result = matchIntent(text);
-      think(estimateReplyDelay(result.response), () => {
-        const assistantMsg: AppMessage = {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          text: result.response,
-          toolCall: result.toolCall,
-          chips: result.chips,
-        };
-        setMessages((prev) => [...prev, assistantMsg]);
-        if (result.toolCall?.tool === "showCaseStudyBeat") {
-          track("case_study_opened", { project: result.toolCall.toolArgs.project, beat: result.toolCall.toolArgs.beat });
-        }
-      }, isFirstMessage ? firstMessagePhrase : undefined);
-    },
-    [isThinking, think, messages.length]
-  );
+  const submitText = (text: string) => {
+    if (!text.trim() || isThinking) return;
+    setInputValue("");
+    track("agent_question_asked", { text });
+    sendMessage({ text });
+  };
 
   useEffect(() => {
     if (!initialQuestion) return;
@@ -172,23 +132,6 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
     onConsumeInitialQuestion?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
-
-  const renderTool = (toolCall: ChatTool) => {
-    switch (toolCall.tool) {
-      case "showCaseStudyBeat":
-        return <CaseStudyBeat project={toolCall.toolArgs.project} beat={toolCall.toolArgs.beat} />;
-      case "showSkillsMap":
-        return <SkillsMap />;
-      case "showTimelineCard":
-        return <TimelineCard />;
-      case "showNDASafeNote":
-        return <NDASafeNote context={toolCall.toolArgs.context} />;
-      case "showQuoteCard":
-        return <QuoteCard quote={toolCall.toolArgs.quote} attribution={toolCall.toolArgs.attribution} />;
-      case "showStatCard":
-        return <StatCard value={toolCall.toolArgs.value} label={toolCall.toolArgs.label} />;
-    }
-  };
 
   return (
     <div className="max-w-[800px] mx-auto px-6">
@@ -211,15 +154,26 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
               <div className={message.role === "user" ? "max-w-[75%]" : "w-full"}>
                 {message.role === "user" ? (
                   <div className="bg-[#211D1D] text-[#FAF3E7] rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
-                    {message.text}
+                    {message.parts.map((p) => (p.type === "text" ? p.text : "")).join("")}
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <RevealText text={message.text} />
-                    {message.toolCall && renderTool(message.toolCall)}
-                    {message.chips && message.chips.length > 0 && (
-                      <PromptChips suggestions={message.chips} onSelect={submitText} />
-                    )}
+                    {message.parts.map((part, i) => {
+                      if (part.type === "text") {
+                        return part.text.trim() ? (
+                          <p key={i} className="text-sm text-[#211D1D] leading-[1.75] whitespace-pre-wrap">
+                            {part.text}
+                          </p>
+                        ) : null;
+                      }
+                      if (part.type === "tool-showPromptChips") {
+                        const input = (part as unknown as ToolPart).input as { suggestions?: string[] } | undefined;
+                        return input?.suggestions ? (
+                          <PromptChips key={i} suggestions={input.suggestions} onSelect={submitText} />
+                        ) : null;
+                      }
+                      return renderToolPart(part as unknown as ToolPart);
+                    })}
                   </div>
                 )}
               </div>
@@ -251,6 +205,27 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Real fetch/API failure (e.g. no ANTHROPIC_API_KEY configured
+            in this environment yet) - an honest inline error, not a
+            silent fallback to the old canned engine. That would leave a
+            visitor unable to tell which system just answered them, and
+            contradicts the point of committing to the real-LLM pivot. */}
+        {status === "error" && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 text-sm">
+            {/* Friendly text for visitors, not the raw SDK error - that
+                detail belongs in server logs / the network tab for
+                whoever's actually debugging it, not on the live page. */}
+            <p className="text-[#211D1D]/50 italic">Something went wrong on that one.</p>
+            <button
+              type="button"
+              onClick={() => regenerate()}
+              className="shrink-0 text-xs font-semibold uppercase tracking-wider text-[#7A5C12] hover:text-[#211D1D] transition-colors"
+            >
+              Try again
+            </button>
+          </motion.div>
+        )}
         <div ref={bottomRef} />
       </div>
 
