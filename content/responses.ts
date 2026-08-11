@@ -22,7 +22,9 @@ export type ChatTool =
   | { tool: "showCaseStudyBeat"; toolArgs: { project: CaseStudyId; beat: BeatId } }
   | { tool: "showSkillsMap" }
   | { tool: "showTimelineCard" }
-  | { tool: "showNDASafeNote"; toolArgs: { context: string } };
+  | { tool: "showNDASafeNote"; toolArgs: { context: string } }
+  | { tool: "showQuoteCard"; toolArgs: { quote: string; attribution: string } }
+  | { tool: "showStatCard"; toolArgs: { value: string; label: string } };
 
 export type ToolName = ChatTool["tool"];
 
@@ -330,6 +332,13 @@ export const intents: Intent[] = [
       "Research for me is less about proving a hypothesis and more about finding the thing I didn't know to ask. That usually happens in the second half of an interview, not the first.",
       "The Qlik study is probably the best example - five months, four user groups, two iteration cycles. The critical insight didn't come from a user question. It came from an engineer who joined one session.",
     ],
+    toolCall: {
+      tool: "showQuoteCard",
+      toolArgs: {
+        quote: "I need to know not just that a connection is used 11 times, but where, and who to contact.",
+        attribution: "Qlik research participant",
+      },
+    },
     followups: [
       "Show me the Qlik project - good example of this",
       "What's your process for synthesizing findings?",
@@ -401,6 +410,27 @@ export const intents: Intent[] = [
       "What makes you different from other senior designers?",
       "What would you do in your first 30 days?",
       "Show me your career timeline",
+    ],
+  },
+
+  {
+    id: "menora_impact",
+    keywords: ["menora", "insurance company", "flagship project", "conversion rate", "insurance platform", "400k customers"],
+    weights: { menora: 5, "flagship project": 4, "conversion rate": 4 },
+    responses: [
+      "Menora Insurance, before AWS - solo designer on their digital flagship project, serving 400K unique monthly customers.",
+    ],
+    toolCall: {
+      tool: "showStatCard",
+      toolArgs: {
+        value: "95%",
+        label: "Conversion rate on the Menora Insurance flagship project - solo designer, 400K monthly customers, millions of NIS in direct revenue impact.",
+      },
+    },
+    followups: [
+      "Show me your career timeline",
+      "What would you do in your first 30 days?",
+      "How can I get in touch?",
     ],
   },
 

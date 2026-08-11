@@ -88,26 +88,43 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Right - stacked real screenshots, one-time entrance only */}
+        {/* Right - real screenshots, one-time entrance only. Desktop/
+            tablet gets the rotated two-image stack; mobile gets a single,
+            unrotated image instead of fighting that composition at a
+            narrow width - wizard-configure-step.jpg is nearly square
+            (1400x1341), so at any width that reads as "small" on a phone
+            it's already about as tall as it is wide, and rotating a
+            second image on top of it was overflowing into the name text
+            below no matter how much height the container was given. */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="flex-1 relative h-[280px] sm:h-[380px] w-full max-w-md"
+          className="flex-1 w-full max-w-md mb-2 lg:mb-0"
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/case-studies/qlik/wizard-configure-step.jpg"
-              alt="Qlik connection wizard, built on Sprout 2.0 components"
-              className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg -rotate-[5deg] -translate-x-[8%] translate-y-2"
-            />
+          <div className="sm:hidden flex items-center justify-center px-10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/case-studies/qlik/browse-connections.jpg"
               alt="Unified connections browse table, all connection types in one view"
-              className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg rotate-[4deg] translate-x-[8%] -translate-y-1"
+              className="w-full rounded-lg border border-[#211D1D]/10 shadow-lg"
             />
+          </div>
+          <div className="hidden sm:block relative h-[380px]">
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/case-studies/qlik/wizard-configure-step.jpg"
+                alt="Qlik connection wizard, built on Sprout 2.0 components"
+                className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg -rotate-[5deg] -translate-x-[8%] translate-y-2"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/case-studies/qlik/browse-connections.jpg"
+                alt="Unified connections browse table, all connection types in one view"
+                className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg rotate-[4deg] translate-x-[8%] -translate-y-1"
+              />
+            </div>
           </div>
         </motion.div>
       </div>

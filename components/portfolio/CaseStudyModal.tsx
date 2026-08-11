@@ -34,7 +34,7 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
   const [frameIndex, setFrameIndex] = useState(0);
   const [miniInput, setMiniInput] = useState("");
 
-  const study: CaseStudy | null = project ? knowledge.caseStudies[project] : null;
+  const study: CaseStudy | null = project ? (knowledge.caseStudies[project] as CaseStudy) : null;
 
   const frames = useMemo(() => {
     if (!study) return [];
@@ -94,35 +94,28 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-6 py-10 lg:py-16 flex flex-col lg:flex-row gap-10 lg:items-center">
-            <div className="lg:w-[60%] flex items-center justify-center">
-              <FrameVisualPanel data={data} study={study} />
-            </div>
-            <div className="lg:w-[40%] flex flex-col">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#F2A93C]">{data.label}</p>
-              <h3 className="mt-2 font-serif text-2xl font-bold text-[#FAF3E7] leading-snug">{data.headline}</h3>
-              {data.paragraphs[0] && (
-                <p className="mt-4 text-[15px] text-[#FAF3E7]/70 leading-relaxed">{data.paragraphs[0]}</p>
-              )}
-              {data.quote && (
-                <p className="mt-5 text-lg italic text-[#FAF3E7]/90 leading-snug border-l-2 border-[#F2A93C]/50 pl-4">
-                  &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
-                </p>
-              )}
-              {data.list && (
-                <ol className="mt-4 space-y-2">
-                  {data.list.slice(0, 4).map((item, i) => (
-                    <li key={item} className="flex gap-2.5 text-sm text-[#FAF3E7]/70">
-                      <span className="text-[#F2A93C] font-semibold shrink-0">{i + 1}</span>
-                      {item}
-                    </li>
-                  ))}
-                </ol>
-              )}
-              {data.nda && study.solution.ndaSafeNote && (
-                <p className="mt-4 text-xs italic text-[#FAF3E7]/40">{study.solution.ndaSafeNote}</p>
-              )}
-            </div>
+          <div className="max-w-5xl mx-auto px-6 py-10 lg:py-16">
+            {data.image || data.visual ? (
+              <div className="flex flex-col lg:flex-row gap-10 lg:items-center">
+                <div className="lg:w-[60%] flex items-center justify-center">
+                  <FrameVisualPanel data={data} study={study} />
+                </div>
+                <div className="lg:w-[40%] flex flex-col">
+                  <FrameNarrative data={data} study={study} />
+                </div>
+              </div>
+            ) : (
+              // No image/visual modeled for this beat (typically a
+              // text-only pivot frame) - a single centered column, not a
+              // 60/40 split with nothing real to put on the left. The
+              // 60/40 split previously repeated the same paragraph on
+              // both sides to fill the empty visual slot - a real
+              // content-duplication bug, the exact failure mode this
+              // project spent several earlier rounds fixing elsewhere.
+              <div className="max-w-xl mx-auto flex flex-col items-center text-center">
+                <FrameNarrative data={data} study={study} centered showSecondParagraph />
+              </div>
+            )}
           </div>
         </div>
 
@@ -205,25 +198,64 @@ function FrameVisualPanel({ data, study }: { data: BeatData; study: CaseStudy })
       </div>
     );
   }
-  if (data.visual) {
-    return (
-      <div className="w-full max-w-md rounded-sm overflow-hidden">
-        {renderVisual(data.visual, study.color, study.accentColor)}
-      </div>
-    );
-  }
-  // No image/visual modeled for this beat (typically a text-only pivot
-  // frame) - a real typographic moment instead of a fabricated diagram.
-  if (data.extra) {
-    return (
-      <p className="font-serif text-2xl lg:text-3xl font-semibold text-[#FAF3E7]/90 leading-snug text-center lg:text-left max-w-md">
-        {data.extra}
-      </p>
-    );
-  }
+  // data.visual - the only other case this gets called for (the parent
+  // only renders this component at all when image or visual exists; see
+  // the centered-single-column branch in the main render for beats with
+  // neither).
   return (
-    <p className="font-serif text-2xl lg:text-3xl font-bold text-[#FAF3E7]/85 leading-snug text-center lg:text-left max-w-md">
-      {data.paragraphs[0]}
-    </p>
+    <div className="w-full max-w-md rounded-sm overflow-hidden">
+      {data.visual && renderVisual(data.visual, study.color, study.accentColor)}
+    </div>
+  );
+}
+
+// Shared narrative block - used both in the 60/40 split (when a beat has
+// a real image/visual) and centered as the sole content (when it
+// doesn't). Never rendered twice for the same beat, so nothing here can
+// duplicate itself the way the split layout used to when there was
+// nothing real to put in the visual slot.
+function FrameNarrative({
+  data,
+  study,
+  centered = false,
+  showSecondParagraph = false,
+}: {
+  data: BeatData;
+  study: CaseStudy;
+  centered?: boolean;
+  showSecondParagraph?: boolean;
+}) {
+  return (
+    <>
+      <p className="text-xs font-semibold uppercase tracking-wider text-[#F2A93C]">{data.label}</p>
+      <h3 className="mt-2 font-serif text-2xl lg:text-3xl font-bold text-[#FAF3E7] leading-snug">{data.headline}</h3>
+      {data.paragraphs[0] && (
+        <p className="mt-4 text-[15px] text-[#FAF3E7]/70 leading-relaxed">{data.paragraphs[0]}</p>
+      )}
+      {showSecondParagraph && data.paragraphs[1] && (
+        <p className="mt-3 text-[15px] text-[#FAF3E7]/70 leading-relaxed">{data.paragraphs[1]}</p>
+      )}
+      {data.quote && (
+        <p className={`mt-5 text-lg italic text-[#FAF3E7]/90 leading-snug ${centered ? "" : "border-l-2 border-[#F2A93C]/50 pl-4"}`}>
+          &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
+        </p>
+      )}
+      {data.list && (
+        <ol className={`mt-4 space-y-2 ${centered ? "text-left inline-block" : ""}`}>
+          {data.list.slice(0, 4).map((item, i) => (
+            <li key={item} className="flex gap-2.5 text-sm text-[#FAF3E7]/70">
+              <span className="text-[#F2A93C] font-semibold shrink-0">{i + 1}</span>
+              {item}
+            </li>
+          ))}
+        </ol>
+      )}
+      {data.nda && study.solution.ndaSafeNote && (
+        <p className="mt-4 text-xs italic text-[#FAF3E7]/40">{study.solution.ndaSafeNote}</p>
+      )}
+      {data.extra && (
+        <p className="mt-4 text-sm italic text-[#FAF3E7]/55 leading-relaxed">{data.extra}</p>
+      )}
+    </>
   );
 }
