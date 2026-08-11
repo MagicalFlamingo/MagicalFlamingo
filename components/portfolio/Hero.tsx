@@ -93,7 +93,7 @@ export function Hero() {
                 href={`mailto:${identity.email}`}
                 onClick={() => track("email_tapped")}
                 aria-label="Email Danielle"
-                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
               >
                 <Mail className="h-3 w-3" />
                 Email
@@ -102,7 +102,7 @@ export function Hero() {
                 href={`tel:${identity.phone.replace(/-/g, "")}`}
                 onClick={() => track("phone_tapped")}
                 aria-label="Call Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
               >
                 <Phone className="h-3 w-3" />
                 {identity.phone}
@@ -140,7 +140,7 @@ export function Hero() {
                 href={`mailto:${identity.email}`}
                 onClick={() => track("email_tapped")}
                 aria-label="Email Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
               >
                 <Mail className="h-3 w-3" />
                 Email
@@ -149,7 +149,7 @@ export function Hero() {
                 href={`tel:${identity.phone.replace(/-/g, "")}`}
                 onClick={() => track("phone_tapped")}
                 aria-label="Call Danielle"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#2E9B5C] hover:bg-[#2E9B5C]/8 transition-colors text-xs font-medium tracking-wide"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[#211D1D]/45 hover:text-[#7A5C12] hover:bg-[#F2A93C]/8 transition-colors text-xs font-medium tracking-wide"
               >
                 <Phone className="h-3 w-3" />
                 {identity.phone}
