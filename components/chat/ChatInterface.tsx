@@ -40,6 +40,35 @@ const dotVariants: Variants = {
   }),
 };
 
+// Council round 18: "I'm missing some movement... animation on the
+// screen, eye candy - something that shows it's live." Not a typewriter
+// (an open-ended, slowly-generating reveal reads as "an LLM is composing
+// this," which fights the whole "no LLM to blame" positioning) - a fast,
+// bounded stagger instead. Every word is already fully "there," it just
+// arrives in a quick ripple instead of one flat instant block. Total
+// added time for a typical one-sentence reply is well under a third of
+// a second.
+function RevealText({ text }: { text: string }) {
+  const words = text.split(" ");
+  return (
+    <p className="text-sm text-[#211D1D] leading-[1.75]">
+      {words.map((w, i) => (
+        <span key={i}>
+          <motion.span
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22, delay: i * 0.014, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-block"
+          >
+            {w}
+          </motion.span>
+          {i < words.length - 1 ? " " : ""}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 type AppMessage = {
   id: string;
   role: "user" | "assistant";
@@ -61,9 +90,13 @@ export function ChatInterface() {
       hasMounted.current = true;
       return;
     }
+    // Council round 18: this used to be an instant `scrollTop` jump - the
+    // moment a reply landed, the log just snapped, no visible motion at
+    // all. `behavior: "smooth"` is the one-line difference between "the
+    // page updated" and "the conversation moved."
     if (scrollContainerRef.current) {
       const el = scrollContainerRef.current;
-      el.scrollTop = el.scrollHeight;
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
     }
   }, [messages, isThinking]);
 
@@ -180,9 +213,7 @@ export function ChatInterface() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p className="text-sm text-[#211D1D] leading-[1.75]">
-                      {message.text}
-                    </p>
+                    <RevealText text={message.text} />
                     {message.toolCall && renderTool(message.toolCall)}
                     {message.chips && message.chips.length > 0 && (
                       <PromptChips
