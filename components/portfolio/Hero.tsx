@@ -27,11 +27,17 @@ export function Hero() {
       <div className="flex flex-col-reverse lg:flex-row items-center gap-14 lg:gap-16 max-w-6xl mx-auto w-full">
         {/* Left - identity */}
         <div className="flex-1 max-w-xl text-center lg:text-left">
+          {/* Council round 22 ("it should be 2026, not 2020"): oversized,
+              tightly-set display type is one of the concrete, current
+              levers for reading as premium rather than a template -
+              this was sized like a competent brochure headline before,
+              not a real hero statement. Same font (Lora), same weight
+              scale, just committed to at real scale. */}
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="font-serif text-[42px] sm:text-[56px] font-bold text-[#211D1D] tracking-tight leading-[1.08]"
+            className="font-serif text-[56px] sm:text-[84px] lg:text-[92px] font-bold text-[#211D1D] tracking-tight leading-[0.95]"
           >
             {identity.name}
           </motion.h1>
@@ -39,7 +45,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="mt-2 text-base text-[#211D1D]/45 font-medium tracking-[0.04em]"
+            className="mt-3 text-lg text-[#211D1D]/45 font-medium tracking-[0.04em]"
           >
             {identity.title}
           </motion.p>
@@ -47,7 +53,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.18 }}
-            className="mt-5 text-lg text-[#211D1D]/75 leading-relaxed mx-auto lg:mx-0 max-w-md"
+            className="mt-6 text-xl text-[#211D1D]/75 leading-relaxed mx-auto lg:mx-0 max-w-md"
           >
             {identity.oneLiner}
           </motion.p>
@@ -94,23 +100,22 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Right - one real screenshot, captioned like a figure, instead
-            of the rotated-overlapping-browser-mockups composition this
-            used to be. That "two tilted app screenshots floating in
-            space" arrangement is one of the most recognizable generic
-            SaaS-hero conventions there is - dropping the tilt, the
-            shadow, and the second image in favor of a single flat,
-            bordered, captioned figure keeps this consistent with how
-            every other real image on the site is already presented
-            (CaseStudyBeat, CaseStudyCard) instead of borrowing a
-            different, unrelated convention just for the hero. */}
+        {/* Right - one real screenshot, captioned like a figure. Council
+            round 20 dropped the rotated-overlapping-mockups cliche in
+            favor of this flat, bordered treatment - right call, but
+            "flat" also meant zero depth anywhere on the page, which is
+            part of why round 22 read this as dated rather than
+            restrained. One soft, wide, low-opacity shadow (not
+            Tailwind's default shadow-lg) puts real depth back without
+            reopening the SaaS-hero-mockup question - the image still
+            sits flat and uncropped, just with real weight under it. */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="flex-1 w-full max-w-md"
         >
-          <figure className="border border-[#211D1D]/10 rounded-sm overflow-hidden bg-[#FFFDF9]">
+          <figure className="border border-[#211D1D]/10 rounded-sm overflow-hidden bg-[#FFFDF9] shadow-[0_40px_80px_-30px_rgba(33,29,29,0.28)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/case-studies/qlik/browse-connections.jpg"
