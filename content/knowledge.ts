@@ -9,7 +9,6 @@ export const knowledge = {
     title: "Senior Product Designer",
     location: "Tel Aviv, Israel",
     email: "goldanielle@gmail.com",
-    phone: "050-6404745",
     linkedin: "https://www.linkedin.com/in/danielle-goldberg-411a103a/",
 
     oneLiner:
