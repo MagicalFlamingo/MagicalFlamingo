@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
 interface CaseStudyCardProps {
@@ -12,6 +13,30 @@ interface CaseStudyCardProps {
   // case study actually carries the most complete real content, not
   // just decoration.
   featured?: boolean;
+}
+
+// Council round 23: the real "67/100" AWS score used to just appear,
+// static, the instant its card mounted - inert data sitting in a
+// colored box. Counting up from 0 the first time it's actually scrolled
+// into view turns a real number into something that reads as felt
+// weight, without inventing or rounding anything - it still ends at the
+// exact same 67 either way.
+function CountUpNumber({ value }: { value: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    const controls = animate(0, value, {
+      duration: 1.1,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [isInView, value]);
+
+  return <span ref={ref}>{display}</span>;
 }
 
 // Council round 20 ("looks over-generic - check how AI websites look and
@@ -44,8 +69,12 @@ function CardVisual({ project }: { project: CaseStudyId }) {
   if (project === "aws") {
     return (
       <div className="w-full h-full flex items-center justify-center" style={{ background: study.accentColor }}>
-        <span className="font-serif font-bold text-7xl" style={{ color: study.color }}>
-          67<span className="text-2xl align-top">/100</span>
+        {/* Council round 23: real weight contrast instead of a uniform
+            bold everywhere - "67" bold, "/100" ultralight, both Inter's
+            actual loaded range (100 and 700), not a new typeface. */}
+        <span className="font-serif font-bold text-7xl inline-flex items-baseline" style={{ color: study.color }}>
+          <CountUpNumber value={67} />
+          <span className="font-sans font-thin text-2xl ml-0.5" style={{ color: study.color }}>/100</span>
         </span>
       </div>
     );
@@ -70,23 +99,29 @@ export function CaseStudyCard({ project, onOpen, featured = false }: CaseStudyCa
   const study = knowledge.caseStudies[project];
 
   return (
-    // Council round 21/22: hover feedback went from a bare border-color
-    // change to a real lift + slow image pan, then round 22 added one
-    // controlled layer of real depth on top - a soft, wide, low-opacity
-    // shadow on hover, not the flat border-only look that (correctly)
-    // replaced the old dark-overlay cards but (over-correctly) left
-    // zero sense of the card lifting off the page.
+    // Council round 21/22/23: hover feedback went from a bare border-
+    // color change to a real lift + slow image pan, then a soft shadow
+    // on top. Round 23 adds a genuine scroll-triggered entrance
+    // (whileInView, not the mount-only reveal every section used to
+    // have) and a shared `layoutId` on the image so opening the modal
+    // morphs this exact image into place instead of an unrelated
+    // fade+scale from the center of the screen - real spatial
+    // continuity between what you clicked and what opens.
     <motion.button
       type="button"
       onClick={() => onOpen(project)}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10% 0px" }}
       whileHover={{ y: -4 }}
       whileTap={{ y: 0, scale: 0.99 }}
-      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className={`group text-left cursor-pointer border border-[#211D1D]/10 bg-[#FFFDF9] rounded-sm overflow-hidden hover:border-[#211D1D]/20 hover:shadow-[0_24px_48px_-24px_rgba(33,29,29,0.25)] transition-[border-color,box-shadow] duration-200 ${
         featured ? "sm:col-span-2 sm:row-span-2 flex flex-col sm:flex-row" : ""
       }`}
     >
-      <div
+      <motion.div
+        layoutId={`case-study-image-${project}`}
         className={`overflow-hidden border-[#211D1D]/10 ${
           featured ? "aspect-[4/3] sm:aspect-auto sm:w-[55%] sm:h-full border-b sm:border-b-0 sm:border-r" : "aspect-[4/3] border-b"
         }`}
@@ -94,15 +129,15 @@ export function CaseStudyCard({ project, onOpen, featured = false }: CaseStudyCa
         <div className="w-full h-full transition-transform duration-500 ease-out group-hover:scale-[1.04]">
           <CardVisual project={project} />
         </div>
-      </div>
+      </motion.div>
       <div className={`p-5 ${featured ? "sm:w-[45%] flex flex-col justify-center" : ""}`}>
-        <p className="text-xs font-semibold uppercase tracking-wider text-[#211D1D]/40">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#211D1D]/40">
           {study.company} &middot; {study.year}
         </p>
-        <h3 className={`mt-1.5 font-serif font-bold text-[#211D1D] leading-tight ${featured ? "text-2xl lg:text-3xl" : "text-xl"}`}>
+        <h3 className={`mt-1.5 font-serif text-[#211D1D] leading-tight ${featured ? "text-[32px] font-bold" : "text-xl font-semibold"}`}>
           {study.title}
         </h3>
-        <p className={`mt-2 text-[#211D1D]/65 leading-relaxed ${featured ? "text-base" : "text-sm"}`}>
+        <p className="mt-2 text-[17px] leading-[1.6] text-[#211D1D]/65">
           {study.hook.headline}
         </p>
         <p className="mt-3 text-xs font-semibold text-[#7A5C12] group-hover:underline underline-offset-2">

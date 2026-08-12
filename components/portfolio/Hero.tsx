@@ -27,17 +27,18 @@ export function Hero() {
       <div className="flex flex-col-reverse lg:flex-row items-center gap-14 lg:gap-16 max-w-6xl mx-auto w-full">
         {/* Left - identity */}
         <div className="flex-1 max-w-xl text-center lg:text-left">
-          {/* Council round 22 ("it should be 2026, not 2020"): oversized,
-              tightly-set display type is one of the concrete, current
-              levers for reading as premium rather than a template -
-              this was sized like a competent brochure headline before,
-              not a real hero statement. Same font (Lora), same weight
-              scale, just committed to at real scale. */}
+          {/* Council round 23 ("$1M... 2026-2027, feels flat"): round 22
+              made this bigger but the type system was still flat - every
+              headline sat at the exact same Lora 700 weight, so "bigger"
+              read as "technically bigger," not art-directed. A huge
+              serif at medium weight reads more considered than
+              bold-everywhere; 700 is reserved for the featured case-study
+              headline now, where the contrast means something. */}
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="font-serif text-[56px] sm:text-[84px] lg:text-[92px] font-bold text-[#211D1D] tracking-tight leading-[0.95]"
+            className="font-serif text-[56px] sm:text-[84px] lg:text-[92px] font-medium text-[#211D1D] tracking-tight leading-[0.95]"
           >
             {identity.name}
           </motion.h1>
@@ -53,7 +54,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.18 }}
-            className="mt-6 text-xl text-[#211D1D]/75 leading-relaxed mx-auto lg:mx-0 max-w-md"
+            className="mt-6 text-[17px] text-[#211D1D]/75 leading-[1.6] mx-auto lg:mx-0 max-w-md"
           >
             {identity.oneLiner}
           </motion.p>
@@ -129,22 +130,22 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator - functional wayfinding for the new scrollable
-          page, not ambient decoration; respects reduced-motion via the
-          sitewide MotionConfig wrapper. */}
+      {/* Scroll indicator - council round 23 caught this as the one
+          actually-ambient animation left on the page: an infinite
+          `repeat: Infinity` loop that plays regardless of anything the
+          visitor does, the exact category of motion CLAUDE.md has twice
+          rejected elsewhere (gradient blobs, auto-playing intro). A
+          single settle-in on mount, no loop, still reads as "there's
+          more below" without becoming the one thing on the page that
+          never stops moving. */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.6 }}
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         aria-hidden="true"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <ChevronDown className="h-5 w-5 text-[#211D1D]/30" />
-        </motion.div>
+        <ChevronDown className="h-5 w-5 text-[#211D1D]/30" />
       </motion.div>
     </section>
   );
