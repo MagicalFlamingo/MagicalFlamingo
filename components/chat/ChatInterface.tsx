@@ -229,12 +229,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
         <div ref={bottomRef} />
       </div>
 
+      {/* Council round 20: a rounded-full pill with an inline round send
+          button is the exact shape every AI chat product uses (ChatGPT,
+          Perplexity, Intercom) - recognizable as "AI chat input" on
+          sight, independent of color. A plain bordered field with a
+          bottom accent rule reads as an inquiry field, not a chatbot
+          widget, and matches the sharp-cornered chrome used everywhere
+          else on the site now (CaseStudyCard, the hero figure). */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submitText(inputValue);
         }}
-        className="mt-6 sticky bottom-4 flex items-center gap-3 bg-[#FFFDF9] rounded-full border border-[#211D1D]/15 px-5 py-3 shadow-md focus-within:border-[#F2A93C]/60 transition-all"
+        className="mt-6 sticky bottom-4 flex items-center gap-3 bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 transition-colors"
       >
         <input
           value={inputValue}
@@ -247,7 +254,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
         <button
           type="submit"
           disabled={isThinking || !inputValue.trim()}
-          className="shrink-0 px-4 py-1.5 rounded-full bg-[#211D1D] text-[#FAF3E7] text-[11px] font-semibold uppercase tracking-[0.14em] disabled:opacity-30 hover:bg-[#332D2A] transition-colors"
+          className="shrink-0 px-4 py-1.5 rounded-sm bg-[#211D1D] text-[#FAF3E7] text-[11px] font-semibold uppercase tracking-[0.14em] disabled:opacity-30 hover:bg-[#332D2A] transition-colors"
         >
           Ask
         </button>

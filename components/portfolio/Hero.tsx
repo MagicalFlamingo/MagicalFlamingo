@@ -17,7 +17,13 @@ export function Hero() {
   const { identity } = knowledge;
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center px-6 lg:px-16 py-20">
+    // Council round 20: this used to be `min-h-screen` regardless of how
+    // much content actually filled it, leaving a large dead gap below
+    // the fold on most screens - "match hero size to actual content,
+    // not a template default" was one of the clearest, most concrete
+    // pieces of real research on why AI-generated pages read as
+    // templated. Generous padding instead of a forced 100vh.
+    <section className="relative flex flex-col justify-center px-6 lg:px-16 py-24 lg:py-32">
       <div className="flex flex-col-reverse lg:flex-row items-center gap-14 lg:gap-16 max-w-6xl mx-auto w-full">
         {/* Left - identity */}
         <div className="flex-1 max-w-xl text-center lg:text-left">
@@ -88,44 +94,33 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Right - real screenshots, one-time entrance only. Desktop/
-            tablet gets the rotated two-image stack; mobile gets a single,
-            unrotated image instead of fighting that composition at a
-            narrow width - wizard-configure-step.jpg is nearly square
-            (1400x1341), so at any width that reads as "small" on a phone
-            it's already about as tall as it is wide, and rotating a
-            second image on top of it was overflowing into the name text
-            below no matter how much height the container was given. */}
+        {/* Right - one real screenshot, captioned like a figure, instead
+            of the rotated-overlapping-browser-mockups composition this
+            used to be. That "two tilted app screenshots floating in
+            space" arrangement is one of the most recognizable generic
+            SaaS-hero conventions there is - dropping the tilt, the
+            shadow, and the second image in favor of a single flat,
+            bordered, captioned figure keeps this consistent with how
+            every other real image on the site is already presented
+            (CaseStudyBeat, CaseStudyCard) instead of borrowing a
+            different, unrelated convention just for the hero. */}
         <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="flex-1 w-full max-w-md mb-2 lg:mb-0"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="flex-1 w-full max-w-md"
         >
-          <div className="sm:hidden flex items-center justify-center px-10">
+          <figure className="border border-[#211D1D]/10 rounded-sm overflow-hidden bg-[#FFFDF9]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/case-studies/qlik/browse-connections.jpg"
               alt="Unified connections browse table, all connection types in one view"
-              className="w-full rounded-lg border border-[#211D1D]/10 shadow-lg"
+              className="w-full"
             />
-          </div>
-          <div className="hidden sm:block relative h-[380px]">
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/case-studies/qlik/wizard-configure-step.jpg"
-                alt="Qlik connection wizard, built on Sprout 2.0 components"
-                className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg -rotate-[5deg] -translate-x-[8%] translate-y-2"
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/case-studies/qlik/browse-connections.jpg"
-                alt="Unified connections browse table, all connection types in one view"
-                className="absolute w-[74%] rounded-lg border border-[#211D1D]/10 shadow-lg rotate-[4deg] translate-x-[8%] -translate-y-1"
-              />
-            </div>
-          </div>
+            <figcaption className="px-4 py-3 border-t border-[#211D1D]/10 text-xs text-[#211D1D]/45">
+              Qlik &middot; unified connections browse view
+            </figcaption>
+          </figure>
         </motion.div>
       </div>
 
