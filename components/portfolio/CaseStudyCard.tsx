@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
 interface CaseStudyCardProps {
@@ -63,13 +64,29 @@ export function CaseStudyCard({ project, onOpen }: CaseStudyCardProps) {
   const study = knowledge.caseStudies[project];
 
   return (
-    <button
+    // Council round 21 ("UI-wise, interactions - check awwwards.com"):
+    // the previous pass fixed the card's look but left its feel flat -
+    // a color-only border change on hover barely registers as feedback.
+    // A real lift + a slow image pan (not a snap-scale) is the
+    // restrained version of the "feels interactive, not just looks
+    // impressive" shift current award-winning sites are judged on -
+    // without reaching for the WebGL/cursor-reactive-3D treatments that
+    // dominate that showcase, which would be real scope and a real
+    // voice mismatch for a site whose whole pitch is directness, not a
+    // performance (ambient/decorative motion has been rejected here
+    // twice already for exactly that reason).
+    <motion.button
       type="button"
       onClick={() => onOpen(project)}
+      whileHover={{ y: -3 }}
+      whileTap={{ y: 0, scale: 0.99 }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
       className="group text-left cursor-pointer border border-[#211D1D]/10 bg-[#FFFDF9] rounded-sm overflow-hidden hover:border-[#211D1D]/25 transition-colors"
     >
       <div className="aspect-[4/3] border-b border-[#211D1D]/10 overflow-hidden">
-        <CardVisual project={project} />
+        <div className="w-full h-full transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+          <CardVisual project={project} />
+        </div>
       </div>
       <div className="p-5">
         <p className="text-xs font-semibold uppercase tracking-wider text-[#211D1D]/40">
@@ -85,6 +102,6 @@ export function CaseStudyCard({ project, onOpen }: CaseStudyCardProps) {
           Open case study
         </p>
       </div>
-    </button>
+    </motion.button>
   );
 }
