@@ -18,9 +18,16 @@ export function CaseStudyGrid({ onOpen }: CaseStudyGridProps) {
       <h2 className="mt-2 font-serif text-3xl font-bold text-[#211D1D]">
         Real work, real constraints
       </h2>
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {PROJECT_ORDER.map((project) => (
-          <CaseStudyCard key={project} project={project} onOpen={onOpen} />
+      {/* Council round 22: three perfectly equal columns is the exact
+          "feature grid" shape research names as templated - a bento-
+          style asymmetric layout (one larger tile, two stacked) reads as
+          considered rather than generated, and it isn't decoration for
+          its own sake here: AWS is the one fully public, shipped, non-
+          NDA story, so it earning more visual weight is also honest
+          about which case study carries the most complete real content. */}
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 sm:grid-rows-2 gap-5">
+        {PROJECT_ORDER.map((project, i) => (
+          <CaseStudyCard key={project} project={project} onOpen={onOpen} featured={i === 0} />
         ))}
       </div>
       <p className="mt-4 text-xs text-[#211D1D]/35">

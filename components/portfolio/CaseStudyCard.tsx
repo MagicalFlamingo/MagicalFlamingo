@@ -1,10 +1,17 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
 interface CaseStudyCardProps {
   project: CaseStudyId;
   onOpen: (project: CaseStudyId) => void;
+  // Council round 22: the bento-style "one bigger tile" layout in
+  // CaseStudyGrid.tsx. AWS gets it - it's the one fully public, shipped,
+  // non-NDA story, so more visual weight here is honest about which
+  // case study actually carries the most complete real content, not
+  // just decoration.
+  featured?: boolean;
 }
 
 // Council round 20 ("looks over-generic - check how AI websites look and
@@ -59,32 +66,49 @@ function CardVisual({ project }: { project: CaseStudyId }) {
   );
 }
 
-export function CaseStudyCard({ project, onOpen }: CaseStudyCardProps) {
+export function CaseStudyCard({ project, onOpen, featured = false }: CaseStudyCardProps) {
   const study = knowledge.caseStudies[project];
 
   return (
-    <button
+    // Council round 21/22: hover feedback went from a bare border-color
+    // change to a real lift + slow image pan, then round 22 added one
+    // controlled layer of real depth on top - a soft, wide, low-opacity
+    // shadow on hover, not the flat border-only look that (correctly)
+    // replaced the old dark-overlay cards but (over-correctly) left
+    // zero sense of the card lifting off the page.
+    <motion.button
       type="button"
       onClick={() => onOpen(project)}
-      className="group text-left cursor-pointer border border-[#211D1D]/10 bg-[#FFFDF9] rounded-sm overflow-hidden hover:border-[#211D1D]/25 transition-colors"
+      whileHover={{ y: -4 }}
+      whileTap={{ y: 0, scale: 0.99 }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      className={`group text-left cursor-pointer border border-[#211D1D]/10 bg-[#FFFDF9] rounded-sm overflow-hidden hover:border-[#211D1D]/20 hover:shadow-[0_24px_48px_-24px_rgba(33,29,29,0.25)] transition-[border-color,box-shadow] duration-200 ${
+        featured ? "sm:col-span-2 sm:row-span-2 flex flex-col sm:flex-row" : ""
+      }`}
     >
-      <div className="aspect-[4/3] border-b border-[#211D1D]/10 overflow-hidden">
-        <CardVisual project={project} />
+      <div
+        className={`overflow-hidden border-[#211D1D]/10 ${
+          featured ? "aspect-[4/3] sm:aspect-auto sm:w-[55%] sm:h-full border-b sm:border-b-0 sm:border-r" : "aspect-[4/3] border-b"
+        }`}
+      >
+        <div className="w-full h-full transition-transform duration-500 ease-out group-hover:scale-[1.04]">
+          <CardVisual project={project} />
+        </div>
       </div>
-      <div className="p-5">
+      <div className={`p-5 ${featured ? "sm:w-[45%] flex flex-col justify-center" : ""}`}>
         <p className="text-xs font-semibold uppercase tracking-wider text-[#211D1D]/40">
           {study.company} &middot; {study.year}
         </p>
-        <h3 className="mt-1.5 font-serif text-xl font-bold text-[#211D1D] leading-tight">
+        <h3 className={`mt-1.5 font-serif font-bold text-[#211D1D] leading-tight ${featured ? "text-2xl lg:text-3xl" : "text-xl"}`}>
           {study.title}
         </h3>
-        <p className="mt-2 text-sm text-[#211D1D]/65 leading-relaxed">
+        <p className={`mt-2 text-[#211D1D]/65 leading-relaxed ${featured ? "text-base" : "text-sm"}`}>
           {study.hook.headline}
         </p>
         <p className="mt-3 text-xs font-semibold text-[#7A5C12] group-hover:underline underline-offset-2">
           Open case study
         </p>
       </div>
-    </button>
+    </motion.button>
   );
 }

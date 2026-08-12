@@ -59,23 +59,30 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
     return () => window.removeEventListener("keydown", onKey);
   }, [project, onClose, frames.length]);
 
-  if (!study || !project) return null;
   const frame = frames[frameIndex];
-  if (!frame) return null;
-  const { data } = frame;
 
+  // Council round 21 ("UI-wise, interactions"): this used to be two early
+  // `return null`s right here - which meant AnimatePresence below never
+  // saw this element unmount; React removed the whole subtree in the
+  // same tick, so the `exit` transition that was "defined" on it never
+  // actually played on close. The guard now lives inside
+  // AnimatePresence's children instead, so closing genuinely animates.
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 z-50 bg-[#211D1D] flex flex-col"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${study.title} case study`}
-      >
+      {study && project && frame && (() => {
+        const data = frame.data;
+        return (
+        <motion.div
+          key="case-study-modal"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed inset-0 z-50 bg-[#211D1D] flex flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${study.title} case study`}
+        >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#FAF3E7]/10 shrink-0">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[#FAF3E7]/45">
@@ -83,51 +90,70 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
             </p>
             <h2 className="font-serif text-lg font-bold text-[#FAF3E7]">{study.title}</h2>
           </div>
-          <button
+          <motion.button
             type="button"
             onClick={onClose}
+            whileTap={{ scale: 0.9 }}
             aria-label="Close"
             className="p-2 rounded-full text-[#FAF3E7]/60 hover:text-[#FAF3E7] hover:bg-[#FAF3E7]/10 transition-colors"
           >
             <X className="h-5 w-5" />
-          </button>
+          </motion.button>
         </div>
 
+        {/* Frame content gets a real transition on prev/next now instead
+            of swapping instantly - "smooth scrolling transitions...
+            guide attention" was one of the concrete, applicable pieces
+            of the current interaction-design research, unlike the
+            3D/cursor-reactive showcases that dominate that research and
+            don't fit a text-and-real-screenshots case study. */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-6 py-10 lg:py-16">
-            {data.image || data.visual ? (
-              <div className="flex flex-col lg:flex-row gap-10 lg:items-center">
-                <div className="lg:w-[60%] flex items-center justify-center">
-                  <FrameVisualPanel data={data} study={study} />
-                </div>
-                <div className="lg:w-[40%] flex flex-col">
-                  <FrameNarrative data={data} study={study} />
-                </div>
-              </div>
-            ) : (
-              // No image/visual modeled for this beat (typically a
-              // text-only pivot frame) - a single centered column, not a
-              // 60/40 split with nothing real to put on the left. The
-              // 60/40 split previously repeated the same paragraph on
-              // both sides to fill the empty visual slot - a real
-              // content-duplication bug, the exact failure mode this
-              // project spent several earlier rounds fixing elsewhere.
-              <div className="max-w-xl mx-auto flex flex-col items-center text-center">
-                <FrameNarrative data={data} study={study} centered showSecondParagraph />
-              </div>
-            )}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={frame.beat}
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {data.image || data.visual ? (
+                  <div className="flex flex-col lg:flex-row gap-10 lg:items-center">
+                    <div className="lg:w-[60%] flex items-center justify-center">
+                      <FrameVisualPanel data={data} study={study} />
+                    </div>
+                    <div className="lg:w-[40%] flex flex-col">
+                      <FrameNarrative data={data} study={study} />
+                    </div>
+                  </div>
+                ) : (
+                  // No image/visual modeled for this beat (typically a
+                  // text-only pivot frame) - a single centered column, not
+                  // a 60/40 split with nothing real to put on the left.
+                  // The 60/40 split previously repeated the same
+                  // paragraph on both sides to fill the empty visual slot
+                  // - a real content-duplication bug, the exact failure
+                  // mode this project spent several earlier rounds fixing
+                  // elsewhere.
+                  <div className="max-w-xl mx-auto flex flex-col items-center text-center">
+                    <FrameNarrative data={data} study={study} centered showSecondParagraph />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
         <div className="flex items-center justify-between px-6 py-3 border-t border-[#FAF3E7]/10 shrink-0">
-          <button
+          <motion.button
             type="button"
             onClick={() => setFrameIndex((i) => Math.max(i - 1, 0))}
             disabled={frameIndex === 0}
+            whileTap={frameIndex === 0 ? undefined : { scale: 0.95, x: -2 }}
             className="flex items-center gap-1 text-sm font-medium text-[#FAF3E7]/60 hover:text-[#FAF3E7] disabled:opacity-25 disabled:hover:text-[#FAF3E7]/60 transition-colors"
           >
             <ChevronLeft className="h-4 w-4" /> Previous
-          </button>
+          </motion.button>
           <div className="flex items-center gap-1.5" role="tablist" aria-label="Frames">
             {frames.map((f, i) => (
               <button
@@ -141,14 +167,15 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
               />
             ))}
           </div>
-          <button
+          <motion.button
             type="button"
             onClick={() => setFrameIndex((i) => Math.min(i + 1, frames.length - 1))}
             disabled={frameIndex === frames.length - 1}
+            whileTap={frameIndex === frames.length - 1 ? undefined : { scale: 0.95, x: 2 }}
             className="flex items-center gap-1 text-sm font-medium text-[#FAF3E7]/60 hover:text-[#FAF3E7] disabled:opacity-25 disabled:hover:text-[#FAF3E7]/60 transition-colors"
           >
             Next <ChevronRight className="h-4 w-4" />
-          </button>
+          </motion.button>
         </div>
 
         <form
@@ -175,7 +202,9 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
             Ask
           </button>
         </form>
-      </motion.div>
+        </motion.div>
+        );
+      })()}
     </AnimatePresence>
   );
 }

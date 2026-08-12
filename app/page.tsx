@@ -5,6 +5,7 @@ import { Hero } from "@/components/portfolio/Hero";
 import { CaseStudyGrid } from "@/components/portfolio/CaseStudyGrid";
 import { CaseStudyModal } from "@/components/portfolio/CaseStudyModal";
 import { ChatSection } from "@/components/portfolio/ChatSection";
+import { CursorAccent } from "@/components/portfolio/CursorAccent";
 import type { CaseStudyId } from "@/content/knowledge";
 
 // Redesign (full-page pivot, confirmed): Hero -> case-study grid -> chat,
@@ -20,6 +21,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#FAF3E7]">
+      <CursorAccent />
       <Hero />
       <CaseStudyGrid onOpen={setOpenProject} />
       <div ref={chatSectionRef}>

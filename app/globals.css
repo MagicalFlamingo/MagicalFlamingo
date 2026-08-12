@@ -43,6 +43,29 @@ body {
   background-color: #FAF3E7;
   color: #211D1D;
   font-family: 'Inter', system-ui, sans-serif;
+  position: relative;
+}
+
+/* Council round 22 ("it should be 2026, now it's 2020"): the previous
+   two rounds stripped rounded corners, shadows, and gradients to kill
+   generic-AI tells - correctly, but that also stripped out everything
+   that read as depth or texture, leaving the page flat in a way that
+   reads as dated rather than restrained. Real, current research names
+   this specific fix directly: a subtle CSS/SVG grain overlay is *the*
+   cheap, honest way to give a flat color field tactile, printed-paper
+   depth without reaching for shadows or gradients again. Fixed,
+   pointer-events:none, barely-there opacity - texture, not decoration
+   anyone consciously notices. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
 
 .font-serif {
