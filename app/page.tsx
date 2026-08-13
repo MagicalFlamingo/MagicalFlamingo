@@ -21,7 +21,7 @@ export default function Home() {
   const chatSectionRef = useRef<HTMLDivElement>(null);
 
   return (
-    <main className="min-h-screen bg-[#211D1D] flex flex-col">
+    <main className="min-h-screen bg-[#FAF3E7] flex flex-col">
       <CursorAccent />
       <Hero />
       <div ref={chatSectionRef} className="flex-1 flex flex-col min-h-0">

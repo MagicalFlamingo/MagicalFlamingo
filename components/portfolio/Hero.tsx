@@ -6,21 +6,14 @@ import { knowledge } from "@/content/knowledge";
 
 const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
 
-// Round 25 ("start from scratch" council - unanimous structural
-// diagnosis across all four advisors). This used to be a full-viewport
-// hero: name, title, one-liner, links, badges, and a large screenshot
-// preview, sitting above a separate case-study grid you had to scroll
-// past to reach the actual chat. 24 rounds of real, verified palette
-// and motion changes to that exact three-block skeleton still read as
-// "the same" - the skeleton itself was the problem, not its paint.
-//
-// The one-liner and the case studies now live inside the chat's own
-// opening (see ChatInterface.tsx's empty-state block and
-// CaseStudyIntroDeck) - real work is visible in the first screenful
-// without a separate section to scroll through first. What's left here
-// is a compact, persistent identity plaque, not a section: name, title,
-// contact links, real company names. It never fills the viewport and
-// there's nothing below it to imply you should scroll past it.
+// Round 26 (full aesthetic pivot to a real reference the user pointed
+// at - talilupovichportfolio.com). That site's nav treats a name as
+// plain, small, unstyled sans text - not a serif display moment - so
+// this identity plaque drops font-serif entirely. The page background
+// went back to light/cream (round 24's ink-primary flip wasn't the
+// actual problem per the round-25 council, and it isn't this
+// reference's look either); this plaque just needed its colors
+// flipped back to match.
 export function Hero() {
   const { identity } = knowledge;
 
@@ -32,7 +25,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="font-serif text-2xl sm:text-[28px] font-medium text-[#FAF3E7] tracking-tight"
+            className="text-lg sm:text-xl font-semibold text-[#211D1D] tracking-tight"
           >
             {identity.name}
           </motion.h1>
@@ -40,7 +33,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.06 }}
-            className="text-[13px] text-[#F2A93C] font-semibold tracking-[0.04em]"
+            className="text-[13px] text-[#7A5C12] font-semibold tracking-[0.04em]"
           >
             {identity.title}
           </motion.p>
@@ -55,11 +48,11 @@ export function Hero() {
           <a
             href={`mailto:${identity.email}`}
             onClick={() => track("email_tapped")}
-            className="text-[#FAF3E7]/55 hover:text-[#F2A93C] transition-colors"
+            className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
           >
             Email
           </a>
-          <span className="text-[#FAF3E7]/20" aria-hidden="true">
+          <span className="text-[#211D1D]/20" aria-hidden="true">
             &middot;
           </span>
           <a
@@ -67,7 +60,7 @@ export function Hero() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track("linkedin_tapped")}
-            className="text-[#FAF3E7]/55 hover:text-[#F2A93C] transition-colors"
+            className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
           >
             LinkedIn
           </a>
@@ -78,7 +71,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.18 }}
-        className="max-w-[800px] mx-auto mt-2 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#FAF3E7]/30"
+        className="max-w-[800px] mx-auto mt-2 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#211D1D]/30"
       >
         {COMPANY_BADGES.map((company, i) => (
           <span key={company} className="flex items-center gap-2.5">

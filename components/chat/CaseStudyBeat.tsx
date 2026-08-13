@@ -67,14 +67,14 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
       case "bareStat":
         return (
           <div className="px-6 py-14 flex flex-col items-center text-center" style={{ background: color }}>
-            <span className="font-serif text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
+            <span className="text-7xl font-bold" style={{ color: "#FAF3E7" }}>{visual.value}</span>
             <span className="mt-4 text-xs tracking-wide" style={{ color: "#FAF3E7", opacity: 0.65 }}>{visual.caption}</span>
           </div>
         );
       case "scoreBreakdown":
         return (
           <div className="rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6">
-            <span className="font-serif text-5xl font-bold" style={{ color }}>{visual.value}</span>
+            <span className="text-5xl font-bold" style={{ color }}>{visual.value}</span>
             <div className="mt-5 space-y-3.5">
               {visual.rows.map((row, i) => (
                 <div key={row.label}>
@@ -152,7 +152,7 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
                 <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">
                   <path d="M12 2.5 L22.5 21 L1.5 21 Z" fill="#FAF3E7" stroke="#C23B3B" strokeWidth="1.75" strokeLinejoin="round" />
                 </svg>
-                <span className="absolute font-serif text-xs font-bold mt-[3px]" style={{ color: "#C23B3B" }}>&times;{visual.count}</span>
+                <span className="absolute text-xs font-bold mt-[3px]" style={{ color: "#C23B3B" }}>&times;{visual.count}</span>
               </span>
             </div>
           </div>
@@ -168,7 +168,7 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
         return (
           <div className="py-7 px-6" style={{ background: accentColor }}>
             <div className="flex items-baseline gap-2.5">
-              <span className="font-serif text-6xl font-bold" style={{ color }}>{total}</span>
+              <span className="text-6xl font-bold" style={{ color }}>{total}</span>
               <span className="text-sm font-semibold" style={{ color, opacity: 0.7 }}>real research {visual.unit}s</span>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5">
@@ -283,7 +283,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
       </div>
 
       {/* Headline - every beat is its own article now, serif throughout */}
-      <h4 className="font-serif text-[26px] font-bold text-[#211D1D] leading-[1.15] mb-3">
+      <h4 className="text-[26px] font-bold text-[#211D1D] leading-[1.15] mb-3">
         {data.headline}
       </h4>
 
@@ -318,11 +318,11 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
         <div className="space-y-3">
           {data.paragraphs.map((p, i) => {
             if (i !== 0) {
-              return <p key={i} className="font-serif text-[15px] leading-[1.6] text-[#211D1D]/70">{p}</p>;
+              return <p key={i} className="text-[15px] leading-[1.6] text-[#211D1D]/70">{p}</p>;
             }
             const { lede, rest } = splitLede(p);
             return (
-              <p key={i} className="font-serif text-[15px] leading-[1.6] text-[#211D1D]">
+              <p key={i} className="text-[15px] leading-[1.6] text-[#211D1D]">
                 <span className="text-[17px] font-semibold">{lede}</span>
                 {rest && <span className="text-[#211D1D]/70"> {rest}</span>}
               </p>
@@ -338,8 +338,8 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
             <ol className="space-y-2.5">
               {data.list.map((item, i) => (
                 <li key={item} className="flex gap-3">
-                  <span className="font-serif text-sm font-semibold shrink-0 w-4" style={{ color: study.color }}>{i + 1}</span>
-                  <span className="font-serif text-[15px] leading-[1.55] text-[#211D1D]/75">{item}</span>
+                  <span className="text-sm font-semibold shrink-0 w-4" style={{ color: study.color }}>{i + 1}</span>
+                  <span className="text-[15px] leading-[1.55] text-[#211D1D]/75">{item}</span>
                 </li>
               ))}
             </ol>
@@ -349,7 +349,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
               {data.features.map((f) => (
                 <div key={f.name}>
                   <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: study.color }}>{f.name}</p>
-                  <p className="font-serif text-[15px] text-[#211D1D]/70 leading-[1.55] mt-0.5">{f.description}</p>
+                  <p className="text-[15px] text-[#211D1D]/70 leading-[1.55] mt-0.5">{f.description}</p>
                 </div>
               ))}
             </div>
@@ -364,7 +364,7 @@ export function CaseStudyBeat({ project, beat }: CaseStudyBeatProps) {
       {data.quote && (
         <>
           <div className="h-px bg-[#211D1D]/10 my-5 max-w-[80px]" />
-          <p className="font-serif text-xl italic leading-snug text-[#211D1D]">
+          <p className="text-xl italic leading-snug text-[#211D1D]">
             &ldquo;{data.quote.replace(/^"|"$/g, "")}&rdquo;
           </p>
         </>

@@ -20,7 +20,7 @@ export function StatCard({ value, label }: StatCardProps) {
       transition={{ duration: 0.35 }}
       className="mt-3 rounded-xl border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-7 text-center"
     >
-      <p className="font-serif text-5xl font-bold text-[#211D1D]">{value}</p>
+      <p className="text-5xl font-bold text-[#211D1D]">{value}</p>
       <p className="mt-2 text-sm text-[#211D1D]/55 leading-relaxed">{label}</p>
     </motion.div>
   );

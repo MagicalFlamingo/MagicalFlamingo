@@ -152,14 +152,40 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
                 same three-block skeleton for 24 rounds is why it kept
                 reading as "the same" no matter the palette. This is the
                 fix: the conversation opens already mid-thought, real
-                work included, nothing to scroll past to get here. */}
-            <motion.p
+                work included, nothing to scroll past to get here.
+
+                Round 26 (full pivot to talilupovichportfolio.com): that
+                site's whole identity is one huge, plain, confident
+                sans headline with a single accent-colored phrase inside
+                it - not a small paragraph. oneLiner is split on its own
+                existing " - " (not a hardcoded substring of the words
+                themselves, so this doesn't break if the real copy in
+                knowledge.ts changes) so the second clause gets the
+                site's one accent color, echoing that exact device. */}
+            <motion.h2
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="text-sm text-[#211D1D] leading-[1.75]"
+              className="text-[26px] sm:text-[32px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
             >
-              {knowledge.identity.oneLiner} Here&rsquo;s the real work - or ask me anything.
+              {(() => {
+                const [statement, explanation] = knowledge.identity.oneLiner.split(" - ");
+                return explanation ? (
+                  <>
+                    {statement} - <span className="text-[#F2A93C]">{explanation}</span>
+                  </>
+                ) : (
+                  knowledge.identity.oneLiner
+                );
+              })()}
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.08 }}
+              className="text-sm text-[#211D1D]/55"
+            >
+              Here&rsquo;s the real work - or ask me anything.
             </motion.p>
             <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
             <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
