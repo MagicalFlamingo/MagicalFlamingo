@@ -140,10 +140,30 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
 
+  // Round 27 (council: "layout is not so good" - a real, standalone
+  // responsive bug, confirmed independently by 3 advisors from actual
+  // screenshots at 1920px). The flex-1/min-h-0 chain from page.tsx down
+  // through ChatSection correctly grows this component's wrapping
+  // <section> to fill the leftover viewport - the chain doesn't break
+  // there. It dead-ends right here: this div was a plain block with
+  // intrinsic content height, so on a short/empty conversation the
+  // grown section just renders a wall of empty space below the input
+  // instead of the content sitting inside it looking placed. Centering
+  // the empty state fixes that without touching the page-level height
+  // strategy - but centering must switch off the moment there's a real
+  // conversation, or a growing message log fights being pinned to a
+  // center point and reflows unpleasantly as it grows past the
+  // viewport. `isEmpty` gates that switch.
+  const isEmpty = messages.length === 0 && !isThinking;
+
   return (
-    <div className="max-w-[800px] mx-auto px-6">
+    <div
+      className={`flex flex-col flex-1 min-h-0 w-full max-w-[800px] mx-auto px-6 ${
+        isEmpty ? "justify-center" : "justify-start"
+      }`}
+    >
       <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
-        {messages.length === 0 && !isThinking && (
+        {isEmpty && (
           <div className="space-y-5">
             {/* Round 25 ("start from scratch" council): the page used to
                 make you scroll past a hero and a case-study grid before
