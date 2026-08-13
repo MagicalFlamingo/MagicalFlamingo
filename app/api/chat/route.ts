@@ -135,11 +135,20 @@ export type ChatTools = typeof tools;
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
+  // Council review: this route speaks in first person as a real person,
+  // to real hiring managers, with the entire knowledge base pasted into
+  // the system prompt - and had zero temperature control, meaning it ran
+  // at the model's default sampling rather than a setting chosen for
+  // this specific job. Lower temperature doesn't replace the "never
+  // fabricate" instruction already in systemPromptInstructions - it
+  // reduces how much room the model has to wander in the first place on
+  // factual questions about a real person's real career.
   const result = streamText({
     model: anthropic("claude-sonnet-5"),
     system: SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages, { tools }),
     stopWhen: isStepCount(5),
+    temperature: 0.4,
     tools,
   });
 

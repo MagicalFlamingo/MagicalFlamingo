@@ -77,6 +77,16 @@ interface CaseStudyIntroCardProps {
 
 export function CaseStudyIntroCard({ project, onOpen, delay }: CaseStudyIntroCardProps) {
   const study = knowledge.caseStudies[project];
+  // Council review: three equal-weight, chrome-free tiles asserted a
+  // parity the real material doesn't have - AWS is knowledge.ts's only
+  // `impact.status: "Shipped"` case study; Qlik and Sprout are both
+  // "In progress." Flattening the cards in round 26 accidentally erased
+  // that distinction. Leading with real status (not company/year) fixes
+  // the actual finding - a hiring manager should know which project is
+  // proven before they click, not after. No new color: shipped is full
+  // ink, in-progress is muted ink - same palette, real contrast doing
+  // the work the border/shadow used to.
+  const isShipped = study.impact.status === "Shipped";
 
   return (
     <motion.button
@@ -92,8 +102,16 @@ export function CaseStudyIntroCard({ project, onOpen, delay }: CaseStudyIntroCar
           <CardVisual project={project} />
         </div>
       </div>
-      <p className="mt-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#211D1D]/40">
-        {study.company} &middot; {study.year}
+      <p className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]">
+        <span className={isShipped ? "text-[#211D1D]" : "text-[#211D1D]/35"}>
+          {isShipped ? "Shipped" : "In progress"}
+        </span>
+        <span className="text-[#211D1D]/20" aria-hidden="true">
+          &middot;
+        </span>
+        <span className="text-[#211D1D]/40">
+          {study.company} &middot; {study.year}
+        </span>
       </p>
       <h4 className="mt-1 text-[15px] font-bold text-[#211D1D] leading-tight tracking-tight group-hover:text-[#7A5C12] transition-colors">
         {study.title}
