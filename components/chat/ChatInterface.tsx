@@ -174,7 +174,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
                 fix: the conversation opens already mid-thought, real
                 work included, nothing to scroll past to get here.
 
-                Round 26 (full pivot to talilupovichportfolio.com): that
+                Round 26 (full pivot to a real reference site the user pointed at): that
                 site's whole identity is one huge, plain, confident
                 sans headline with a single accent-colored phrase inside
                 it - not a small paragraph. oneLiner is split on its own

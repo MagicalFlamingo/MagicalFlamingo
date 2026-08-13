@@ -8,13 +8,13 @@ import { knowledge, type CaseStudyId } from "@/content/knowledge";
 // as an early part of the chat instead of a separate scrollable
 // section, so real work is visible in the first screenful.
 //
-// Round 26 (full aesthetic pivot to talilupovichportfolio.com, a real
-// reference the user pointed at): that site's case-study tiles have no
-// chrome at all - no border, no background box, no shadow, no rounded
-// container. Just a full-bleed image, a tiny uppercase tag, and a bold
-// title underneath. The previous "wall label" bordered-card treatment
-// (round 25) is gone - this is a much closer, more literal match to the
-// reference than "borrow the idea of oversized type" was.
+// Round 26 (full aesthetic pivot to a real reference site the user
+// pointed at): that site's case-study tiles have no chrome at all - no
+// border, no background box, no shadow, no rounded container. Just a
+// full-bleed image, a tiny uppercase tag, and a bold title underneath.
+// The previous "wall label" bordered-card treatment (round 25) is gone
+// - this is a much closer, more literal match to the reference than
+// "borrow the idea of oversized type" was.
 function CountUpNumber({ value }: { value: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });

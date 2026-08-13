@@ -38,7 +38,7 @@ interface CaseStudyModalProps {
 // no `pivot` field in content/knowledge.ts (buildBeat returns null for
 // it), so its modal genuinely has 4 frames, not a padded/fabricated 5th.
 //
-// Color, round 26 (full aesthetic pivot to talilupovichportfolio.com):
+// Color, round 26 (full aesthetic pivot to a real reference site the user pointed at):
 // this shell was a deliberate dark "focus mode" (ink backdrop, cream
 // text, marigold accents) built to differ from the rest of a
 // cream-primary page. Round 24 then made ink the primary page

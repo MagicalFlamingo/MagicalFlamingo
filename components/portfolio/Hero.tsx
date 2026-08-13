@@ -6,11 +6,11 @@ import { knowledge } from "@/content/knowledge";
 
 const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
 
-// Round 26 (full aesthetic pivot to a real reference the user pointed
-// at - talilupovichportfolio.com). That site's nav treats a name as
-// plain, small, unstyled sans text - not a serif display moment - so
-// this identity plaque drops font-serif entirely. The page background
-// went back to light/cream (round 24's ink-primary flip wasn't the
+// Round 26 (full aesthetic pivot to a real reference site the user
+// pointed at). That site's nav treats a name as plain, small, unstyled
+// sans text - not a serif display moment - so this identity plaque
+// drops font-serif entirely. The page background went back to
+// light/cream (round 24's ink-primary flip wasn't the
 // actual problem per the round-25 council, and it isn't this
 // reference's look either); this plaque just needed its colors
 // flipped back to match.

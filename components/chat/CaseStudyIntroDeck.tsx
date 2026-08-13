@@ -8,7 +8,7 @@ interface CaseStudyIntroDeckProps {
   startDelay: number;
 }
 
-// Round 26 (full aesthetic pivot to talilupovichportfolio.com): that
+// Round 26 (full aesthetic pivot to a real reference site the user pointed at): that
 // site's "Selected work" section is one plain, equal-width 3-up grid -
 // no asymmetric featured tile. Round 25's "salon hang" (AWS bigger,
 // Qlik/Sprout smaller) was a real, considered idea, but the reference

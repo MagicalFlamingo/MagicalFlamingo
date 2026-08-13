@@ -42,7 +42,7 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Round 26 (full aesthetic pivot to talilupovichportfolio.com):
+        {/* Round 26 (full aesthetic pivot to a real reference site the user pointed at):
             that reference has no serif display moment anywhere - one
             plain sans throughout. Lora dropped from this link entirely;
             Inter is now the only typeface in the app, not a swap to a
