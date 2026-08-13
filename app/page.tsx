@@ -20,7 +20,7 @@ export default function Home() {
   const chatSectionRef = useRef<HTMLDivElement>(null);
 
   return (
-    <main className="min-h-screen bg-[#FAF3E7]">
+    <main className="min-h-screen bg-[#211D1D]">
       <CursorAccent />
       <Hero />
       <CaseStudyGrid onOpen={setOpenProject} />

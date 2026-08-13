@@ -116,13 +116,20 @@ export function CaseStudyCard({ project, onOpen, featured = false }: CaseStudyCa
       whileHover={{ y: -4 }}
       whileTap={{ y: 0, scale: 0.99 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`group text-left cursor-pointer border border-[#211D1D]/10 bg-[#FFFDF9] rounded-sm overflow-hidden hover:border-[#211D1D]/20 hover:shadow-[0_24px_48px_-24px_rgba(33,29,29,0.25)] transition-[border-color,box-shadow] duration-200 ${
+      className={`group text-left cursor-pointer border border-[#FAF3E7]/10 bg-[#2A2521] rounded-sm overflow-hidden hover:border-[#F2A93C]/40 hover:shadow-[0_24px_60px_-20px_rgba(242,169,60,0.22)] transition-[border-color,box-shadow] duration-200 ${
         featured ? "sm:col-span-2 sm:row-span-2 flex flex-col sm:flex-row" : ""
       }`}
     >
+      {/* Image/visual area deliberately keeps its existing light chrome
+          (paper bg for qlik's real screenshot, each study's own
+          accentColor for the aws/sprout diagrams) unchanged - against
+          the new ink/charcoal page this reads as a lit window rather
+          than a photo boxed in cream paper, which is the whole point of
+          this round; only the border needed to flip so it still frames
+          against the new dark card instead of the old cream one. */}
       <motion.div
         layoutId={`case-study-image-${project}`}
-        className={`overflow-hidden border-[#211D1D]/10 ${
+        className={`overflow-hidden border-[#FAF3E7]/10 ${
           featured ? "aspect-[4/3] sm:aspect-auto sm:w-[55%] sm:h-full border-b sm:border-b-0 sm:border-r" : "aspect-[4/3] border-b"
         }`}
       >
@@ -131,16 +138,16 @@ export function CaseStudyCard({ project, onOpen, featured = false }: CaseStudyCa
         </div>
       </motion.div>
       <div className={`p-5 ${featured ? "sm:w-[45%] flex flex-col justify-center" : ""}`}>
-        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#211D1D]/40">
+        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#FAF3E7]/40">
           {study.company} &middot; {study.year}
         </p>
-        <h3 className={`mt-1.5 font-serif text-[#211D1D] leading-tight ${featured ? "text-[32px] font-bold" : "text-xl font-semibold"}`}>
+        <h3 className={`mt-1.5 font-serif text-[#FAF3E7] leading-tight ${featured ? "text-[32px] font-bold" : "text-xl font-semibold"}`}>
           {study.title}
         </h3>
-        <p className="mt-2 text-[17px] leading-[1.6] text-[#211D1D]/65">
+        <p className="mt-2 text-[17px] leading-[1.6] text-[#FAF3E7]/65">
           {study.hook.headline}
         </p>
-        <p className="mt-3 text-xs font-semibold text-[#7A5C12] group-hover:underline underline-offset-2">
+        <p className="mt-3 text-xs font-semibold text-[#F2A93C] group-hover:underline underline-offset-2">
           Open case study
         </p>
       </div>

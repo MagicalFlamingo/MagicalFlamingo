@@ -18,7 +18,7 @@ export function CaseStudyGrid({ onOpen }: CaseStudyGridProps) {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-10%" }}
         transition={{ duration: 0.4 }}
-        className="text-xs font-bold uppercase tracking-[0.12em] text-[#211D1D]/40"
+        className="text-xs font-bold uppercase tracking-[0.12em] text-[#F2A93C]"
       >
         Case studies
       </motion.p>
@@ -35,7 +35,7 @@ export function CaseStudyGrid({ onOpen }: CaseStudyGridProps) {
         whileInView={{ clipPath: "inset(0 0% 0 0)" }}
         viewport={{ once: true, margin: "-10%" }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-2 font-serif text-[40px] sm:text-[56px] font-semibold text-[#211D1D] leading-[1.0] tracking-[-0.01em]"
+        className="mt-2 font-serif text-[40px] sm:text-[56px] font-semibold text-[#FAF3E7] leading-[1.0] tracking-[-0.01em]"
       >
         Real work, real constraints
       </motion.h2>
@@ -51,7 +51,7 @@ export function CaseStudyGrid({ onOpen }: CaseStudyGridProps) {
           <CaseStudyCard key={project} project={project} onOpen={onOpen} featured={i === 0} />
         ))}
       </div>
-      <p className="mt-4 text-xs text-[#211D1D]/35">
+      <p className="mt-4 text-xs text-[#FAF3E7]/35">
         Qlik and Sprout are in-progress work, shown NDA-safe.
       </p>
     </section>

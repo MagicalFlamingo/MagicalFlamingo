@@ -1,33 +1,43 @@
 @import "tailwindcss";
 
 /*
- * Palette (v3, council round 19 - marigold promoted to primary)
+ * Palette (v4, council round 24 - dark gallery pivot)
  *
- * Round 19 found the v2 palette read as "enterprise-report serious," not
- * "optimistic/fresh/welcoming" - green (#2E9B5C) reads closer to a
- * verified/compliance green than a growth green, and marigold, the
- * better candidate for warmth, was rationed to a single 6px status dot.
- * Also found real pre-existing contrast bugs: marigold as literal text
- * on cream was 1.81:1 (fails everything), green as text was 3.19:1
- * (fails the 4.5:1 body-text floor). Fix for both: promote marigold to
- * primary accent with real surface area, and split every warm/green
- * color into a bright FILL/WASH variant (backgrounds, borders, large
- * UI - 3:1 floor) and a darkened TEXT variant (links, labels - 4.5:1
- * floor) rather than using one hex for both jobs.
+ * Direct feedback after five rounds of refinement on a cream-first page
+ * (rounds 19-23: palette, de-generic tokens, interactions, depth/scale,
+ * motion): "it looks the same, it should be so different" - explicit
+ * sign-off to loosen the restraint every one of those rounds protected
+ * (one palette, no bold color swings) and to revisit locked-in
+ * decisions if that's what an actual visual swing takes.
  *
- * Kept off-limits per the design council: no pastel/light color used as
- * text (the math doesn't work against this light a cream), no warm wash
- * behind an "assertion" moment (case-study stat cards, headlines) - those
- * stay ink-on-neutral. Case-study accent colors (content/knowledge.ts,
- * one per company) are a separate system and untouched here.
+ * The move: ink stops being "the dark surface used in two special
+ * places" (the case-study modal, the chat section) and becomes the
+ * PAGE's primary background everywhere. That focus-mode language was
+ * already built, already shipped, and never drew a complaint - the
+ * fix isn't inventing a new look, it's stopping the rationing of the
+ * one that already worked. Real product screenshots (the only bright,
+ * white surfaces left anywhere on the page) now read as lit windows in
+ * a dark gallery instead of photos boxed in cream paper - a real,
+ * immediately-visible structural change, not another token pass.
  *
- * cream    #FAF3E7  body background
- * ink      #211D1D  headline/body text, dark surfaces
- * marigold #F2A93C  primary accent FILL - chip fill, status dot, borders, washes (3:1 use)
- * ochre    #7A5C12  primary accent TEXT - links, hover text, labels (4.5:1 on cream)
- * green    #2E9B5C  secondary accent FILL - rare/quiet moments only (3:1 use)
- * pine     #1F6B45  secondary accent TEXT - same rule as ochre, used sparingly
- * paper    #FFFDF9  card surfaces on cream
+ * marigold gets louder to match - full borders and glow instead of
+ * thin washes, since it's now the one warm color in the room instead
+ * of one of several competing for attention against cream.
+ *
+ * ink      #211D1D  PRIMARY page background, was "dark surfaces only"
+ * cream    #FAF3E7  primary text on ink, was "page background"
+ * marigold #F2A93C  primary accent - now full-strength borders/glow, not washes
+ * ochre    #7A5C12  kept for any remaining light-surface text (inside the
+ *                   chat panel, which stays cream - see ChatSection.tsx)
+ * charcoal #2A2521  card/surface tone on ink, the "paper" of this palette -
+ *                   distinct from the page background the way paper
+ *                   #FFFDF9 was distinct from cream before
+ * paper    #FFFDF9  still used inside the chat panel + inside real
+ *                   screenshots/diagrams, which keep their existing
+ *                   light chrome unchanged (see note in CaseStudyCard.tsx)
+ *
+ * Case-study accent colors (content/knowledge.ts, one per company) are a
+ * separate system and untouched here.
  */
 
 * {
@@ -40,22 +50,17 @@ html {
 }
 
 body {
-  background-color: #FAF3E7;
-  color: #211D1D;
+  background-color: #211D1D;
+  color: #FAF3E7;
   font-family: 'Inter', system-ui, sans-serif;
   position: relative;
 }
 
-/* Council round 22 ("it should be 2026, now it's 2020"): the previous
-   two rounds stripped rounded corners, shadows, and gradients to kill
-   generic-AI tells - correctly, but that also stripped out everything
-   that read as depth or texture, leaving the page flat in a way that
-   reads as dated rather than restrained. Real, current research names
-   this specific fix directly: a subtle CSS/SVG grain overlay is *the*
-   cheap, honest way to give a flat color field tactile, printed-paper
-   depth without reaching for shadows or gradients again. Fixed,
-   pointer-events:none, barely-there opacity - texture, not decoration
-   anyone consciously notices. */
+/* Council round 22's grain overlay, rebalanced for round 24's dark
+   background - multiply only darkens, which does nothing visible on an
+   already-dark page; screen only lightens, which is the right direction
+   for grain texture to actually read against ink. Same texture, same
+   restraint, just the correct blend mode for the surface it's now on. */
 body::before {
   content: "";
   position: fixed;
@@ -63,7 +68,7 @@ body::before {
   z-index: 30;
   pointer-events: none;
   opacity: 0.05;
-  mix-blend-mode: multiply;
+  mix-blend-mode: screen;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
