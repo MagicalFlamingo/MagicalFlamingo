@@ -8,6 +8,21 @@ import { buildBeat, renderVisual, type BeatId, type BeatData } from "@/component
 
 const BEAT_ORDER: BeatId[] = ["hook", "friction", "pivot", "solution", "impact"];
 
+// Council round 23: which beat's image/visual is literally the same
+// content CaseStudyCard.tsx previews on the landing grid - qlik's card
+// shows the real browse-connections.jpg screenshot (that's the
+// `solution` beat, not `hook`), AWS's card shows the 67/100 breakdown
+// (also `solution`), sprout's card shows the swatchChaos colors (that's
+// `friction`). Opening straight to that beat, with a matching
+// `layoutId` on its visual, is what makes the shared-element transition
+// below actually connect to what was clicked instead of an unrelated
+// diagram morphing in.
+const CARD_PREVIEW_BEAT: Record<CaseStudyId, BeatId> = {
+  qlik: "solution",
+  aws: "solution",
+  sprout: "friction",
+};
+
 interface CaseStudyModalProps {
   project: CaseStudyId | null;
   onClose: () => void;
@@ -43,8 +58,26 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
     );
   }, [study]);
 
+  // Council round 23: opening straight to the beat matching the clicked
+  // card (CARD_PREVIEW_BEAT) used to be done in a useEffect - which
+  // fires *after* the first paint, so the very first frame rendered was
+  // always "hook" (frameIndex's stale initial 0) before snapping to the
+  // right beat a tick later. A visible flash of the wrong content right
+  // as the shared-element transition is trying to prove spatial
+  // continuity defeated the whole point. React's own recommended fix
+  // for "derive state from a changed prop": compare against the last
+  // seen project *during render* and correct frameIndex immediately,
+  // so the corrected value is what actually gets painted the first time.
+  const [lastProject, setLastProject] = useState<CaseStudyId | null>(null);
+  if (project !== lastProject) {
+    setLastProject(project);
+    if (project) {
+      const idx = frames.findIndex((f) => f.beat === CARD_PREVIEW_BEAT[project]);
+      setFrameIndex(idx >= 0 ? idx : 0);
+    }
+  }
+
   useEffect(() => {
-    setFrameIndex(0);
     setMiniInput("");
   }, [project]);
 
@@ -120,7 +153,11 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
                 {data.image || data.visual ? (
                   <div className="flex flex-col lg:flex-row gap-10 lg:items-center">
                     <div className="lg:w-[60%] flex items-center justify-center">
-                      <FrameVisualPanel data={data} study={study} />
+                      <FrameVisualPanel
+                        data={data}
+                        study={study}
+                        sharedLayoutId={frame.beat === CARD_PREVIEW_BEAT[project] ? `case-study-image-${project}` : undefined}
+                      />
                     </div>
                     <div className="lg:w-[40%] flex flex-col">
                       <FrameNarrative data={data} study={study} />
@@ -209,10 +246,10 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
   );
 }
 
-function FrameVisualPanel({ data, study }: { data: BeatData; study: CaseStudy }) {
+function FrameVisualPanel({ data, study, sharedLayoutId }: { data: BeatData; study: CaseStudy; sharedLayoutId?: string }) {
   if (data.image) {
     return (
-      <div className="relative w-full max-w-md">
+      <motion.div layoutId={sharedLayoutId} className="relative w-full max-w-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={data.image.src}
@@ -224,7 +261,7 @@ function FrameVisualPanel({ data, study }: { data: BeatData; study: CaseStudy })
             <Lock className="h-3 w-3" /> NDA &middot; in-progress prototype
           </span>
         )}
-      </div>
+      </motion.div>
     );
   }
   // data.visual - the only other case this gets called for (the parent
@@ -232,9 +269,9 @@ function FrameVisualPanel({ data, study }: { data: BeatData; study: CaseStudy })
   // the centered-single-column branch in the main render for beats with
   // neither).
   return (
-    <div className="w-full max-w-md rounded-sm overflow-hidden">
+    <motion.div layoutId={sharedLayoutId} className="w-full max-w-md rounded-sm overflow-hidden">
       {data.visual && renderVisual(data.visual, study.color, study.accentColor)}
-    </div>
+    </motion.div>
   );
 }
 
