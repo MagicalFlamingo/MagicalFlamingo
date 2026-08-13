@@ -7,13 +7,14 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyBeat } from "./CaseStudyBeat";
+import { CaseStudyIntroDeck } from "./CaseStudyIntroDeck";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { QuoteCard } from "./QuoteCard";
 import { StatCard } from "./StatCard";
 import { pick, thinkingPhrases, firstMessagePhrase } from "@/content/responses";
-import type { CaseStudyId } from "@/content/knowledge";
+import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import type { BeatId } from "./CaseStudyBeat";
 
 // Redesign (confirmed pivot, step 5): the chat now calls the real LLM
@@ -47,6 +48,12 @@ interface ChatInterfaceProps {
   // same sendMessage() path as anything typed directly.
   initialQuestion?: string | null;
   onConsumeInitialQuestion?: () => void;
+  // Round 25: case studies are no longer a separate page section you
+  // scroll past to reach the chat - they're the first thing the chat
+  // itself shows you, via CaseStudyIntroDeck below. Opening one still
+  // goes through the same full-screen CaseStudyModal as before; this
+  // prop is just how that click reaches page.tsx's existing modal state.
+  onOpenCaseStudy?: (project: CaseStudyId) => void;
 }
 
 // Loosely-typed tool-part narrowing rather than full generic inference
@@ -82,7 +89,7 @@ function renderToolPart(part: ToolPart) {
   }
 }
 
-export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: ChatInterfaceProps = {}) {
+export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpenCaseStudy }: ChatInterfaceProps = {}) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
@@ -137,7 +144,24 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
     <div className="max-w-[800px] mx-auto px-6">
       <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
         {messages.length === 0 && !isThinking && (
-          <div>
+          <div className="space-y-5">
+            {/* Round 25 ("start from scratch" council): the page used to
+                make you scroll past a hero and a case-study grid before
+                reaching this. Three of four advisors converged
+                independently on the same diagnosis - repainting that
+                same three-block skeleton for 24 rounds is why it kept
+                reading as "the same" no matter the palette. This is the
+                fix: the conversation opens already mid-thought, real
+                work included, nothing to scroll past to get here. */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-sm text-[#211D1D] leading-[1.75]"
+            >
+              {knowledge.identity.oneLiner} Here&rsquo;s the real work - or ask me anything.
+            </motion.p>
+            <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
             <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
           </div>
         )}

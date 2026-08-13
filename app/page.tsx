@@ -2,32 +2,33 @@
 
 import { useRef, useState } from "react";
 import { Hero } from "@/components/portfolio/Hero";
-import { CaseStudyGrid } from "@/components/portfolio/CaseStudyGrid";
 import { CaseStudyModal } from "@/components/portfolio/CaseStudyModal";
 import { ChatSection } from "@/components/portfolio/ChatSection";
 import { CursorAccent } from "@/components/portfolio/CursorAccent";
 import type { CaseStudyId } from "@/content/knowledge";
 
-// Redesign (full-page pivot, confirmed): Hero -> case-study grid -> chat,
-// one scrollable page instead of the old fixed two-pane layout. This is
-// now a client component (was a plain server component before) because
-// it owns the shared state between the card grid, the modal, and the
-// chat's mini "ask about this project" handoff - lifted here since three
-// separate components need to coordinate on it.
+// Round 25 ("start from scratch" council): the standalone case-study
+// grid is gone - case studies now surface inline in the chat's own
+// opening (ChatInterface's empty-state block -> CaseStudyIntroDeck), so
+// this is Hero (a compact identity plaque, not a full-viewport section)
+// -> ChatSection, effectively the whole page. Still a client component:
+// it owns the shared state between the chat's inline case-study cards,
+// the full-screen modal they open, and the modal's own "ask about this
+// project" handoff back into the same chat.
 export default function Home() {
   const [openProject, setOpenProject] = useState<CaseStudyId | null>(null);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const chatSectionRef = useRef<HTMLDivElement>(null);
 
   return (
-    <main className="min-h-screen bg-[#211D1D]">
+    <main className="min-h-screen bg-[#211D1D] flex flex-col">
       <CursorAccent />
       <Hero />
-      <CaseStudyGrid onOpen={setOpenProject} />
-      <div ref={chatSectionRef}>
+      <div ref={chatSectionRef} className="flex-1 flex flex-col min-h-0">
         <ChatSection
           initialQuestion={pendingQuestion}
           onConsumeInitialQuestion={() => setPendingQuestion(null)}
+          onOpenCaseStudy={setOpenProject}
         />
       </div>
       <CaseStudyModal

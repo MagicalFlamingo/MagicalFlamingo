@@ -42,7 +42,13 @@ export function pick<T>(arr: T[]): T {
 }
 
 export const thinkingPhrases: string[] = [
-  "actually thinking, no LLM to blame",
+  // Round 25 (council): the chat has called a real LLM since the
+  // redesign's step 5 (ChatInterface.tsx -> app/api/chat/route.ts) -
+  // "no LLM to blame" was left over from before that pivot and is now
+  // an actively false claim shown while a real model streams a real
+  // answer. Fixed to something true and still in voice, not a silent
+  // re-hedge back toward "AI-generated" boilerplate.
+  "actually thinking this through, not routing to a script",
   "reading between the lines",
   "checking my notes",
   "no bullet points forming yet",
