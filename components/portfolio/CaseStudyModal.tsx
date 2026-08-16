@@ -8,21 +8,6 @@ import { buildBeat, renderVisual, type BeatId, type BeatData } from "@/component
 
 const BEAT_ORDER: BeatId[] = ["hook", "friction", "pivot", "solution", "impact"];
 
-// Council round 23: which beat's image/visual is literally the same
-// content CaseStudyCard.tsx previews on the landing grid - qlik's card
-// shows the real browse-connections.jpg screenshot (that's the
-// `solution` beat, not `hook`), AWS's card shows the 67/100 breakdown
-// (also `solution`), sprout's card shows the swatchChaos colors (that's
-// `friction`). Opening straight to that beat, with a matching
-// `layoutId` on its visual, is what makes the shared-element transition
-// below actually connect to what was clicked instead of an unrelated
-// diagram morphing in.
-const CARD_PREVIEW_BEAT: Record<CaseStudyId, BeatId> = {
-  qlik: "solution",
-  aws: "solution",
-  sprout: "friction",
-};
-
 interface CaseStudyModalProps {
   project: CaseStudyId | null;
   onClose: () => void;
@@ -60,23 +45,22 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
     );
   }, [study]);
 
-  // Council round 23: opening straight to the beat matching the clicked
-  // card (CARD_PREVIEW_BEAT) used to be done in a useEffect - which
-  // fires *after* the first paint, so the very first frame rendered was
-  // always "hook" (frameIndex's stale initial 0) before snapping to the
-  // right beat a tick later. A visible flash of the wrong content right
-  // as the shared-element transition is trying to prove spatial
-  // continuity defeated the whole point. React's own recommended fix
-  // for "derive state from a changed prop": compare against the last
-  // seen project *during render* and correct frameIndex immediately,
-  // so the corrected value is what actually gets painted the first time.
+  // Every case study now opens at the beginning (frameIndex 0 - "hook").
+  // This used to open straight to whichever beat matched the clicked
+  // tile's preview image (round 23), driven by a shared-element
+  // animation between the tile and the modal. Round 26 rewrote the
+  // tiles without that shared layoutId, so the animation this was
+  // built for no longer exists - it kept skipping ahead for a reason
+  // that was already dead. It also actively fought round 28's
+  // deep-linkable URLs: a ?case=aws link is a cold entry point, not a
+  // continuation of a click, and should tell the story from the start
+  // like any other visitor's first view. Still resets on every project
+  // change, during render (not a useEffect) - the original fix for a
+  // one-frame flash of stale content still applies here.
   const [lastProject, setLastProject] = useState<CaseStudyId | null>(null);
   if (project !== lastProject) {
     setLastProject(project);
-    if (project) {
-      const idx = frames.findIndex((f) => f.beat === CARD_PREVIEW_BEAT[project]);
-      setFrameIndex(idx >= 0 ? idx : 0);
-    }
+    if (project) setFrameIndex(0);
   }
 
   useEffect(() => {
@@ -155,11 +139,7 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
                 {data.image || data.visual ? (
                   <div className="flex flex-col lg:flex-row gap-10 lg:items-center">
                     <div className="lg:w-[60%] flex items-center justify-center">
-                      <FrameVisualPanel
-                        data={data}
-                        study={study}
-                        sharedLayoutId={frame.beat === CARD_PREVIEW_BEAT[project] ? `case-study-image-${project}` : undefined}
-                      />
+                      <FrameVisualPanel data={data} study={study} />
                     </div>
                     <div className="lg:w-[40%] flex flex-col">
                       <FrameNarrative data={data} study={study} />
@@ -248,10 +228,10 @@ export function CaseStudyModal({ project, onClose, onAskAboutProject }: CaseStud
   );
 }
 
-function FrameVisualPanel({ data, study, sharedLayoutId }: { data: BeatData; study: CaseStudy; sharedLayoutId?: string }) {
+function FrameVisualPanel({ data, study }: { data: BeatData; study: CaseStudy }) {
   if (data.image) {
     return (
-      <motion.div layoutId={sharedLayoutId} className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={data.image.src}
@@ -263,7 +243,7 @@ function FrameVisualPanel({ data, study, sharedLayoutId }: { data: BeatData; stu
             <Lock className="h-3 w-3" /> NDA &middot; in-progress prototype
           </span>
         )}
-      </motion.div>
+      </div>
     );
   }
   // data.visual - the only other case this gets called for (the parent
@@ -271,9 +251,9 @@ function FrameVisualPanel({ data, study, sharedLayoutId }: { data: BeatData; stu
   // the centered-single-column branch in the main render for beats with
   // neither).
   return (
-    <motion.div layoutId={sharedLayoutId} className="w-full max-w-md rounded-sm overflow-hidden">
+    <div className="w-full max-w-md rounded-sm overflow-hidden">
       {data.visual && renderVisual(data.visual, study.color, study.accentColor)}
-    </motion.div>
+    </div>
   );
 }
 
