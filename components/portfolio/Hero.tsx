@@ -14,72 +14,85 @@ const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
 // actual problem per the round-25 council, and it isn't this
 // reference's look either); this plaque just needed its colors
 // flipped back to match.
+//
+// Council round 2 ("it feels very condensed"): this used to wrap its
+// max-w-[800px] content in header-level px-6 lg:px-16, while
+// ChatInterface.tsx centered its own max-w-[800px] directly against the
+// full viewport before adding its own inner px-6. Two different
+// reference frames for the "same" 800px column - a real, measurable 24px
+// left-edge mismatch (confirmed: Hero's name landed at x=560 on a
+// 1920px screen, the headline below it at x=584), not a taste question.
+// Now both share one page-level container - PAGE_MAX_W, PAGE_PADDING -
+// so whatever width the content column ends up at, Hero and the chat
+// agree on where its left edge actually is.
 export function Hero() {
   const { identity } = knowledge;
 
   return (
-    <header className="px-6 lg:px-16 pt-8 pb-4 lg:pt-10">
-      <div className="max-w-[800px] mx-auto flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <motion.h1
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-lg sm:text-xl font-semibold text-[#211D1D] tracking-tight"
+    <header className="px-6 lg:px-8">
+      <div className="max-w-[1160px] mx-auto pt-8 lg:pt-10 pb-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-lg sm:text-xl font-semibold text-[#211D1D] tracking-tight"
+            >
+              {identity.name}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.06 }}
+              className="text-[13px] text-[#7A5C12] font-semibold tracking-[0.04em]"
+            >
+              {identity.title}
+            </motion.p>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.12 }}
+            className="flex items-center gap-4 text-[13px] font-medium"
           >
-            {identity.name}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.06 }}
-            className="text-[13px] text-[#7A5C12] font-semibold tracking-[0.04em]"
-          >
-            {identity.title}
-          </motion.p>
+            <a
+              href={`mailto:${identity.email}`}
+              onClick={() => track("email_tapped")}
+              className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
+            >
+              Email
+            </a>
+            <span className="text-[#211D1D]/20" aria-hidden="true">
+              &middot;
+            </span>
+            <a
+              href={identity.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("linkedin_tapped")}
+              className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
+            >
+              LinkedIn
+            </a>
+          </motion.div>
         </div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.12 }}
-          className="flex items-center gap-4 text-[13px] font-medium"
+          transition={{ duration: 0.4, delay: 0.18 }}
+          className="mt-2 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#211D1D]/30"
         >
-          <a
-            href={`mailto:${identity.email}`}
-            onClick={() => track("email_tapped")}
-            className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
-          >
-            Email
-          </a>
-          <span className="text-[#211D1D]/20" aria-hidden="true">
-            &middot;
-          </span>
-          <a
-            href={identity.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => track("linkedin_tapped")}
-            className="text-[#211D1D]/55 hover:text-[#7A5C12] transition-colors"
-          >
-            LinkedIn
-          </a>
+          {COMPANY_BADGES.map((company, i) => (
+            <span key={company} className="flex items-center gap-2.5">
+              {i > 0 && <span aria-hidden="true">&middot;</span>}
+              {company}
+            </span>
+          ))}
         </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.18 }}
-        className="max-w-[800px] mx-auto mt-2 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#211D1D]/30"
-      >
-        {COMPANY_BADGES.map((company, i) => (
-          <span key={company} className="flex items-center gap-2.5">
-            {i > 0 && <span aria-hidden="true">&middot;</span>}
-            {company}
-          </span>
-        ))}
-      </motion.div>
     </header>
   );
 }

@@ -15,9 +15,17 @@ interface CaseStudyIntroDeckProps {
 // the user actually pointed at doesn't do that, and "much closer to a
 // straight copy" was the explicit instruction this round - so this is
 // a plain equal grid now, stacking to one column on mobile.
+//
+// Council round 2 ("it feels very condensed"): this grid used to live
+// inside the same max-w-[800px] column as the chat prose, which capped
+// each tile at ~235px on a 1920px screen - the real AWS/Qlik screenshots,
+// the actual evidence of shipped work, were illegible at that size. It
+// now renders at the full width of ChatInterface's wider shared
+// container (see PAGE_MAX_W there), so tiles genuinely grow with the
+// viewport instead of staying phone-sized on a monitor.
 export function CaseStudyIntroDeck({ onOpen, startDelay }: CaseStudyIntroDeckProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
       <CaseStudyIntroCard project="aws" onOpen={onOpen} delay={startDelay} />
       <CaseStudyIntroCard project="qlik" onOpen={onOpen} delay={startDelay + 0.1} />
       <CaseStudyIntroCard project="sprout" onOpen={onOpen} delay={startDelay + 0.2} />

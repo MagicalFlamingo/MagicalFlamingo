@@ -140,28 +140,30 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
 
-  // Round 27 (council: "layout is not so good" - a real, standalone
-  // responsive bug, confirmed independently by 3 advisors from actual
-  // screenshots at 1920px). The flex-1/min-h-0 chain from page.tsx down
-  // through ChatSection correctly grows this component's wrapping
-  // <section> to fill the leftover viewport - the chain doesn't break
-  // there. It dead-ends right here: this div was a plain block with
-  // intrinsic content height, so on a short/empty conversation the
-  // grown section just renders a wall of empty space below the input
-  // instead of the content sitting inside it looking placed. Centering
-  // the empty state fixes that without touching the page-level height
-  // strategy - but centering must switch off the moment there's a real
-  // conversation, or a growing message log fights being pinned to a
-  // center point and reflows unpleasantly as it grows past the
-  // viewport. `isEmpty` gates that switch.
+  // Round 27 (council: "layout is not so good") vertically centered this
+  // whole block to fix dead space that used to sit only below it.
+  //
+  // Council round 2 ("it feels very condensed" - 5/5 advisors, same
+  // diagnosis): centering treated the symptom. The real cause was a
+  // single max-w-[800px] measure doing two incompatible jobs - a
+  // reading width for prose/chat, and the frame for a 3-up work
+  // gallery. On a 1920px screen that shrank each case-study tile to
+  // ~235px (the AWS/Qlik screenshots - the actual proof of shipped
+  // work - became genuinely illegible) while the headline, a claim,
+  // stayed the visually dominant element. Backwards for a portfolio.
+  //
+  // Fix: two measures instead of one. PAGE_MAX_W (1160px) is the outer
+  // container width - what the case-study gallery is allowed to use.
+  // TEXT_MAX_W (720px) is what the headline/subtext/chips/input cap
+  // themselves to *without their own centering*, so they hug the same
+  // left edge as the gallery instead of re-centering into their own
+  // smaller box. `justify-center` is gone - top-anchored with
+  // deliberate lead space instead, so emptiness (if any) reads as
+  // "page continues," not "this is the whole thing."
   const isEmpty = messages.length === 0 && !isThinking;
 
   return (
-    <div
-      className={`flex flex-col flex-1 min-h-0 w-full max-w-[800px] mx-auto px-6 ${
-        isEmpty ? "justify-center" : "justify-start"
-      }`}
-    >
+    <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1160px] mx-auto px-6 lg:px-8 justify-start">
       {/* Council review (Eliminator advisor, confirmed): this whole block
           used to sit inside the role="log" region below, which meant a
           screen reader announced the static headline, case-study tiles,
@@ -170,7 +172,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           role="log" entirely; only the real, changing conversation
           (messages, thinking state, errors) is a log. */}
       {isEmpty && (
-        <div className="space-y-5">
+        <div className="space-y-6 lg:space-y-8 pt-[6vh] lg:pt-[8vh]">
           {/* Round 25 ("start from scratch" council): the page used to
               make you scroll past a hero and a case-study grid before
               reaching this. Three of four advisors converged
@@ -187,12 +189,18 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               existing " - " (not a hardcoded substring of the words
               themselves, so this doesn't break if the real copy in
               knowledge.ts changes) so the second clause gets the
-              site's one accent color, echoing that exact device. */}
+              site's one accent color, echoing that exact device.
+
+              Council round 2: headline now scales up past the old
+              32px cap (48px+ at desktop, matching Materialist's "a
+              headline should be sized like a headline, not a blog h2"),
+              capped at max-w-[720px] so it still wraps to real lines
+              instead of running the full 1160px width. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-[26px] sm:text-[32px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
+            className="max-w-[720px] text-[26px] sm:text-[32px] lg:text-[42px] xl:text-[48px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
           >
             {(() => {
               const [statement, explanation] = knowledge.identity.oneLiner.split(" - ");
@@ -214,11 +222,13 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
             Here&rsquo;s the real work - or ask me anything.
           </motion.p>
           <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
-          <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
+          <div className="max-w-[720px] space-y-6">
+            <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
+          </div>
         </div>
       )}
 
-      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
+      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="max-w-[720px] space-y-5">
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div
@@ -312,13 +322,27 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           sight, independent of color. A plain bordered field with a
           bottom accent rule reads as an inquiry field, not a chatbot
           widget, and matches the sharp-cornered chrome used everywhere
-          else on the site now (CaseStudyCard, the hero figure). */}
+          else on the site now (CaseStudyCard, the hero figure).
+
+          Sticky is now conditional on a real conversation existing.
+          Round 2's density fix (removing justify-center, adding real
+          top padding) pushed the empty state's total content height
+          close enough to typical viewport heights that `sticky bottom-4`
+          started triggering on first paint - no scrolling needed to
+          reach the "stuck" threshold, so the input rendered pinned mid-
+          page, overlapping the chips above it. Caught in a real
+          screenshot at 1440x900, not theoretical. Sticky only matters
+          once there's something to scroll past - a real, growing
+          message log - so it's off during the empty state and on once
+          messages exist. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submitText(inputValue);
         }}
-        className="mt-6 sticky bottom-4 flex items-center gap-3 bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 transition-colors"
+        className={`mt-6 max-w-[720px] flex items-center gap-3 bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 transition-colors ${
+          isEmpty ? "" : "sticky bottom-4"
+        }`}
       >
         <input
           value={inputValue}

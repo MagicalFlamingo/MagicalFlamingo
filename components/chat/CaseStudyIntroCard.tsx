@@ -102,7 +102,12 @@ export function CaseStudyIntroCard({ project, onOpen, delay }: CaseStudyIntroCar
           <CardVisual project={project} />
         </div>
       </div>
-      <p className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]">
+      {/* Council round 2: metadata was wrapping mid-phrase ("IN /
+          PROGRESS") in the old ~235px tile - `whitespace-nowrap` plus
+          the tile's own extra width (from the wider shared gallery
+          container) fixes that instead of shrinking the words further.
+          Text sizes bump slightly at lg since there's real room now. */}
+      <p className="mt-2.5 flex items-center gap-1.5 text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.14em] whitespace-nowrap">
         <span className={isShipped ? "text-[#211D1D]" : "text-[#211D1D]/35"}>
           {isShipped ? "Shipped" : "In progress"}
         </span>
@@ -113,7 +118,7 @@ export function CaseStudyIntroCard({ project, onOpen, delay }: CaseStudyIntroCar
           {study.company} &middot; {study.year}
         </span>
       </p>
-      <h4 className="mt-1 text-[15px] font-bold text-[#211D1D] leading-tight tracking-tight group-hover:text-[#7A5C12] transition-colors">
+      <h4 className="mt-1 text-[15px] lg:text-[17px] font-bold text-[#211D1D] leading-tight tracking-tight group-hover:text-[#7A5C12] transition-colors">
         {study.title}
       </h4>
     </motion.button>
