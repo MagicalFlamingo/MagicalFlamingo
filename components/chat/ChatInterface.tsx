@@ -7,7 +7,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyBeat } from "./CaseStudyBeat";
-import { CaseStudyIntroDeck } from "./CaseStudyIntroDeck";
+import { HeroCaseStudyBlock } from "./HeroCaseStudyBlock";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
@@ -24,15 +24,6 @@ import type { BeatId } from "./CaseStudyBeat";
 // rollback, but is no longer imported here. `pick`/`thinkingPhrases`/
 // `firstMessagePhrase` are just personality-phrase pools, unrelated to
 // the matching logic itself, and are still real content worth reusing.
-//
-// Curated to 4 starter chips (was 6); these specifically surface
-// QuoteCard/art-history angles a cold visitor wouldn't otherwise find.
-const INITIAL_CHIPS = [
-  "What makes you different from other designers?",
-  "How does art history show up in your work?",
-  "Walk me through your research process",
-  "What would you do in your first 30 days here?",
-];
 
 const dotVariants: Variants = {
   animate: (i: number) => ({
@@ -50,7 +41,7 @@ interface ChatInterfaceProps {
   onConsumeInitialQuestion?: () => void;
   // Round 25: case studies are no longer a separate page section you
   // scroll past to reach the chat - they're the first thing the chat
-  // itself shows you, via CaseStudyIntroDeck below. Opening one still
+  // itself shows you, via HeroCaseStudyBlock below. Opening one still
   // goes through the same full-screen CaseStudyModal as before; this
   // prop is just how that click reaches page.tsx's existing modal state.
   onOpenCaseStudy?: (project: CaseStudyId) => void;
@@ -195,7 +186,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               32px cap (48px+ at desktop, matching Materialist's "a
               headline should be sized like a headline, not a blog h2"),
               capped at max-w-[720px] so it still wraps to real lines
-              instead of running the full 1160px width. */}
+              instead of running the full 1160px width.
+
+              Council round 3 ("a lot of text, a lot of items - hard to
+              understand the layout"): the subtext line ("Here's the
+              real work - or ask me anything") is gone - pure narration
+              of a layout that should be self-evident, per the
+              Eliminator's cut list. The starter chips are gone from
+              cold load too - they already exist mid-conversation via
+              the LLM's own showPromptChips tool call once there's real
+              context to react to; four of them competing with the
+              headline and the case study for attention on first paint
+              was one invitation too many, confirmed independently by
+              3 of 5 advisors and the peer-review pass. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -213,18 +216,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               );
             })()}
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.08 }}
-            className="text-sm text-[#211D1D]/55"
-          >
-            Here&rsquo;s the real work - or ask me anything.
-          </motion.p>
-          <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
-          <div className="max-w-[720px] space-y-6">
-            <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
-          </div>
+          <HeroCaseStudyBlock onOpen={(p) => onOpenCaseStudy?.(p)} delay={0.12} />
         </div>
       )}
 

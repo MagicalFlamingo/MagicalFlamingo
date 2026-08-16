@@ -9,7 +9,7 @@ import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
 // Round 25 ("start from scratch" council): the standalone case-study
 // grid is gone - case studies now surface inline in the chat's own
-// opening (ChatInterface's empty-state block -> CaseStudyIntroDeck), so
+// opening (ChatInterface's empty-state block -> HeroCaseStudyBlock), so
 // this is Hero (a compact identity plaque, not a full-viewport section)
 // -> ChatSection, effectively the whole page. Still a client component:
 // it owns the shared state between the chat's inline case-study cards,
