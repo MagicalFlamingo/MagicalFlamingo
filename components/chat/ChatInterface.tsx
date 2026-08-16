@@ -7,13 +7,14 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyBeat } from "./CaseStudyBeat";
+import { CaseStudyIntroDeck } from "./CaseStudyIntroDeck";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
 import { QuoteCard } from "./QuoteCard";
 import { StatCard } from "./StatCard";
 import { pick, thinkingPhrases, firstMessagePhrase } from "@/content/responses";
-import type { CaseStudyId } from "@/content/knowledge";
+import { knowledge, type CaseStudyId } from "@/content/knowledge";
 import type { BeatId } from "./CaseStudyBeat";
 
 // Redesign (confirmed pivot, step 5): the chat now calls the real LLM
@@ -47,6 +48,12 @@ interface ChatInterfaceProps {
   // same sendMessage() path as anything typed directly.
   initialQuestion?: string | null;
   onConsumeInitialQuestion?: () => void;
+  // Round 25: case studies are no longer a separate page section you
+  // scroll past to reach the chat - they're the first thing the chat
+  // itself shows you, via CaseStudyIntroDeck below. Opening one still
+  // goes through the same full-screen CaseStudyModal as before; this
+  // prop is just how that click reaches page.tsx's existing modal state.
+  onOpenCaseStudy?: (project: CaseStudyId) => void;
 }
 
 // Loosely-typed tool-part narrowing rather than full generic inference
@@ -82,7 +89,7 @@ function renderToolPart(part: ToolPart) {
   }
 }
 
-export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: ChatInterfaceProps = {}) {
+export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpenCaseStudy }: ChatInterfaceProps = {}) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [thinkingPhrase, setThinkingPhrase] = useState(thinkingPhrases[0]);
@@ -133,15 +140,85 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion }: Cha
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
 
-  return (
-    <div className="max-w-[800px] mx-auto px-6">
-      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
-        {messages.length === 0 && !isThinking && (
-          <div>
-            <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
-          </div>
-        )}
+  // Round 27 (council: "layout is not so good" - a real, standalone
+  // responsive bug, confirmed independently by 3 advisors from actual
+  // screenshots at 1920px). The flex-1/min-h-0 chain from page.tsx down
+  // through ChatSection correctly grows this component's wrapping
+  // <section> to fill the leftover viewport - the chain doesn't break
+  // there. It dead-ends right here: this div was a plain block with
+  // intrinsic content height, so on a short/empty conversation the
+  // grown section just renders a wall of empty space below the input
+  // instead of the content sitting inside it looking placed. Centering
+  // the empty state fixes that without touching the page-level height
+  // strategy - but centering must switch off the moment there's a real
+  // conversation, or a growing message log fights being pinned to a
+  // center point and reflows unpleasantly as it grows past the
+  // viewport. `isEmpty` gates that switch.
+  const isEmpty = messages.length === 0 && !isThinking;
 
+  return (
+    <div
+      className={`flex flex-col flex-1 min-h-0 w-full max-w-[800px] mx-auto px-6 ${
+        isEmpty ? "justify-center" : "justify-start"
+      }`}
+    >
+      {/* Council review (Eliminator advisor, confirmed): this whole block
+          used to sit inside the role="log" region below, which meant a
+          screen reader announced the static headline, case-study tiles,
+          and starter chips as live chat traffic the instant the page
+          loaded - they're not messages, nothing "arrived." Moved outside
+          role="log" entirely; only the real, changing conversation
+          (messages, thinking state, errors) is a log. */}
+      {isEmpty && (
+        <div className="space-y-5">
+          {/* Round 25 ("start from scratch" council): the page used to
+              make you scroll past a hero and a case-study grid before
+              reaching this. Three of four advisors converged
+              independently on the same diagnosis - repainting that
+              same three-block skeleton for 24 rounds is why it kept
+              reading as "the same" no matter the palette. This is the
+              fix: the conversation opens already mid-thought, real
+              work included, nothing to scroll past to get here.
+
+              Round 26 (full pivot to a real reference site the user pointed at): that
+              site's whole identity is one huge, plain, confident
+              sans headline with a single accent-colored phrase inside
+              it - not a small paragraph. oneLiner is split on its own
+              existing " - " (not a hardcoded substring of the words
+              themselves, so this doesn't break if the real copy in
+              knowledge.ts changes) so the second clause gets the
+              site's one accent color, echoing that exact device. */}
+          <motion.h2
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-[26px] sm:text-[32px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
+          >
+            {(() => {
+              const [statement, explanation] = knowledge.identity.oneLiner.split(" - ");
+              return explanation ? (
+                <>
+                  {statement} - <span className="text-[#F2A93C]">{explanation}</span>
+                </>
+              ) : (
+                knowledge.identity.oneLiner
+              );
+            })()}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.08 }}
+            className="text-sm text-[#211D1D]/55"
+          >
+            Here&rsquo;s the real work - or ask me anything.
+          </motion.p>
+          <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
+          <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
+        </div>
+      )}
+
+      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div

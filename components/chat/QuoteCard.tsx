@@ -20,7 +20,7 @@ export function QuoteCard({ quote, attribution }: QuoteCardProps) {
       transition={{ duration: 0.35 }}
       className="mt-3 rounded-xl border border-[#211D1D]/10 bg-[#FFFDF9] px-6 py-5"
     >
-      <p className="font-serif text-lg italic text-[#211D1D] leading-snug">&ldquo;{clean}&rdquo;</p>
+      <p className="text-lg italic text-[#211D1D] leading-snug">&ldquo;{clean}&rdquo;</p>
       <p className="mt-3 text-xs font-medium uppercase tracking-wider text-[#211D1D]/40">{attribution}</p>
     </motion.div>
   );

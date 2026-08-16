@@ -42,7 +42,13 @@ export function pick<T>(arr: T[]): T {
 }
 
 export const thinkingPhrases: string[] = [
-  "actually thinking, no LLM to blame",
+  // Round 25 (council): the chat has called a real LLM since the
+  // redesign's step 5 (ChatInterface.tsx -> app/api/chat/route.ts) -
+  // "no LLM to blame" was left over from before that pivot and is now
+  // an actively false claim shown while a real model streams a real
+  // answer. Fixed to something true and still in voice, not a silent
+  // re-hedge back toward "AI-generated" boilerplate.
+  "actually thinking this through, not routing to a script",
   "reading between the lines",
   "checking my notes",
   "no bullet points forming yet",
@@ -624,9 +630,16 @@ export const intents: Intent[] = [
     id: "contact",
     keywords: ["contact", "reach out", "email", "hire", "get in touch", "connect", "talk", "meeting", "apply", "how do i"],
     weights: { hire: 4, "get in touch": 5, contact: 3, email: 3, meeting: 3, apply: 3 },
+    // Phone number removed (matches the same fix already applied to
+    // content/knowledge.ts, commit 32b62fa - "it fed the LLM directly").
+    // This file's intents[] array is dead code for the live chat (see
+    // the file-level comment at the top of ChatInterface.tsx), but dead
+    // code in a public repo is still public - a real phone number sitting
+    // here unused was exactly the same exposure the earlier fix was
+    // meant to close, just missed in this file.
     responses: [
-      "Fastest way is my mobile: 050-6404745. Email works too - goldanielle@gmail.com - but I actually pick up the phone. Or keep asking here first, I can usually say more in conversation than the portfolio shows.",
-      "Call or text is quickest: 050-6404745. Email if you'd rather - goldanielle@gmail.com. If you want to go deeper on a specific project before reaching out, ask here.",
+      "Email's the way in - goldanielle@gmail.com. Or keep asking here first, I can usually say more in conversation than the portfolio shows.",
+      "goldanielle@gmail.com works. If you want to go deeper on a specific project before reaching out, ask here.",
     ],
     followups: [
       "What would you do in your first 30 days?",

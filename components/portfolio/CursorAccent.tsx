@@ -57,7 +57,14 @@ export function CursorAccent() {
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none fixed top-0 left-0 z-[999] rounded-full"
+      // Council round 24: the page background flipped from cream to ink
+      // (dark gallery pivot) - a fixed "#211D1D at rest" dot would now
+      // sit on a page the same color as itself and disappear. `difference`
+      // blend mode makes the dot self-inverting against whatever's under
+      // it (dark page, a light screenshot inside a card, the cream chat
+      // panel) instead of needing a light/dark variant hand-maintained
+      // per surface.
+      className="pointer-events-none fixed top-0 left-0 z-[999] rounded-full mix-blend-difference"
       style={{
         x: springX,
         y: springY,
@@ -66,8 +73,8 @@ export function CursorAccent() {
         width: hovering ? 26 : 7,
         height: hovering ? 26 : 7,
         border: hovering ? "1.5px solid #F2A93C" : "none",
-        backgroundColor: hovering ? "transparent" : "#211D1D",
-        opacity: visible ? (hovering ? 0.9 : 0.45) : 0,
+        backgroundColor: hovering ? "transparent" : "#FAF3E7",
+        opacity: visible ? (hovering ? 0.9 : 0.6) : 0,
         transition: "width 0.2s ease, height 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease",
       }}
     />

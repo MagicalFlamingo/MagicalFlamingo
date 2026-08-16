@@ -1,33 +1,43 @@
 @import "tailwindcss";
 
 /*
- * Palette (v3, council round 19 - marigold promoted to primary)
+ * Palette (v5 - full aesthetic pivot to a real reference)
  *
- * Round 19 found the v2 palette read as "enterprise-report serious," not
- * "optimistic/fresh/welcoming" - green (#2E9B5C) reads closer to a
- * verified/compliance green than a growth green, and marigold, the
- * better candidate for warmth, was rationed to a single 6px status dot.
- * Also found real pre-existing contrast bugs: marigold as literal text
- * on cream was 1.81:1 (fails everything), green as text was 3.19:1
- * (fails the 4.5:1 body-text floor). Fix for both: promote marigold to
- * primary accent with real surface area, and split every warm/green
- * color into a bright FILL/WASH variant (backgrounds, borders, large
- * UI - 3:1 floor) and a darkened TEXT variant (links, labels - 4.5:1
- * floor) rather than using one hex for both jobs.
+ * Round 25 fixed the site's structure (case studies live inside the chat
+ * now, not a separate section) but kept round 24's dark "gallery"
+ * palette. The user then pointed at a real reference site as the actual
+ * bar and asked for a full pivot to it, not just
+ * borrowed elements: light/off-white throughout, huge confident plain
+ * sans typography (no serif), zero card chrome (no borders, no shadows,
+ * no rounded boxes - full-bleed images with a plain tag+title stack
+ * underneath), one accent color used sparingly rather than as a bold
+ * fill/border/glow everywhere, and no grain/texture overlay at all -
+ * that site is completely flat.
  *
- * Kept off-limits per the design council: no pastel/light color used as
- * text (the math doesn't work against this light a cream), no warm wash
- * behind an "assertion" moment (case-study stat cards, headlines) - those
- * stay ink-on-neutral. Case-study accent colors (content/knowledge.ts,
- * one per company) are a separate system and untouched here.
+ * This reverses round 24's ink-primary flip (the palette itself wasn't
+ * the actual problem per the round-25 council, and it's explicitly not
+ * the reference's look either) but keeps the same 3 real tokens - ink,
+ * cream, marigold - just back in their v3-era roles, with marigold used
+ * far more sparingly than round 24's "full-strength borders and glow."
  *
- * cream    #FAF3E7  body background
- * ink      #211D1D  headline/body text, dark surfaces
- * marigold #F2A93C  primary accent FILL - chip fill, status dot, borders, washes (3:1 use)
- * ochre    #7A5C12  primary accent TEXT - links, hover text, labels (4.5:1 on cream)
- * green    #2E9B5C  secondary accent FILL - rare/quiet moments only (3:1 use)
- * pine     #1F6B45  secondary accent TEXT - same rule as ochre, used sparingly
- * paper    #FFFDF9  card surfaces on cream
+ * ink      #211D1D  primary text everywhere
+ * cream    #FAF3E7  PRIMARY page background everywhere
+ * marigold #F2A93C  the one accent - used sparingly, on a single word/
+ *                   line at a time, never as a card border or a glow
+ * ochre    #7A5C12  darker-accent text where marigold-on-cream would
+ *                   fail contrast at small sizes (unchanged role)
+ * paper    #FFFDF9  minor surfaces that want to sit just slightly above
+ *                   the cream page (unchanged role)
+ *
+ * Case-study accent colors (content/knowledge.ts, one per company) are a
+ * separate system and untouched here.
+ *
+ * Typography: `.font-serif` (Lora) is gone - the reference is plain sans
+ * throughout, no serif display moment anywhere. Inter is now the only
+ * typeface in the app; see app/layout.tsx, which dropped the Lora
+ * family from its Google Fonts link to match. This isn't a third font
+ * being added (that's been explicitly rejected before) - it's going
+ * from two typefaces down to one.
  */
 
 * {
@@ -44,32 +54,6 @@ body {
   color: #211D1D;
   font-family: 'Inter', system-ui, sans-serif;
   position: relative;
-}
-
-/* Council round 22 ("it should be 2026, now it's 2020"): the previous
-   two rounds stripped rounded corners, shadows, and gradients to kill
-   generic-AI tells - correctly, but that also stripped out everything
-   that read as depth or texture, leaving the page flat in a way that
-   reads as dated rather than restrained. Real, current research names
-   this specific fix directly: a subtle CSS/SVG grain overlay is *the*
-   cheap, honest way to give a flat color field tactile, printed-paper
-   depth without reaching for shadows or gradients again. Fixed,
-   pointer-events:none, barely-there opacity - texture, not decoration
-   anyone consciously notices. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-}
-
-.font-serif {
-  font-family: 'Lora', Georgia, serif;
 }
 
 .scrollbar-thin {

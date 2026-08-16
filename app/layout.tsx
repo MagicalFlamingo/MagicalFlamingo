@@ -42,15 +42,16 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
-        {/* Council round 23: widened the weight range on the SAME two
-            typefaces (still no third font - that was explicitly rejected
-            once already) - Lora 500 for the hero name (was missing, so
-            `font-medium` silently fell back to the nearest loaded weight
-            instead of the weight actually requested), plus Inter 100/900
-            so real weight contrast (the AWS stat's "/100" vs "67") is an
-            available lever, not just bigger sizes. */}
+        {/* Round 26 (full aesthetic pivot to a real reference site the user pointed at):
+            that reference has no serif display moment anywhere - one
+            plain sans throughout. Lora dropped from this link entirely;
+            Inter is now the only typeface in the app, not a swap to a
+            different sans - going from two typefaces to one, not adding
+            a third (that's been explicitly rejected before). The wide
+            weight range (round 23) stays - real weight contrast is still
+            a lever with just one typeface. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;900&display=swap"
           rel="stylesheet"
         />
       </head>
