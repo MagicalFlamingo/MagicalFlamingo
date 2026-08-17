@@ -3,7 +3,7 @@
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { track } from "@vercel/analytics";
-import { knowledge, type CaseStudyId } from "@/content/knowledge";
+import { knowledge, type CaseStudyId, type FrameVisual } from "@/content/knowledge";
 
 // Round 3 council ("home page has a lot of text, a lot of items - very
 // hard to understand the layout"). Three of five advisors independently
@@ -11,21 +11,28 @@ import { knowledge, type CaseStudyId } from "@/content/knowledge";
 // review confirmed the version that survives: this isn't a chat that
 // happens to show three case studies - it's one real story, with two
 // more real projects a click away. What replaced the 3-up equal grid
-// (CaseStudyIntroDeck/CaseStudyIntroCard, retired this round):
+// (CaseStudyIntroDeck/CaseStudyIntroCard, retired that round):
 //
 // One hero beat - AWS, the only knowledge.caseStudies entry with
 // impact.status "Shipped" - told as an actual reveal using its own real
 // copy verbatim (hook.headline, solution.headline from
-// content/knowledge.ts), not an invented connective sentence. Peer
-// review caught something the original advisors missed: this visual is
-// an honest data diagram (a real 67/100, traceable to real component
-// scores), not a product screenshot - it's still the strongest EVIDENCE
-// on the site, just not the best photo. Framed that way, not oversold.
+// content/knowledge.ts), not an invented connective sentence.
 //
-// Then one quiet line for the other two real, in-progress projects -
-// still full click-throughs into the same CaseStudyModal (with the same
-// real ?case= deep link from round 28), just not competing for equal
-// visual weight with the one finished, provable story.
+// Round 4 ("more visuals from the projects, it should be wow"): the
+// visual used to be just the bare "67/100" number - real, but thin.
+// Checked whether there were unused real screenshots that could add
+// more (public/case-studies/aws/*.jpg) - both existing extras have
+// hand-drawn review-annotation marks baked into the pixels (one is a
+// console screenshot with arrows drawn on it, the other is a dark
+// presentation slide with callout lines), confirmed by looking
+// directly at them, not assumed. Using either as-is would read as a
+// leaked internal deck, not a cleaner site. The honest lever left is
+// depth, not more photos: the real 4-row score breakdown (RTO/RPO,
+// Alarms, SOPs, FIS - same numbers already in content/knowledge.ts,
+// same ones shown inside CaseStudyModal, single-sourced here via
+// aws.solution.visual rather than re-typed) now renders on the
+// homepage itself, with each row's bar filling in on a real stagger -
+// motion doing the "more" work no additional image could honestly do.
 function CountUpNumber({ value }: { value: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
@@ -44,6 +51,30 @@ function CountUpNumber({ value }: { value: number }) {
   return <span ref={ref}>{display}</span>;
 }
 
+function ScoreBar({ score, max, color, accentColor, index, isInView }: {
+  score: number;
+  max: number;
+  color: string;
+  accentColor: string;
+  index: number;
+  isInView: boolean;
+}) {
+  return (
+    <div
+      className="h-1.5 rounded-full overflow-hidden"
+      style={{ background: accentColor }}
+    >
+      <motion.div
+        className="h-full rounded-full"
+        style={{ background: color }}
+        initial={{ width: "0%" }}
+        animate={isInView ? { width: `${(score / max) * 100}%` } : {}}
+        transition={{ duration: 0.7, delay: 0.3 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+      />
+    </div>
+  );
+}
+
 interface HeroCaseStudyBlockProps {
   onOpen: (project: CaseStudyId) => void;
   delay: number;
@@ -53,6 +84,10 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
   const aws = knowledge.caseStudies.aws;
   const qlik = knowledge.caseStudies.qlik;
   const sprout = knowledge.caseStudies.sprout;
+  const awsVisual = aws.solution.visual as Extract<FrameVisual, { kind: "scoreBreakdown" }>;
+
+  const visualRef = useRef<HTMLDivElement>(null);
+  const visualInView = useInView(visualRef, { once: true, margin: "-10% 0px" });
 
   // Round 3 council (peer review, verified in code): the old tiles had
   // zero click tracking of their own - case_study_opened only fired
@@ -75,15 +110,36 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         className="group w-full text-left flex flex-col sm:flex-row gap-6 sm:items-center"
       >
         <div
-          className="w-full sm:w-[38%] aspect-[4/3] shrink-0 flex items-center justify-center overflow-hidden"
+          ref={visualRef}
+          className="w-full sm:w-[42%] shrink-0 overflow-hidden p-5"
           style={{ background: aws.accentColor }}
         >
-          <span className="font-bold text-6xl inline-flex items-baseline" style={{ color: aws.color }}>
+          <span className="font-bold text-5xl inline-flex items-baseline" style={{ color: aws.color }}>
             <CountUpNumber value={67} />
-            <span className="font-normal text-2xl ml-1 opacity-60" style={{ color: aws.color }}>
+            <span className="font-normal text-xl ml-1 opacity-60" style={{ color: aws.color }}>
               /100
             </span>
           </span>
+          <div className="mt-4 space-y-2.5">
+            {awsVisual.rows.map((row, i) => (
+              <div key={row.label}>
+                <div className="flex items-center justify-between text-[11px] mb-1" style={{ color: aws.color, opacity: 0.75 }}>
+                  <span>{row.label}</span>
+                  <span className="font-semibold">
+                    {row.score}/{row.max}
+                  </span>
+                </div>
+                <ScoreBar
+                  score={row.score}
+                  max={row.max}
+                  color={aws.color}
+                  accentColor="#FFFFFF"
+                  index={i}
+                  isInView={visualInView}
+                />
+              </div>
+            ))}
+          </div>
         </div>
         <div className="flex-1 min-w-0">
           <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]">

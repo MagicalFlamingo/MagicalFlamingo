@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { Hero } from "@/components/portfolio/Hero";
 import { CaseStudyModal } from "@/components/portfolio/CaseStudyModal";
 import { ChatSection } from "@/components/portfolio/ChatSection";
-import { CursorAccent } from "@/components/portfolio/CursorAccent";
 import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
 // Round 25 ("start from scratch" council): the standalone case-study
@@ -62,7 +61,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#FAF3E7] flex flex-col">
-      <CursorAccent />
       <Hero />
       <div ref={chatSectionRef} className="flex-1 flex flex-col min-h-0">
         <ChatSection
