@@ -254,19 +254,31 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
   );
 }
 
+// Direct feedback ("the case studies feel very dull - as a recruiter or
+// design manager I can barely learn something about her work"): traced
+// this to buildBeat() itself, not the layout around it. Real content
+// was being cut before it ever reached the reader - solution.features
+// sliced to 2 of the real 5, and two entire real fields
+// (friction.researchMethod, impact.whatIDifferently) were never
+// referenced here at all, only reachable if a visitor happened to ask
+// the chat the right question. whatIDifferently in particular is
+// exactly the kind of reflective, senior-designer content a hiring
+// manager is trying to find and was previously invisible everywhere
+// except a lucky chat prompt. Nothing here is new copy - every string
+// below already existed in content/knowledge.ts before this change.
 export function buildBeat(study: CaseStudy, beat: BeatId): BeatData | null {
   switch (beat) {
     case "hook":
       return { label: "Hook", headline: study.hook.headline, paragraphs: paragraphsOf(study.hook.context), extra: study.hook.scale, image: study.hook.image, visual: study.hook.visual };
     case "friction":
-      return { label: "Friction", headline: study.friction.headline, paragraphs: [], list: study.friction.problems.slice(0, 4), quote: study.friction.userVoice?.[0], image: study.friction.image, visual: study.friction.visual };
+      return { label: "Friction", headline: study.friction.headline, paragraphs: [], list: study.friction.problems.slice(0, 4), quote: study.friction.userVoice?.[0], extra: study.friction.researchMethod, image: study.friction.image, visual: study.friction.visual };
     case "pivot":
       if (!study.pivot) return null;
       return { label: "Pivot", headline: study.pivot.headline, paragraphs: paragraphsOf(study.pivot.insight), extra: study.pivot.designDecision, image: study.pivot.image };
     case "solution":
-      return { label: "Solution", headline: study.solution.headline, paragraphs: [], features: study.solution.features.slice(0, 2), nda: study.ndaLevel === "partial", image: study.solution.image, visual: study.solution.visual };
+      return { label: "Solution", headline: study.solution.headline, paragraphs: [], features: study.solution.features.slice(0, 4), nda: study.ndaLevel === "partial", image: study.solution.image, visual: study.solution.visual };
     case "impact":
-      return { label: "Impact", headline: study.impact.headline, paragraphs: [], list: study.impact.outcomes.slice(0, 4), image: study.impact.image, status: study.impact.status, visual: study.impact.visual };
+      return { label: "Impact", headline: study.impact.headline, paragraphs: [], list: study.impact.outcomes.slice(0, 5), extra: study.impact.whatIDifferently, image: study.impact.image, status: study.impact.status, visual: study.impact.visual };
   }
 }
 

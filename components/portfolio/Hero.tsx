@@ -2,9 +2,23 @@
 
 import { motion } from "framer-motion";
 import { track } from "@vercel/analytics";
-import { knowledge } from "@/content/knowledge";
+import { knowledge, type CaseStudyId } from "@/content/knowledge";
 
-const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
+// Real employers with a real case study to back the link. Menora was
+// removed per direct feedback - a peer review earlier in this project
+// had already flagged it independently: it appeared once, backed by
+// no case study, on a page whose headline promises she can explain
+// every decision. Qlik and Amazon AWS both map to a real
+// knowledge.caseStudies entry, so clicking either opens that real
+// case study instead of just naming it.
+const COMPANY_BADGES: { label: string; project: CaseStudyId }[] = [
+  { label: "Qlik", project: "qlik" },
+  { label: "Amazon AWS", project: "aws" },
+];
+
+interface HeroProps {
+  onOpenCaseStudy?: (project: CaseStudyId) => void;
+}
 
 // Round 26 (full aesthetic pivot to a real reference site the user
 // pointed at). That site's nav treats a name as plain, small, unstyled
@@ -25,7 +39,7 @@ const COMPANY_BADGES = ["Qlik", "Amazon AWS", "Menora"];
 // Now both share one page-level container - PAGE_MAX_W, PAGE_PADDING -
 // so whatever width the content column ends up at, Hero and the chat
 // agree on where its left edge actually is.
-export function Hero() {
+export function Hero({ onOpenCaseStudy }: HeroProps) {
   const { identity } = knowledge;
 
   return (
@@ -86,9 +100,18 @@ export function Hero() {
           className="mt-2 flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-wider text-[#211D1D]/30"
         >
           {COMPANY_BADGES.map((company, i) => (
-            <span key={company} className="flex items-center gap-2.5">
+            <span key={company.label} className="flex items-center gap-2.5">
               {i > 0 && <span aria-hidden="true">&middot;</span>}
-              {company}
+              <button
+                type="button"
+                onClick={() => {
+                  track("case_study_opened", { project: company.project, source: "badge" });
+                  onOpenCaseStudy?.(company.project);
+                }}
+                className="hover:text-[#7A5C12] transition-colors"
+              >
+                {company.label}
+              </button>
             </span>
           ))}
         </motion.div>

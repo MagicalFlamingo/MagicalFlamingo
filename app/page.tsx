@@ -61,7 +61,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#FAF3E7] flex flex-col">
-      <Hero />
+      <Hero onOpenCaseStudy={setOpenProject} />
       <div ref={chatSectionRef} className="flex-1 flex flex-col min-h-0">
         <ChatSection
           initialQuestion={pendingQuestion}
