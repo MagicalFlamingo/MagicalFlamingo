@@ -121,8 +121,15 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
       // Same irregular-mistake framing for the stack: a clean, evenly-fanned
       // deck reads as "organized," which is the opposite of what actually
       // happened. Each card gets its own off-kilter rotation and offset,
-      // and the neutral round badge is now a warning triangle - a
-      // duplicate nobody noticed, not a tidy total.
+      // and the neutral round badge flags a mistake, not a tidy total.
+      //
+      // Original craft pass: found on the same audit as swatchChaos -
+      // this diagram was carrying a `shadow-sm` on every card plus a
+      // CSS `drop-shadow` filter and an SVG warning-triangle icon on the
+      // badge, both against this file's own documented rule a few lines
+      // up ("Never a shadow, gradient, or icon"). The warning badge is
+      // now a flat red-bordered mark doing the same job in text - a
+      // bold "!" and the real count - not an icon shape.
       case "duplicateStack": {
         const rotations = [-7, 4, -3, 6, -5];
         const shiftX = [-9, 11, -4, 14, 7];
@@ -135,7 +142,7 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
                 return (
                   <div
                     key={idx}
-                    className="absolute w-52 h-16 rounded-md flex items-center justify-center text-sm font-semibold shadow-sm"
+                    className="absolute w-52 h-16 rounded-md flex items-center justify-center text-sm font-semibold"
                     style={{
                       background: color,
                       opacity: isTop ? 1 : 0.45 - idx * 0.07,
@@ -148,11 +155,12 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
                   </div>
                 );
               })}
-              <span className="absolute -top-1 right-[calc(50%-6.25rem)] z-10 flex items-center justify-center w-11 h-11" style={{ filter: "drop-shadow(0 1px 2px rgba(33,29,29,0.2))" }}>
-                <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">
-                  <path d="M12 2.5 L22.5 21 L1.5 21 Z" fill="#FAF3E7" stroke="#C23B3B" strokeWidth="1.75" strokeLinejoin="round" />
-                </svg>
-                <span className="absolute text-xs font-bold mt-[3px]" style={{ color: "#C23B3B" }}>&times;{visual.count}</span>
+              <span
+                className="absolute -top-2 right-[calc(50%-6.5rem)] z-10 flex items-center gap-1 rounded-full border-2 bg-[#FAF3E7] px-2.5 py-1 text-xs font-bold"
+                style={{ borderColor: "#C23B3B", color: "#C23B3B" }}
+              >
+                <span aria-hidden="true">!</span>
+                <span>&times;{visual.count}</span>
               </span>
             </div>
           </div>
@@ -186,17 +194,36 @@ export function renderVisual(visual: FrameVisual, color: string, accentColor: st
           </div>
         );
       }
+      // Original craft pass: the previous version varied both size and
+      // rotation per swatch (up to 13px offset, 6deg tilt) and put a
+      // shadow on every square. Two real problems with that, caught on
+      // review, not guessed at: (1) the actual claim here is color
+      // drift - "the same brand blue, hardcoded five different ways" -
+      // not size drift, so varying size muddied the one thing this
+      // diagram is supposed to prove; a hiring manager glancing at five
+      // different-sized squares reads "messy," not "these should be one
+      // token." (2) `shadow-sm` directly violates this file's own
+      // documented visual system a few lines up ("Fixed chrome... Never
+      // a shadow, gradient, or icon - those are exactly the 'decorated
+      // to look impressive' pattern this site has rejected repeatedly").
+      // Same size now (the real, honest variable is the hex value, not
+      // physical size), rotation/offset cut to a restrained 3px/3deg -
+      // still reads as five separate, slightly-off swatches, just
+      // deliberate rather than scattered.
       case "swatchChaos": {
-        const offsets = [0, 10, -7, 13, -9];
-        const rotations = [0, -6, 4, 0, -5];
-        const sizes = [56, 46, 62, 42, 52];
+        const offsets = [0, 2, -2, 3, -1];
+        const rotations = [0, -2, 1.5, -1, 2];
         return (
           <div className="py-12 px-6" style={{ background: accentColor }}>
-            <div className="flex items-end justify-center gap-3">
+            <div className="flex items-end justify-center gap-4">
               {visual.swatches.map((hex, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-2" style={{ transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)` }}>
-                  <div className="rounded-md shadow-sm" style={{ background: hex, width: sizes[idx % sizes.length], height: sizes[idx % sizes.length] }} />
-                  <span className="text-[10px] font-mono" style={{ color, opacity: 0.55 }}>{hex}</span>
+                <div
+                  key={idx}
+                  className="flex flex-col items-center gap-2"
+                  style={{ transform: `translateY(${offsets[idx % offsets.length]}px) rotate(${rotations[idx % rotations.length]}deg)` }}
+                >
+                  <div className="rounded-md" style={{ background: hex, width: 52, height: 52 }} />
+                  <span className="text-[10px] font-mono" style={{ color, opacity: 0.6 }}>{hex}</span>
                 </div>
               ))}
             </div>
