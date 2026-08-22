@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView, useReducedMotion, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { track } from "@vercel/analytics";
 import { knowledge, type CaseStudyId, type FrameVisual } from "@/content/knowledge";
@@ -27,18 +27,47 @@ import { knowledge, type CaseStudyId, type FrameVisual } from "@/content/knowled
 // presentation slide with callout lines), confirmed by looking
 // directly at them, not assumed. Using either as-is would read as a
 // leaked internal deck, not a cleaner site. The honest lever left is
-// depth, not more photos: the real 4-row score breakdown (RTO/RPO,
-// Alarms, SOPs, FIS - same numbers already in content/knowledge.ts,
-// same ones shown inside CaseStudyModal, single-sourced here via
-// aws.solution.visual rather than re-typed) now renders on the
-// homepage itself, with each row's bar filling in on a real stagger -
-// motion doing the "more" work no additional image could honestly do.
-function CountUpNumber({ value }: { value: number }) {
+// depth, not more photos: the real score breakdown (RTO/RPO, Alarms,
+// SOPs, FIS - same numbers already in content/knowledge.ts, same ones
+// shown inside CaseStudyModal, single-sourced here via
+// aws.solution.visual rather than re-typed) renders on the homepage
+// itself, with each row's bar filling in on a real stagger - motion
+// doing the "more" work no additional image could honestly do.
+//
+// Council round 4 (Eliminator + Materialist advisors):
+// - Only 2 of the 4 real rows render here, not 4 - the strongest
+//   (37/40) and the weakest (2/20), on purpose. All 4 near-full-width
+//   bars read fine inside the modal, where a reader has already
+//   opted into detail; on the homepage, under the word SHIPPED, two
+//   mostly-empty bars read as Danielle's own performance, not the
+//   customer's starting point. The real contrast - one strong metric,
+//   one weak one - is the actual argument ("a breakdown you can act
+//   on"), and it survives on 2 rows. All 4 are still one click away,
+//   verbatim, inside the modal.
+// - This card used to render in aws.color/aws.accentColor - the
+//   per-case-study palette that content/knowledge.ts documents as
+//   scoped to the modal (Qlik blue, Sprout green, AWS navy). Promoting
+//   one case study's palette onto homepage-level chrome meant this
+//   card would silently change color if a future round ever led with
+//   a different study. Now built from the site's own fixed FrameVisual
+//   chrome (rounded-lg border-[#211D1D]/10 bg-[#FFFDF9], no shadow/
+//   gradient/icon - the same rule content/knowledge.ts documents for
+//   every other diagram) so the front door stays palette-stable.
+function CountUpNumber({ value, reduceMotion }: { value: number; reduceMotion: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0px" });
-  const [display, setDisplay] = useState(0);
+  const [display, setDisplay] = useState(reduceMotion ? value : 0);
 
   useEffect(() => {
+    // Council round 4 (Materialist advisor): MotionConfig's
+    // reducedMotion="user" only gates Framer's own transform/layout
+    // animations - it never reaches this imperative animate() driving
+    // plain React state, so a reduced-motion visitor still watched the
+    // number count up. Skip the tween entirely instead.
+    if (reduceMotion) {
+      setDisplay(value);
+      return;
+    }
     if (!isInView) return;
     const controls = animate(0, value, {
       duration: 1,
@@ -46,30 +75,26 @@ function CountUpNumber({ value }: { value: number }) {
       onUpdate: (v) => setDisplay(Math.round(v)),
     });
     return () => controls.stop();
-  }, [isInView, value]);
+  }, [isInView, value, reduceMotion]);
 
   return <span ref={ref}>{display}</span>;
 }
 
-function ScoreBar({ score, max, color, accentColor, index, isInView }: {
+function ScoreBar({ score, max, index, isInView, reduceMotion }: {
   score: number;
   max: number;
-  color: string;
-  accentColor: string;
   index: number;
   isInView: boolean;
+  reduceMotion: boolean;
 }) {
+  const pct = `${(score / max) * 100}%`;
   return (
-    <div
-      className="h-1.5 rounded-full overflow-hidden"
-      style={{ background: accentColor }}
-    >
+    <div className="h-1.5 rounded-full overflow-hidden bg-[#211D1D]/10">
       <motion.div
-        className="h-full rounded-full"
-        style={{ background: color }}
-        initial={{ width: "0%" }}
-        animate={isInView ? { width: `${(score / max) * 100}%` } : {}}
-        transition={{ duration: 0.7, delay: 0.3 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+        className="h-full rounded-full bg-[#211D1D]"
+        initial={{ width: reduceMotion ? pct : "0%" }}
+        animate={reduceMotion ? { width: pct } : isInView ? { width: pct } : {}}
+        transition={reduceMotion ? { duration: 0 } : { duration: 0.7, delay: 0.3 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
       />
     </div>
   );
@@ -85,9 +110,16 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
   const qlik = knowledge.caseStudies.qlik;
   const sprout = knowledge.caseStudies.sprout;
   const awsVisual = aws.solution.visual as Extract<FrameVisual, { kind: "scoreBreakdown" }>;
+  // Council round 4 (Eliminator advisor): 2 of the 4 real rows, not 4
+  // - see the comment above ScoreBar for why. rows[0] is always the
+  // strongest and rows[length-1] the weakest in this dataset's real
+  // order (RTO/RPO 37/40 ... FIS 2/20), so this reads off the array
+  // rather than re-typing either row's numbers.
+  const heroRows = [awsVisual.rows[0], awsVisual.rows[awsVisual.rows.length - 1]];
 
   const visualRef = useRef<HTMLDivElement>(null);
   const visualInView = useInView(visualRef, { once: true, margin: "-10% 0px" });
+  const reduceMotion = useReducedMotion();
 
   // Round 3 council (peer review, verified in code): the old tiles had
   // zero click tracking of their own - case_study_opened only fired
@@ -109,56 +141,54 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
         className="group w-full text-left flex flex-col sm:flex-row gap-6 sm:items-center"
       >
+        {/* Council round 4 (Materialist advisor): fixed house chrome
+            (rounded-lg border-[#211D1D]/10 bg-[#FFFDF9]) instead of
+            aws.color/aws.accentColor - see the block comment above
+            ScoreBar. The "67" itself is now the card's one dominant
+            mark (text-7xl/8xl, not the same 48px as the headline
+            above it), so it reads as a genuine second beat instead of
+            competing with the headline for the same size. */}
         <div
           ref={visualRef}
-          className="w-full sm:w-[42%] shrink-0 overflow-hidden p-5"
-          style={{ background: aws.accentColor }}
+          className="w-full sm:w-[42%] shrink-0 overflow-hidden rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6"
         >
-          <span className="font-bold text-5xl inline-flex items-baseline" style={{ color: aws.color }}>
-            <CountUpNumber value={67} />
-            <span className="font-normal text-xl ml-1 opacity-60" style={{ color: aws.color }}>
-              /100
-            </span>
+          <span className="font-bold text-7xl lg:text-8xl text-[#211D1D] inline-flex items-baseline">
+            <CountUpNumber value={67} reduceMotion={!!reduceMotion} />
+            <span className="font-normal text-2xl ml-1 text-[#211D1D]/50">/100</span>
           </span>
-          <div className="mt-4 space-y-2.5">
-            {awsVisual.rows.map((row, i) => (
+          <div className="mt-5 space-y-3">
+            {heroRows.map((row, i) => (
               <div key={row.label}>
-                <div className="flex items-center justify-between text-[11px] mb-1" style={{ color: aws.color, opacity: 0.75 }}>
+                <div className="flex items-center justify-between text-[11px] mb-1 text-[#211D1D]/60">
                   <span>{row.label}</span>
-                  <span className="font-semibold">
+                  <span className="font-semibold text-[#211D1D]/80">
                     {row.score}/{row.max}
                   </span>
                 </div>
-                <ScoreBar
-                  score={row.score}
-                  max={row.max}
-                  color={aws.color}
-                  accentColor="#FFFFFF"
-                  index={i}
-                  isInView={visualInView}
-                />
+                <ScoreBar score={row.score} max={row.max} index={i} isInView={visualInView} reduceMotion={!!reduceMotion} />
               </div>
             ))}
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]">
-            <span className="text-[#211D1D]">Shipped</span>
-            <span className="text-[#211D1D]/20" aria-hidden="true">
-              &middot;
-            </span>
-            <span className="text-[#211D1D]/40">
-              {aws.company} &middot; {aws.year}
-            </span>
-          </p>
-          <h3 className="mt-1.5 text-xl sm:text-2xl font-bold text-[#211D1D] leading-snug tracking-tight group-hover:text-[#7A5C12] transition-colors">
+          {/* Council round 4: dropped the duplicate company/year -
+              "Amazon AWS" already names itself as the headline's first
+              word, and "2021 - 2024" only advertised how stale the
+              lead story is. SHIPPED alone is the one fact this line
+              needs to add. */}
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#211D1D]">Shipped</p>
+          {/* Council round 4 (Value & Friction advisor): this whole
+              card is one ~700px-tall button with no resting
+              affordance - nothing here read as clickable before a
+              visitor happened to hover it. A permanent underline on
+              the headline gives it one, without adding a second,
+              competing "See the full case study" link (Eliminator's
+              cut - the whole block is already the click target). */}
+          <h3 className="mt-1.5 text-xl sm:text-2xl font-bold text-[#211D1D] leading-snug tracking-tight underline decoration-[#211D1D]/15 underline-offset-4 group-hover:text-[#7A5C12] group-hover:decoration-[#7A5C12]/40 transition-colors">
             {aws.hook.headline}
           </h3>
           <p className="mt-2 text-[15px] text-[#211D1D]/60 leading-relaxed">
             {aws.solution.headline}
-          </p>
-          <p className="mt-3 text-xs font-semibold text-[#F2A93C] group-hover:underline underline-offset-2">
-            See the full case study
           </p>
         </div>
       </motion.button>
@@ -167,13 +197,22 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: delay + 0.15 }}
-        className="text-[13px] text-[#211D1D]/45"
+        className="text-[12px] text-[#211D1D]/40"
       >
-        Also real, in progress:{" "}
+        {/* Council round 4 (Eliminator advisor): "Also real, in
+            progress" hedged twice - conceding, in the same breath as
+            the invite, that these two aren't finished. "Also:" concedes
+            nothing. Underline moved to hover-only and size dropped a
+            notch so these read as clearly secondary to the AWS story,
+            not competing with it (they used to render larger and more
+            permanently-underlined than the primary CTA - a real,
+            measured hierarchy inversion the Value & Friction advisor
+            caught). */}
+        Also:{" "}
         <button
           type="button"
           onClick={() => openWithTracking("qlik", "secondary")}
-          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] underline underline-offset-2 decoration-[#211D1D]/20 transition-colors"
+          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] hover:underline underline-offset-2 transition-colors"
         >
           {qlik.title}
         </button>{" "}
@@ -181,7 +220,7 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         <button
           type="button"
           onClick={() => openWithTracking("sprout", "secondary")}
-          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] underline underline-offset-2 decoration-[#211D1D]/20 transition-colors"
+          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] hover:underline underline-offset-2 transition-colors"
         >
           {sprout.title}
         </button>

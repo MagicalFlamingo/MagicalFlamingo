@@ -11,8 +11,12 @@ export const knowledge = {
     email: "goldanielle@gmail.com",
     linkedin: "https://www.linkedin.com/in/danielle-goldberg-411a103a/",
 
-    oneLiner:
-      "Eight years making enterprise software make sense - and I can explain exactly why every decision was made.",
+    // Design council round 4: the second clause ("and I can explain
+    // exactly why every decision was made") was flagged twice by the
+    // user as redundant, and independently by all 5 advisors - it's a
+    // process claim the chat input two inches below it already proves
+    // structurally. Cut. The one-liner is now a single real claim.
+    oneLiner: "Eight years making enterprise software make sense.",
 
     positioning: `I'm a senior product designer who specializes in the hard stuff: enterprise B2B systems where the users are experts, the constraints are real, and "just make it simpler" isn't actually an option.\n\nEight years in product design, with stints at Amazon AWS, a major Israeli insurance company, and currently Qlik - where I'm running a multi-team research initiative to unify how data connections work across their entire platform.\n\nMy background is unusual: I started in art history and spent years studying how objects communicate meaning - how a painting earns trust, how a designed space guides behavior without signage. I use that lens constantly. The question I always come back to is: what is this actually saying to the person looking at it?`,
 
@@ -29,7 +33,7 @@ export const knowledge = {
     {
       role: "Senior Product Designer",
       company: "Qlik",
-      period: "May 2025 – Present",
+      period: "May 2025 - Present",
       location: "Tel Aviv, Israel",
       note: "Leading a cross-product research initiative to unify the data connections experience across Qlik's platform.",
       highlight: "5-month longitudinal study, 4 user groups, directly influencing roadmap decisions across multiple product lines.",
@@ -37,7 +41,7 @@ export const knowledge = {
     {
       role: "Senior Product Designer",
       company: "Amazon AWS",
-      period: "September 2021 – February 2024",
+      period: "September 2021 - February 2024",
       location: "Tel Aviv, Israel",
       note: "Solo designer embedded in the AWS Resilience Hub team. Owned research, UX, and interaction design end-to-end.",
       highlight: "Redesigned the Resiliency Score from a black-box metric to a transparent, actionable dashboard.",
@@ -45,7 +49,7 @@ export const knowledge = {
     {
       role: "Product Designer",
       company: "Menora Insurance",
-      period: "March 2019 – September 2021",
+      period: "March 2019 - September 2021",
       location: "Tel Aviv, Israel",
       note: "Solo designer serving 400K unique monthly customers across multiple digital products.",
       highlight: "Led digital flagship project - achieved 95% conversion rate and millions NIS in direct revenue impact.",
@@ -53,7 +57,7 @@ export const knowledge = {
     {
       role: "UX Architect",
       company: "Ngsoft",
-      period: "2016 – 2018",
+      period: "2016 - 2018",
       location: "Petah Tikva, Israel",
       note: "Led UX for web and mobile projects across startups and large Israeli corporations.",
       highlight: "Clients included Teva, Bank Hapoalim, and the IDF.",
@@ -61,14 +65,14 @@ export const knowledge = {
     {
       role: "Interior Designer / Project Manager",
       company: "Basic Collection",
-      period: "2014 – 2015",
+      period: "2014 - 2015",
       location: "Tel Aviv, Israel",
       note: "Led commercial interior design for hotels, shopping malls, offices, and restaurants.",
     },
     {
       role: "Photographer",
       company: "Israel Defense Forces",
-      period: "2004 – 2006",
+      period: "2004 - 2006",
       note: "Military service as a documentary photographer.",
     },
   ],
@@ -78,20 +82,20 @@ export const knowledge = {
       degree: "User Experience Design",
       institution: "John Bryce College",
       location: "Tel Aviv, Israel",
-      years: "2014 – 2015",
+      years: "2014 - 2015",
     },
     {
       degree: "Master of Arts - Art History (Contemporary Design)",
       institution: "Leiden University",
       location: "Leiden, Netherlands",
-      years: "2011 – 2013",
+      years: "2011 - 2013",
       note: "Specialization in contemporary design history - how designed objects communicate meaning, authority, and trust.",
     },
     {
       degree: "Bachelor of Arts - Art History",
       institution: "Tel Aviv University",
       location: "Tel Aviv, Israel",
-      years: "2007 – 2010",
+      years: "2007 - 2010",
     },
   ],
 
@@ -101,7 +105,7 @@ export const knowledge = {
       id: "qlik",
       title: "Unified Data Connections",
       company: "Qlik",
-      year: "2025 – Present",
+      year: "2025 - Present",
       role: "Senior Product Designer - Research Lead + UX Design",
       ndaLevel: "partial" as const,
       color: "#4A6FA5",
@@ -187,7 +191,7 @@ export const knowledge = {
       id: "aws",
       title: "Resiliency Score Transparency",
       company: "Amazon AWS",
-      year: "2021 – 2024",
+      year: "2021 - 2024",
       role: "Solo Product Designer - Research, UX, Interaction Design, Design System (AWS CloudScape)",
       ndaLevel: "low" as const,
       color: "#232F3E",
@@ -272,7 +276,7 @@ export const knowledge = {
       id: "sprout",
       title: "Sprout 2.0 - Qlik's Design System",
       company: "Qlik",
-      year: "2025 – Present",
+      year: "2025 - Present",
       role: "Senior Product Designer - Design System, Component Library",
       ndaLevel: "partial" as const,
       color: "#2E9B5C",

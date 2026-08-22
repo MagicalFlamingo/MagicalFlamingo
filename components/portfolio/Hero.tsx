@@ -44,7 +44,14 @@ export function Hero({ onOpenCaseStudy }: HeroProps) {
 
   return (
     <header className="px-6 lg:px-8">
-      <div className="max-w-[1160px] mx-auto pt-8 lg:pt-10 pb-4">
+      {/* Council round 4: kept in lockstep with ChatInterface.tsx's own
+          outer container - min(1440px, 92vw) instead of a flat
+          max-w-[1160px] fixes the same scale-invariance the density
+          rule in CLAUDE.md flags (711px of content at both 1440px and
+          1920px). Both containers must change together or the
+          left-edge alignment this file exists to guarantee breaks
+          again. */}
+      <div className="max-w-[min(1440px,92vw)] mx-auto pt-8 lg:pt-10 pb-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
           <div className="flex items-baseline gap-3 flex-wrap">
             <motion.h1

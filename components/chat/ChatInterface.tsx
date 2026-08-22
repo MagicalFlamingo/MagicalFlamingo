@@ -153,8 +153,16 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
   // "page continues," not "this is the whole thing."
   const isEmpty = messages.length === 0 && !isThinking;
 
+  // Council round 4 (Materialist advisor, measured not guessed): this
+  // was a flat max-w-[1160px], which measured identically - 711px of
+  // actual content width - at both 1440px and 1920px viewports. Same
+  // scale-invariance bug the density rule in CLAUDE.md was written to
+  // catch, regressed into this fixed cap. min(1440px, 92vw) grows with
+  // the viewport up to a real ceiling instead of stepping once and
+  // going flat; kept identical in Hero.tsx so the two containers' left
+  // edges stay locked together at every width, not just some.
   return (
-    <div className="flex flex-col flex-1 min-h-0 w-full max-w-[1160px] mx-auto px-6 lg:px-8 justify-start">
+    <div className="flex flex-col flex-1 min-h-0 w-full max-w-[min(1440px,92vw)] mx-auto px-6 lg:px-8 justify-start">
       {/* Council review (Eliminator advisor, confirmed): this whole block
           used to sit inside the role="log" region below, which meant a
           screen reader announced the static headline, case-study tiles,
@@ -198,21 +206,40 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               context to react to; four of them competing with the
               headline and the case study for attention on first paint
               was one invitation too many, confirmed independently by
-              3 of 5 advisors and the peer-review pass. */}
+              3 of 5 advisors and the peer-review pass.
+
+              Council round 4: two real, measured defects, both from the
+              same span. First, oneLiner used to be split on its own
+              " - " and everything after the dash got marigold
+              #F2A93C - which happened to be 3 of the headline's 4
+              lines. Marigold-on-cream measures 1.81:1 contrast, under
+              WCAG's 3:1 floor for large text, and globals.css already
+              documents ochre #7A5C12 (5.65:1) as the token for exactly
+              this case. Second, the fixed text-[..48px] steps and the
+              max-w-[720px] cap render the exact same line breaks at
+              1440px and 1920px - the same scale-invariance bug round 2
+              fixed elsewhere, regressed here. Fixed by highlighting
+              only the real claim ("make sense") in ochre instead of an
+              entire clause, and by sizing with clamp() so the headline
+              actually grows with the viewport instead of stepping once
+              and stopping. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="max-w-[720px] text-[26px] sm:text-[32px] lg:text-[42px] xl:text-[48px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
+            className="max-w-[clamp(720px,72vw,1000px)] text-[clamp(1.75rem,4.4vw,3rem)] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
           >
             {(() => {
-              const [statement, explanation] = knowledge.identity.oneLiner.split(" - ");
-              return explanation ? (
+              const line = knowledge.identity.oneLiner;
+              const accent = "make sense";
+              const idx = line.indexOf(accent);
+              if (idx === -1) return line;
+              return (
                 <>
-                  {statement} - <span className="text-[#F2A93C]">{explanation}</span>
+                  {line.slice(0, idx)}
+                  <span className="text-[#7A5C12]">{accent}</span>
+                  {line.slice(idx + accent.length)}
                 </>
-              ) : (
-                knowledge.identity.oneLiner
               );
             })()}
           </motion.h2>
@@ -220,7 +247,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
         </div>
       )}
 
-      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="max-w-[720px] space-y-5">
+      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="max-w-[clamp(720px,72vw,1000px)] space-y-5">
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div
@@ -326,14 +353,26 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           screenshot at 1440x900, not theoretical. Sticky only matters
           once there's something to scroll past - a real, growing
           message log - so it's off during the empty state and on once
-          messages exist. */}
+          messages exist.
+
+          Council round 4 (Value & Friction advisor): at cold load,
+          isEmpty is true and inputValue is "", so the Ask button used
+          to render permanently at disabled:opacity-30 - the loudest
+          filled control on the page arrived looking broken. Cold load
+          now uses a bare hairline underline (no box, no button) so the
+          field reads as an open invitation, not a form; the filled Ask
+          pill only appears once there's real text to submit, and the
+          full bordered/boxed chrome only returns once a real
+          conversation exists. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submitText(inputValue);
         }}
-        className={`mt-6 max-w-[720px] flex items-center gap-3 bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 transition-colors ${
-          isEmpty ? "" : "sticky bottom-4"
+        className={`mt-6 max-w-[clamp(720px,72vw,1000px)] flex items-center gap-3 transition-colors ${
+          isEmpty
+            ? "border-b border-[#211D1D]/15 focus-within:border-[#211D1D]/40 px-1 py-2.5"
+            : "bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 sticky bottom-4"
         }`}
       >
         <input
@@ -344,13 +383,15 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
           disabled={isThinking}
         />
-        <button
-          type="submit"
-          disabled={isThinking || !inputValue.trim()}
-          className="shrink-0 px-4 py-1.5 rounded-sm bg-[#211D1D] text-[#FAF3E7] text-[11px] font-semibold uppercase tracking-[0.14em] disabled:opacity-30 hover:bg-[#332D2A] transition-colors"
-        >
-          Ask
-        </button>
+        {(!isEmpty || inputValue.trim()) && (
+          <button
+            type="submit"
+            disabled={isThinking || !inputValue.trim()}
+            className="shrink-0 px-4 py-1.5 rounded-sm bg-[#211D1D] text-[#FAF3E7] text-[11px] font-semibold uppercase tracking-[0.14em] disabled:opacity-30 hover:bg-[#332D2A] transition-colors"
+          >
+            Ask
+          </button>
+        )}
       </form>
     </div>
   );
