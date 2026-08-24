@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -7,6 +7,19 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+// Direct feedback after round 4 ("colors, fonts, typography - all need
+// to be enhanced"): round 26 had gone to one plain sans everywhere,
+// which read as flat rather than restrained. Fraunces is the one
+// addition - a real optical-size serif with actual character, reserved
+// for display headlines only (see .font-display in globals.css) so
+// this stays a 2-typeface system, not the 3-typeface mix that's
+// already been explicitly rejected before.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  style: ["normal", "italic"],
 });
 
 const TITLE = "Danielle Goldberg - Senior Product Designer";
@@ -34,26 +47,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} h-full`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        {/* Round 26 (full aesthetic pivot to a real reference site the user pointed at):
-            that reference has no serif display moment anywhere - one
-            plain sans throughout. Lora dropped from this link entirely;
-            Inter is now the only typeface in the app, not a swap to a
-            different sans - going from two typefaces to one, not adding
-            a third (that's been explicitly rejected before). The wide
-            weight range (round 23) stays - real weight contrast is still
-            a lever with just one typeface. */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;900&display=swap"
-          rel="stylesheet"
-        />
+        {/* Round 4 (enhanced richness pass): both typefaces now load
+            via next/font/google (self-hosted at build time, no runtime
+            request to Google's CDN) instead of a manual stylesheet
+            link - the old link only ever covered Inter anyway, so
+            adding Fraunces here would have meant two different loading
+            strategies for two fonts. One mechanism for both now. */}
       </head>
       <body className="min-h-full bg-[#FAF3E7]">
         {/* Respects the OS-level "reduce motion" setting sitewide - one

@@ -54,11 +54,18 @@ export function Hero({ onOpenCaseStudy }: HeroProps) {
       <div className="max-w-[min(1440px,92vw)] mx-auto pt-8 lg:pt-10 pb-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
           <div className="flex items-baseline gap-3 flex-wrap">
+            {/* Enhanced richness pass: font-display (Fraunces) on the
+                one place her name appears - the plaque stays exactly
+                as compact as before (same size, same line), just set
+                in the same typeface as the page's display headlines
+                instead of plain Inter, so the two typefaces read as
+                one considered system rather than the headline being
+                an isolated flourish. */}
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="text-lg sm:text-xl font-semibold text-[#211D1D] tracking-tight"
+              className="font-display text-lg sm:text-xl font-medium text-[#211D1D] tracking-tight"
             >
               {identity.name}
             </motion.h1>

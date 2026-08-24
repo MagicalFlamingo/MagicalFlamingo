@@ -147,10 +147,16 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
             ScoreBar. The "67" itself is now the card's one dominant
             mark (text-7xl/8xl, not the same 48px as the headline
             above it), so it reads as a genuine second beat instead of
-            competing with the headline for the same size. */}
+            competing with the headline for the same size.
+
+            Enhanced richness pass: marigold now appears as a real
+            solid fill (a 4px top rule) instead of only ever being
+            accent text - one flat block of real color, not a
+            gradient/glow/icon (still honoring the documented
+            never-decorate rule, just no longer whispering). */}
         <div
           ref={visualRef}
-          className="w-full sm:w-[42%] shrink-0 overflow-hidden rounded-lg border border-[#211D1D]/10 bg-[#FFFDF9] p-6"
+          className="w-full sm:w-[42%] shrink-0 overflow-hidden rounded-lg border border-[#211D1D]/10 border-t-4 border-t-[#F2A93C] bg-[#FFFDF9] p-6"
         >
           <span className="font-bold text-7xl lg:text-8xl text-[#211D1D] inline-flex items-baseline">
             <CountUpNumber value={67} reduceMotion={!!reduceMotion} />
@@ -184,7 +190,12 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
               the headline gives it one, without adding a second,
               competing "See the full case study" link (Eliminator's
               cut - the whole block is already the click target). */}
-          <h3 className="mt-1.5 text-xl sm:text-2xl font-bold text-[#211D1D] leading-snug tracking-tight underline decoration-[#211D1D]/15 underline-offset-4 group-hover:text-[#7A5C12] group-hover:decoration-[#7A5C12]/40 transition-colors">
+          {/* Enhanced richness pass: font-display (Fraunces) here too -
+              this headline is the page's other real display moment
+              (see ChatInterface.tsx's h2), so it gets the same
+              typographic treatment rather than sitting in plain Inter
+              next to it. */}
+          <h3 className="font-display mt-1.5 text-xl sm:text-2xl font-medium text-[#211D1D] leading-snug tracking-tight underline decoration-[#211D1D]/15 underline-offset-4 group-hover:text-[#7A5C12] group-hover:decoration-[#7A5C12]/40 transition-colors">
             {aws.hook.headline}
           </h3>
           <p className="mt-2 text-[15px] text-[#211D1D]/60 leading-relaxed">
