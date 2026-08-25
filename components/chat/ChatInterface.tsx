@@ -413,13 +413,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           round icon send button at every state (cold load included),
           filled in petrol (the new conversation accent) rather than
           grayed ink - so "not ready yet" reads as a quieter shade of
-          the same real color, not a broken control. */}
+          the same real color, not a broken control.
+
+          Direct feedback ("layout wise, it's still not airbnb like"):
+          added a real soft shadow (Airbnb's search bar is a floating
+          pill, not a flat bordered one) and a touch more vertical
+          padding so it reads as the page's one prominent "search"
+          moment rather than a plain text field with rounded ends. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submitText(inputValue);
         }}
-        className={`mt-6 max-w-[clamp(720px,72vw,1000px)] flex items-center gap-2 bg-[#FFFDF9] rounded-full border border-[#211D1D]/12 pl-5 pr-2 py-2 focus-within:border-[#1F5E5C]/50 transition-colors ${
+        className={`mt-6 max-w-[clamp(720px,72vw,1000px)] flex items-center gap-2 bg-[#FFFDF9] rounded-full border border-[#211D1D]/10 pl-5 pr-2 py-2.5 shadow-[0_2px_16px_-2px_rgba(33,29,29,0.10)] focus-within:shadow-[0_4px_24px_-2px_rgba(33,29,29,0.16)] focus-within:border-[#1F5E5C]/40 transition-shadow ${
           isEmpty ? "" : "sticky bottom-4"
         }`}
       >

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useReducedMotion, animate } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { track } from "@vercel/analytics";
 import { knowledge, type CaseStudyId, type FrameVisual } from "@/content/knowledge";
 
@@ -105,11 +105,54 @@ interface HeroCaseStudyBlockProps {
   delay: number;
 }
 
+// Direct feedback ("layout wise, it's still not airbnb like"): Airbnb's
+// card language is soft elevation (rounded-2xl, a warm drop shadow, a
+// hover lift) and image-forward listing cards - a real reversal of
+// round 26's "never a shadow" flat rule, adopted deliberately here, not
+// by accident. SecondaryCard borrows that shape for Qlik/Sprout without
+// promoting them to the AWS hero's weight: smaller, a plain title/meta
+// stack instead of a headline+body, still clearly secondary.
+function SecondaryCard({
+  onClick,
+  visual,
+  title,
+  meta,
+  delay,
+}: {
+  onClick: () => void;
+  visual: ReactNode;
+  title: string;
+  meta: string;
+  delay: number;
+}) {
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="group text-left rounded-2xl bg-[#FFFDF9] shadow-[0_2px_10px_-2px_rgba(33,29,29,0.08)] hover:shadow-[0_14px_32px_-8px_rgba(33,29,29,0.16)] hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300 overflow-hidden"
+    >
+      <div className="aspect-[16/10] w-full overflow-hidden">{visual}</div>
+      <div className="p-3.5">
+        <p className="text-[13px] font-semibold text-[#211D1D] group-hover:text-[#7A5C12] transition-colors leading-snug">{title}</p>
+        <p className="mt-0.5 text-[11px] text-[#211D1D]/45">{meta}</p>
+      </div>
+    </motion.button>
+  );
+}
+
 export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
   const aws = knowledge.caseStudies.aws;
   const qlik = knowledge.caseStudies.qlik;
   const sprout = knowledge.caseStudies.sprout;
   const awsVisual = aws.solution.visual as Extract<FrameVisual, { kind: "scoreBreakdown" }>;
+  // Stakeholder Translator advisor (round 4): the strongest real visual
+  // asset in the repo was buried behind a 12px grey link - a real
+  // screenshot, not a diagram. Promoted into a real card image instead.
+  const qlikImage = qlik.solution.image!;
+  const sproutVisual = sprout.friction.visual as Extract<FrameVisual, { kind: "swatchChaos" }>;
   // Council round 4 (Eliminator advisor): 2 of the 4 real rows, not 4
   // - see the comment above ScoreBar for why. rows[0] is always the
   // strongest and rows[length-1] the weakest in this dataset's real
@@ -142,21 +185,22 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         className="group w-full text-left flex flex-col sm:flex-row gap-6 sm:items-center"
       >
         {/* Council round 4 (Materialist advisor): fixed house chrome
-            (rounded-lg border-[#211D1D]/10 bg-[#FFFDF9]) instead of
-            aws.color/aws.accentColor - see the block comment above
-            ScoreBar. The "67" itself is now the card's one dominant
-            mark (text-7xl/8xl, not the same 48px as the headline
-            above it), so it reads as a genuine second beat instead of
-            competing with the headline for the same size.
+            instead of aws.color/aws.accentColor - see the block
+            comment above ScoreBar. The "67" itself is now the card's
+            one dominant mark (text-7xl/8xl, not the same 48px as the
+            headline above it), so it reads as a genuine second beat
+            instead of competing with the headline for the same size.
 
-            Enhanced richness pass: marigold now appears as a real
-            solid fill (a 4px top rule) instead of only ever being
-            accent text - one flat block of real color, not a
-            gradient/glow/icon (still honoring the documented
-            never-decorate rule, just no longer whispering). */}
+            Direct feedback ("layout wise, it's still not airbnb
+            like"): rounded-lg -> rounded-2xl and a real soft warm
+            shadow with a hover lift replace the flat bordered box -
+            round 26's "never a shadow" rule, deliberately reversed
+            here, not forgotten. Marigold stays as a real solid fill
+            (the top rule), now sitting on a softer, more elevated
+            card instead of a flat one. */}
         <div
           ref={visualRef}
-          className="w-full sm:w-[42%] shrink-0 overflow-hidden rounded-lg border border-[#211D1D]/10 border-t-4 border-t-[#F2A93C] bg-[#FFFDF9] p-6"
+          className="w-full sm:w-[42%] shrink-0 overflow-hidden rounded-2xl border-t-4 border-t-[#F2A93C] bg-[#FFFDF9] p-6 shadow-[0_4px_20px_-4px_rgba(33,29,29,0.10)] group-hover:shadow-[0_16px_40px_-8px_rgba(33,29,29,0.18)] group-hover:-translate-y-1 transition-[box-shadow,transform] duration-300"
         >
           <span className="font-bold text-7xl lg:text-8xl text-[#211D1D] inline-flex items-baseline">
             <CountUpNumber value={67} reduceMotion={!!reduceMotion} />
@@ -204,38 +248,58 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
         </div>
       </motion.button>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: delay + 0.15 }}
-        className="text-[12px] text-[#211D1D]/40"
-      >
-        {/* Council round 4 (Eliminator advisor): "Also real, in
-            progress" hedged twice - conceding, in the same breath as
-            the invite, that these two aren't finished. "Also:" concedes
-            nothing. Underline moved to hover-only and size dropped a
-            notch so these read as clearly secondary to the AWS story,
-            not competing with it (they used to render larger and more
-            permanently-underlined than the primary CTA - a real,
-            measured hierarchy inversion the Value & Friction advisor
-            caught). */}
-        Also:{" "}
-        <button
-          type="button"
-          onClick={() => openWithTracking("qlik", "secondary")}
-          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] hover:underline underline-offset-2 transition-colors"
+      {/* Council round 4 (Eliminator advisor): "Also real, in progress"
+          hedged twice, so the label stays plain ("Also:").
+
+          Direct feedback ("layout wise, it's still not airbnb like" +
+          round 4's own Stakeholder Translator finding that the
+          strongest real visual asset in the repo, the Qlik screenshot,
+          was buried behind a 12px grey link): these are now real
+          image-forward listing cards, not text links - Airbnb's
+          actual signature move. Still clearly secondary to the AWS
+          hero (smaller, a plain title+meta stack, no headline/body
+          copy, no marigold) - the hierarchy fix from round 4 holds,
+          this only changes the chrome, not the weight. */}
+      <div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: delay + 0.15 }}
+          className="text-[12px] text-[#211D1D]/40 mb-2"
         >
-          {qlik.title}
-        </button>{" "}
-        &middot;{" "}
-        <button
-          type="button"
-          onClick={() => openWithTracking("sprout", "secondary")}
-          className="text-[#211D1D]/70 font-medium hover:text-[#7A5C12] hover:underline underline-offset-2 transition-colors"
-        >
-          {sprout.title}
-        </button>
-      </motion.p>
+          Also:
+        </motion.p>
+        <div className="grid grid-cols-2 gap-3 max-w-[420px]">
+          <SecondaryCard
+            onClick={() => openWithTracking("qlik", "secondary")}
+            delay={delay + 0.18}
+            title={qlik.title}
+            meta={`${qlik.company} · ${qlik.year}`}
+            visual={
+              <img src={qlikImage.src} alt={qlikImage.alt} className="w-full h-full object-cover" />
+            }
+          />
+          <SecondaryCard
+            onClick={() => openWithTracking("sprout", "secondary")}
+            delay={delay + 0.24}
+            title={sprout.title}
+            meta={`${sprout.company} · ${sprout.year}`}
+            visual={
+              // No clean screenshot exists for Sprout (see the
+              // council round-4 comments on the AWS extras for why
+              // that bar is real, not skipped by accident) - the real
+              // swatches from its own friction beat (the "same brand
+              // blue, hardcoded 5 different ways" problem) stand in
+              // as an honest visual instead of a fabricated photo.
+              <div className="w-full h-full grid grid-cols-5">
+                {sproutVisual.swatches.map((hex, i) => (
+                  <div key={i} style={{ background: hex }} />
+                ))}
+              </div>
+            }
+          />
+        </div>
+      </div>
     </div>
   );
 }
