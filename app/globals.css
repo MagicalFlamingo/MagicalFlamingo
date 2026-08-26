@@ -1,43 +1,62 @@
 @import "tailwindcss";
 
 /*
- * Palette (v5 - full aesthetic pivot to a real reference)
+ * Palette (v6 - enhanced richness pass)
  *
- * Round 25 fixed the site's structure (case studies live inside the chat
- * now, not a separate section) but kept round 24's dark "gallery"
- * palette. The user then pointed at a real reference site as the actual
- * bar and asked for a full pivot to it, not just
- * borrowed elements: light/off-white throughout, huge confident plain
- * sans typography (no serif), zero card chrome (no borders, no shadows,
- * no rounded boxes - full-bleed images with a plain tag+title stack
- * underneath), one accent color used sparingly rather than as a bold
- * fill/border/glow everywhere, and no grain/texture overlay at all -
- * that site is completely flat.
- *
- * This reverses round 24's ink-primary flip (the palette itself wasn't
- * the actual problem per the round-25 council, and it's explicitly not
- * the reference's look either) but keeps the same 3 real tokens - ink,
- * cream, marigold - just back in their v3-era roles, with marigold used
- * far more sparingly than round 24's "full-strength borders and glow."
+ * Round 25-26 flattened the whole site onto one plain-sans, one-accent,
+ * completely flat reference. Round 4 of council review fixed real
+ * defects on top of that (contrast, density, hierarchy) but the base
+ * system itself was never made richer - and direct feedback afterward
+ * ("colors, fonts, typography - all need to be enhanced" / "the chat
+ * doesn't look like a chat") named that flatness as the actual problem,
+ * not any one defect. This keeps the v5 foundation - it's proven, and
+ * the point isn't a 6th full pivot - and adds two real levers instead:
+ * a second typeface for genuine display contrast, and one new color
+ * scoped specifically to the conversation surface so the chat reads as
+ * its own mode, not more of the marketing page above it.
  *
  * ink      #211D1D  primary text everywhere
  * cream    #FAF3E7  PRIMARY page background everywhere
- * marigold #F2A93C  the one accent - used sparingly, on a single word/
- *                   line at a time, never as a card border or a glow
+ * marigold #F2A93C  the marketing-surface accent (hero, case-study
+ *                   block) - now also used as a solid fill (buttons,
+ *                   the count-up card's rule), not just accent text
  * ochre    #7A5C12  darker-accent text where marigold-on-cream would
  *                   fail contrast at small sizes (unchanged role)
  * paper    #FFFDF9  minor surfaces that want to sit just slightly above
  *                   the cream page (unchanged role)
+ * petrol   #1F5E5C  new - the conversation surface's own accent (avatar
+ *                   fill, the compose bar's send control, assistant-turn
+ *                   marks). Deliberately a cool color against an
+ *                   otherwise all-warm palette (cream/ink/marigold/
+ *                   ochre) so crossing from the static hero into the
+ *                   live chat has one real, felt shift, not just a
+ *                   change of content. Not a revival of either
+ *                   previously-tried direction (the rejected terracotta/
+ *                   gold pass, or the superseded cream/green/marigold
+ *                   pass) - scoped to the chat only, everywhere else
+ *                   keeps the proven warm system as-is.
  *
  * Case-study accent colors (content/knowledge.ts, one per company) are a
  * separate system and untouched here.
  *
- * Typography: `.font-serif` (Lora) is gone - the reference is plain sans
- * throughout, no serif display moment anywhere. Inter is now the only
- * typeface in the app; see app/layout.tsx, which dropped the Lora
- * family from its Google Fonts link to match. This isn't a third font
- * being added (that's been explicitly rejected before) - it's going
- * from two typefaces down to one.
+ * Typography: Inter remains the only body/UI typeface (buttons, labels,
+ * chat bubbles, meta text) - round 26's "no third typeface" rule holds,
+ * this is 1-to-2, not 2-to-3. Fraunces (see app/layout.tsx) is the one
+ * addition, reserved for display headlines only (the empty-state
+ * headline, the hero case-study's own headline) - real optical weight
+ * and personality where the page makes its one big claim, plain Inter
+ * everywhere the copy is doing UI work instead of a display moment.
+ *
+ * Card chrome ("layout wise, it's still not airbnb like"): round 26's
+ * "never a shadow, gradient, or icon" rule is deliberately reversed for
+ * the site's real cards (the AWS hero card, the Qlik/Sprout secondary
+ * cards, the compose bar) - soft warm-tinted shadows plus a hover lift,
+ * matching Airbnb's actual card language, replace the flat bordered
+ * boxes those surfaces used before. This is scoped to cards/the input,
+ * not a full reversal - FrameVisual's diagrams inside CaseStudyModal
+ * (score breakdowns, swatch grids) keep their existing flat chrome
+ * unchanged; this is about surfaces a visitor clicks, not every
+ * illustration on the site.
  */
 
 * {
@@ -54,6 +73,11 @@ body {
   color: #211D1D;
   font-family: 'Inter', system-ui, sans-serif;
   position: relative;
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
 }
 
 .scrollbar-thin {

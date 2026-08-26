@@ -7,7 +7,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { PromptChips } from "./PromptChips";
 import { CaseStudyBeat } from "./CaseStudyBeat";
-import { CaseStudyIntroDeck } from "./CaseStudyIntroDeck";
+import { HeroCaseStudyBlock } from "./HeroCaseStudyBlock";
 import { SkillsMap } from "./SkillsMap";
 import { TimelineCard } from "./TimelineCard";
 import { NDASafeNote } from "./NDASafeNote";
@@ -24,15 +24,6 @@ import type { BeatId } from "./CaseStudyBeat";
 // rollback, but is no longer imported here. `pick`/`thinkingPhrases`/
 // `firstMessagePhrase` are just personality-phrase pools, unrelated to
 // the matching logic itself, and are still real content worth reusing.
-//
-// Curated to 4 starter chips (was 6); these specifically surface
-// QuoteCard/art-history angles a cold visitor wouldn't otherwise find.
-const INITIAL_CHIPS = [
-  "What makes you different from other designers?",
-  "How does art history show up in your work?",
-  "Walk me through your research process",
-  "What would you do in your first 30 days here?",
-];
 
 const dotVariants: Variants = {
   animate: (i: number) => ({
@@ -42,6 +33,86 @@ const dotVariants: Variants = {
   }),
 };
 
+// Enhanced richness pass: Danielle's one visual mark in the live
+// conversation - petrol fill (the new chat-only accent, see
+// globals.css), a plain initial rather than a photo (no headshot
+// exists in this repo, and fabricating an illustrated avatar would be
+// exactly the invented-asset problem this project has avoided before).
+function Avatar() {
+  return (
+    <div
+      aria-hidden="true"
+      className="shrink-0 w-7 h-7 rounded-full bg-[#1F5E5C] text-[#FAF3E7] text-[11px] font-semibold flex items-center justify-center select-none"
+    >
+      D
+    </div>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 8h11.5M8.5 2.5 14 8l-5.5 5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Direct feedback ("nothing from what I've asked was made" / confirmed:
+// the structure itself hasn't changed): every round since round 3 kept
+// the exact same shape - headline, then case study, then the input way
+// down at the bottom, all in one undifferentiated column. That's the
+// actual "not airbnb like" complaint - Airbnb's real hero is a headline
+// paired *directly* with its search bar as one unit, with results
+// below as a distinct second zone. Pulled the compose bar out into its
+// own component so the same controlled input can render in two real
+// places - right under the headline (the "hero" pairing) at cold load,
+// and pinned at the bottom once a real conversation exists - without
+// duplicating the input's state or losing focus on re-render (a plain
+// inline function component redefined every render would remount the
+// input and drop keystrokes; this one is stable across renders).
+function ComposeBar({
+  value,
+  onChange,
+  onSubmit,
+  disabled,
+  sticky,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  disabled: boolean;
+  sticky: boolean;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      className={`w-full flex items-center gap-2 bg-[#FFFDF9] rounded-full border border-[#211D1D]/10 pl-5 pr-2 py-2.5 shadow-[0_2px_16px_-2px_rgba(33,29,29,0.10)] focus-within:shadow-[0_4px_24px_-2px_rgba(33,29,29,0.16)] focus-within:border-[#1F5E5C]/40 transition-shadow ${
+        sticky ? "sticky bottom-4" : ""
+      }`}
+    >
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Ask a question..."
+        aria-label="Message"
+        className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/40 outline-none bg-transparent"
+        disabled={disabled}
+      />
+      <button
+        type="submit"
+        disabled={disabled || !value.trim()}
+        aria-label="Send"
+        className="shrink-0 w-9 h-9 rounded-full bg-[#1F5E5C] text-[#FAF3E7] flex items-center justify-center disabled:bg-[#1F5E5C]/25 hover:bg-[#174A48] transition-colors"
+      >
+        <SendIcon />
+      </button>
+    </form>
+  );
+}
+
 interface ChatInterfaceProps {
   // Handoff from the case-study modal's mini "Ask about this project..."
   // input - a real question lands here and gets sent through the exact
@@ -50,7 +121,7 @@ interface ChatInterfaceProps {
   onConsumeInitialQuestion?: () => void;
   // Round 25: case studies are no longer a separate page section you
   // scroll past to reach the chat - they're the first thing the chat
-  // itself shows you, via CaseStudyIntroDeck below. Opening one still
+  // itself shows you, via HeroCaseStudyBlock below. Opening one still
   // goes through the same full-screen CaseStudyModal as before; this
   // prop is just how that click reaches page.tsx's existing modal state.
   onOpenCaseStudy?: (project: CaseStudyId) => void;
@@ -140,28 +211,38 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuestion]);
 
-  // Round 27 (council: "layout is not so good" - a real, standalone
-  // responsive bug, confirmed independently by 3 advisors from actual
-  // screenshots at 1920px). The flex-1/min-h-0 chain from page.tsx down
-  // through ChatSection correctly grows this component's wrapping
-  // <section> to fill the leftover viewport - the chain doesn't break
-  // there. It dead-ends right here: this div was a plain block with
-  // intrinsic content height, so on a short/empty conversation the
-  // grown section just renders a wall of empty space below the input
-  // instead of the content sitting inside it looking placed. Centering
-  // the empty state fixes that without touching the page-level height
-  // strategy - but centering must switch off the moment there's a real
-  // conversation, or a growing message log fights being pinned to a
-  // center point and reflows unpleasantly as it grows past the
-  // viewport. `isEmpty` gates that switch.
+  // Round 27 (council: "layout is not so good") vertically centered this
+  // whole block to fix dead space that used to sit only below it.
+  //
+  // Council round 2 ("it feels very condensed" - 5/5 advisors, same
+  // diagnosis): centering treated the symptom. The real cause was a
+  // single max-w-[800px] measure doing two incompatible jobs - a
+  // reading width for prose/chat, and the frame for a 3-up work
+  // gallery. On a 1920px screen that shrank each case-study tile to
+  // ~235px (the AWS/Qlik screenshots - the actual proof of shipped
+  // work - became genuinely illegible) while the headline, a claim,
+  // stayed the visually dominant element. Backwards for a portfolio.
+  //
+  // Fix: two measures instead of one. PAGE_MAX_W (1160px) is the outer
+  // container width - what the case-study gallery is allowed to use.
+  // TEXT_MAX_W (720px) is what the headline/subtext/chips/input cap
+  // themselves to *without their own centering*, so they hug the same
+  // left edge as the gallery instead of re-centering into their own
+  // smaller box. `justify-center` is gone - top-anchored with
+  // deliberate lead space instead, so emptiness (if any) reads as
+  // "page continues," not "this is the whole thing."
   const isEmpty = messages.length === 0 && !isThinking;
 
+  // Council round 4 (Materialist advisor, measured not guessed): this
+  // was a flat max-w-[1160px], which measured identically - 711px of
+  // actual content width - at both 1440px and 1920px viewports. Same
+  // scale-invariance bug the density rule in CLAUDE.md was written to
+  // catch, regressed into this fixed cap. min(1440px, 92vw) grows with
+  // the viewport up to a real ceiling instead of stepping once and
+  // going flat; kept identical in Hero.tsx so the two containers' left
+  // edges stay locked together at every width, not just some.
   return (
-    <div
-      className={`flex flex-col flex-1 min-h-0 w-full max-w-[800px] mx-auto px-6 ${
-        isEmpty ? "justify-center" : "justify-start"
-      }`}
-    >
+    <div className="flex flex-col flex-1 min-h-0 w-full max-w-[min(1440px,92vw)] mx-auto px-6 lg:px-8 justify-start">
       {/* Council review (Eliminator advisor, confirmed): this whole block
           used to sit inside the role="log" region below, which meant a
           screen reader announced the static headline, case-study tiles,
@@ -170,7 +251,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           role="log" entirely; only the real, changing conversation
           (messages, thinking state, errors) is a log. */}
       {isEmpty && (
-        <div className="space-y-5">
+        <div className="pt-[6vh] lg:pt-[8vh]">
           {/* Round 25 ("start from scratch" council): the page used to
               make you scroll past a hero and a case-study grid before
               reaching this. Three of four advisors converged
@@ -187,38 +268,132 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               existing " - " (not a hardcoded substring of the words
               themselves, so this doesn't break if the real copy in
               knowledge.ts changes) so the second clause gets the
-              site's one accent color, echoing that exact device. */}
+              site's one accent color, echoing that exact device.
+
+              Council round 2: headline now scales up past the old
+              32px cap (48px+ at desktop, matching Materialist's "a
+              headline should be sized like a headline, not a blog h2"),
+              capped at max-w-[720px] so it still wraps to real lines
+              instead of running the full 1160px width.
+
+              Council round 3 ("a lot of text, a lot of items - hard to
+              understand the layout"): the subtext line ("Here's the
+              real work - or ask me anything") is gone - pure narration
+              of a layout that should be self-evident, per the
+              Eliminator's cut list. The starter chips are gone from
+              cold load too - they already exist mid-conversation via
+              the LLM's own showPromptChips tool call once there's real
+              context to react to; four of them competing with the
+              headline and the case study for attention on first paint
+              was one invitation too many, confirmed independently by
+              3 of 5 advisors and the peer-review pass.
+
+              Council round 4: two real, measured defects, both from the
+              same span. First, oneLiner used to be split on its own
+              " - " and everything after the dash got marigold
+              #F2A93C - which happened to be 3 of the headline's 4
+              lines. Marigold-on-cream measures 1.81:1 contrast, under
+              WCAG's 3:1 floor for large text, and globals.css already
+              documents ochre #7A5C12 (5.65:1) as the token for exactly
+              this case. Second, the fixed text-[..48px] steps and the
+              max-w-[720px] cap render the exact same line breaks at
+              1440px and 1920px - the same scale-invariance bug round 2
+              fixed elsewhere, regressed here. Fixed by highlighting
+              only the real claim ("make sense") in ochre instead of an
+              entire clause, and by sizing with clamp() so the headline
+              actually grows with the viewport instead of stepping once
+              and stopping.
+
+              Enhanced richness pass (direct feedback: "colors, fonts,
+              typography - all need to be enhanced"): font-display
+              (Fraunces, see globals.css) replaces plain Inter here -
+              the one display moment on the page, everywhere else
+              (buttons, labels, bubbles) stays Inter. The accent word
+              is now italic too, not just ochre - Fraunces' italic has
+              real personality most system sans fonts don't, so the
+              one word doing the most work gets both real levers.
+
+              Direct feedback ("make sense - another row... the layout
+              is very strange"): at several real widths the browser's
+              default line-break left "sense" alone on its own line,
+              splitting the one accent phrase across two rows - the
+              same orphan problem hit the AWS card's headline ("it."
+              stranded alone). text-balance tells the browser to
+              balance a heading's line lengths instead of just
+              breaking wherever the width runs out, so short trailing
+              fragments like this don't happen - a real CSS fix for a
+              real layout bug, not a taste call.
+
+              Structural pass (direct feedback, confirmed: "the
+              structure itself hasn't changed" - fonts/shadows/colors
+              got polished across 3 rounds but it was still the same
+              single-column stack every round since round 3). Airbnb's
+              actual hero isn't a headline sitting alone above a
+              search bar six inches down the page - the two are one
+              paired unit. The compose bar now renders directly here,
+              tight against the headline (space-y-5, not the old gap
+              before the case study), so asking a question is the
+              hero's own call to action, not an afterthought at the
+              bottom of the scroll. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-[26px] sm:text-[32px] font-semibold text-[#211D1D] leading-[1.15] tracking-tight"
+            className="font-display text-balance max-w-[clamp(720px,72vw,1000px)] text-[clamp(1.75rem,4.4vw,3rem)] font-medium text-[#211D1D] leading-[1.15] tracking-tight"
           >
             {(() => {
-              const [statement, explanation] = knowledge.identity.oneLiner.split(" - ");
-              return explanation ? (
+              const line = knowledge.identity.oneLiner;
+              const accent = "make sense";
+              const idx = line.indexOf(accent);
+              if (idx === -1) return line;
+              return (
                 <>
-                  {statement} - <span className="text-[#F2A93C]">{explanation}</span>
+                  {line.slice(0, idx)}
+                  <span className="italic text-[#7A5C12]">{accent}</span>
+                  {line.slice(idx + accent.length)}
                 </>
-              ) : (
-                knowledge.identity.oneLiner
               );
             })()}
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 6 }}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.08 }}
-            className="text-sm text-[#211D1D]/55"
+            className="mt-5 max-w-[clamp(720px,72vw,1000px)]"
           >
-            Here&rsquo;s the real work - or ask me anything.
-          </motion.p>
-          <CaseStudyIntroDeck onOpen={(p) => onOpenCaseStudy?.(p)} startDelay={0.15} />
-          <PromptChips suggestions={INITIAL_CHIPS} onSelect={submitText} highlightFirst />
+            <ComposeBar value={inputValue} onChange={setInputValue} onSubmit={() => submitText(inputValue)} disabled={isThinking} sticky={false} />
+          </motion.div>
+
+          {/* Structural pass: the case study used to sit directly
+              under the headline in the same rhythm as everything
+              else - now that the input has moved up to pair with the
+              headline, this is genuinely its own second zone (a real
+              gap, a plain section label echoing "SHIPPED"/"Also:"'s
+              existing meta-label style) rather than more of the same
+              vertical stack. Chat-native rule holds: still nothing to
+              scroll past, still inline, still the same conversation -
+              this is composition, not a return to a separate page
+              section. */}
+          <p className="mt-12 lg:mt-16 mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#211D1D]/35">
+            Recent work
+          </p>
+          <HeroCaseStudyBlock onOpen={(p) => onOpenCaseStudy?.(p)} delay={0.12} />
         </div>
       )}
 
-      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="space-y-5">
+      {/* Enhanced richness pass (direct feedback: "the chat doesn't
+          look like a chat"): the actual defect was asymmetric chrome -
+          user turns were a real filled bubble, assistant turns were
+          bare unstyled paragraphs with no avatar, no container, no
+          visual sender identity. Assistant turns now get the same
+          bubble treatment (rounded-2xl, mirrored corner) plus a real
+          avatar (petrol #1F5E5C, the new conversation-only accent) so
+          both sides of the conversation read as the same kind of
+          object. Avatar only on Danielle's side, matching the common
+          chat-product convention (chat-native reference: iMessage,
+          Intercom, ChatGPT) - a visitor doesn't need an avatar of
+          themselves to know which bubble they wrote. */}
+      <div role="log" aria-live="polite" aria-label="Conversation with Danielle" className="max-w-[clamp(720px,72vw,1000px)] space-y-5">
         <AnimatePresence initial={false}>
           {messages.map((message) => (
             <motion.div
@@ -226,9 +401,10 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex items-end gap-2.5 ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div className={message.role === "user" ? "max-w-[75%]" : "w-full"}>
+              {message.role !== "user" && <Avatar />}
+              <div className={message.role === "user" ? "max-w-[75%]" : "max-w-[85%] w-full"}>
                 {message.role === "user" ? (
                   <div className="bg-[#211D1D] text-[#FAF3E7] rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed">
                     {message.parts.map((p) => (p.type === "text" ? p.text : "")).join("")}
@@ -238,7 +414,10 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
                     {message.parts.map((part, i) => {
                       if (part.type === "text") {
                         return part.text.trim() ? (
-                          <p key={i} className="text-sm text-[#211D1D] leading-[1.75] whitespace-pre-wrap">
+                          <p
+                            key={i}
+                            className="bg-[#FFFDF9] border border-[#211D1D]/10 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#211D1D] leading-[1.75] whitespace-pre-wrap"
+                          >
                             {part.text}
                           </p>
                         ) : null;
@@ -266,9 +445,10 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               exit={{ opacity: 0, y: -4, transition: { duration: 0.15 } }}
               className="flex items-center gap-2.5"
             >
+              <Avatar />
               <div className="flex items-center gap-1">
                 {[0, 1, 2].map((i) => (
-                  <motion.span key={i} custom={i} variants={dotVariants} animate="animate" className="w-2 h-2 rounded-full bg-[#F2A93C]" />
+                  <motion.span key={i} custom={i} variants={dotVariants} animate="animate" className="w-2 h-2 rounded-full bg-[#1F5E5C]" />
                 ))}
               </div>
               <motion.span
@@ -306,36 +486,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
         <div ref={bottomRef} />
       </div>
 
-      {/* Council round 20: a rounded-full pill with an inline round send
-          button is the exact shape every AI chat product uses (ChatGPT,
-          Perplexity, Intercom) - recognizable as "AI chat input" on
-          sight, independent of color. A plain bordered field with a
-          bottom accent rule reads as an inquiry field, not a chatbot
-          widget, and matches the sharp-cornered chrome used everywhere
-          else on the site now (CaseStudyCard, the hero figure). */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitText(inputValue);
-        }}
-        className="mt-6 sticky bottom-4 flex items-center gap-3 bg-[#FFFDF9] rounded-sm border border-[#211D1D]/15 px-4 py-3 focus-within:border-[#F2A93C]/60 transition-colors"
-      >
-        <input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask a question..."
-          aria-label="Message"
-          className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/35 outline-none bg-transparent"
-          disabled={isThinking}
-        />
-        <button
-          type="submit"
-          disabled={isThinking || !inputValue.trim()}
-          className="shrink-0 px-4 py-1.5 rounded-sm bg-[#211D1D] text-[#FAF3E7] text-[11px] font-semibold uppercase tracking-[0.14em] disabled:opacity-30 hover:bg-[#332D2A] transition-colors"
-        >
-          Ask
-        </button>
-      </form>
+      {/* Structural pass: this is now the *conversation's* compose bar
+          only - the cold-load one lives up next to the headline (see
+          ComposeBar's own comment). Same shape (round pill, icon send
+          button, soft shadow - council round 20's original reasoning
+          for the pill shape, and round 4/6's shadow/petrol treatment,
+          both still hold), rendered a second time here once there's a
+          real message log to pin it under. max-w matches the log's own
+          column so it doesn't jump width when a conversation starts. */}
+      {!isEmpty && (
+        <div className="mt-6 max-w-[clamp(720px,72vw,1000px)]">
+          <ComposeBar value={inputValue} onChange={setInputValue} onSubmit={() => submitText(inputValue)} disabled={isThinking} sticky />
+        </div>
+      )}
     </div>
   );
 }
