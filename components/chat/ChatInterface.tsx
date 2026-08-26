@@ -255,12 +255,23 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               (buttons, labels, bubbles) stays Inter. The accent word
               is now italic too, not just ochre - Fraunces' italic has
               real personality most system sans fonts don't, so the
-              one word doing the most work gets both real levers. */}
+              one word doing the most work gets both real levers.
+
+              Direct feedback ("make sense - another row... the layout
+              is very strange"): at several real widths the browser's
+              default line-break left "sense" alone on its own line,
+              splitting the one accent phrase across two rows - the
+              same orphan problem hit the AWS card's headline ("it."
+              stranded alone). text-balance tells the browser to
+              balance a heading's line lengths instead of just
+              breaking wherever the width runs out, so short trailing
+              fragments like this don't happen - a real CSS fix for a
+              real layout bug, not a taste call. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="font-display max-w-[clamp(720px,72vw,1000px)] text-[clamp(1.75rem,4.4vw,3rem)] font-medium text-[#211D1D] leading-[1.15] tracking-tight"
+            className="font-display text-balance max-w-[clamp(720px,72vw,1000px)] text-[clamp(1.75rem,4.4vw,3rem)] font-medium text-[#211D1D] leading-[1.15] tracking-tight"
           >
             {(() => {
               const line = knowledge.identity.oneLiner;

@@ -238,8 +238,14 @@ export function HeroCaseStudyBlock({ onOpen, delay }: HeroCaseStudyBlockProps) {
               this headline is the page's other real display moment
               (see ChatInterface.tsx's h2), so it gets the same
               typographic treatment rather than sitting in plain Inter
-              next to it. */}
-          <h3 className="font-display mt-1.5 text-xl sm:text-2xl font-medium text-[#211D1D] leading-snug tracking-tight underline decoration-[#211D1D]/15 underline-offset-4 group-hover:text-[#7A5C12] group-hover:decoration-[#7A5C12]/40 transition-colors">
+              next to it.
+
+              Direct feedback ("the layout is very strange"): this real
+              sentence ("...and expected them to trust it.") was
+              leaving "it." stranded alone on its own line at several
+              real widths - the same orphan problem as the h2 above,
+              same fix (text-balance). */}
+          <h3 className="font-display text-balance mt-1.5 text-xl sm:text-2xl font-medium text-[#211D1D] leading-snug tracking-tight underline decoration-[#211D1D]/15 underline-offset-4 group-hover:text-[#7A5C12] group-hover:decoration-[#7A5C12]/40 transition-colors">
             {aws.hook.headline}
           </h3>
           <p className="mt-2 text-[15px] text-[#211D1D]/60 leading-relaxed">
