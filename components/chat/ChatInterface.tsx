@@ -57,6 +57,62 @@ function SendIcon() {
   );
 }
 
+// Direct feedback ("nothing from what I've asked was made" / confirmed:
+// the structure itself hasn't changed): every round since round 3 kept
+// the exact same shape - headline, then case study, then the input way
+// down at the bottom, all in one undifferentiated column. That's the
+// actual "not airbnb like" complaint - Airbnb's real hero is a headline
+// paired *directly* with its search bar as one unit, with results
+// below as a distinct second zone. Pulled the compose bar out into its
+// own component so the same controlled input can render in two real
+// places - right under the headline (the "hero" pairing) at cold load,
+// and pinned at the bottom once a real conversation exists - without
+// duplicating the input's state or losing focus on re-render (a plain
+// inline function component redefined every render would remount the
+// input and drop keystrokes; this one is stable across renders).
+function ComposeBar({
+  value,
+  onChange,
+  onSubmit,
+  disabled,
+  sticky,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  disabled: boolean;
+  sticky: boolean;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      className={`w-full flex items-center gap-2 bg-[#FFFDF9] rounded-full border border-[#211D1D]/10 pl-5 pr-2 py-2.5 shadow-[0_2px_16px_-2px_rgba(33,29,29,0.10)] focus-within:shadow-[0_4px_24px_-2px_rgba(33,29,29,0.16)] focus-within:border-[#1F5E5C]/40 transition-shadow ${
+        sticky ? "sticky bottom-4" : ""
+      }`}
+    >
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Ask a question..."
+        aria-label="Message"
+        className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/40 outline-none bg-transparent"
+        disabled={disabled}
+      />
+      <button
+        type="submit"
+        disabled={disabled || !value.trim()}
+        aria-label="Send"
+        className="shrink-0 w-9 h-9 rounded-full bg-[#1F5E5C] text-[#FAF3E7] flex items-center justify-center disabled:bg-[#1F5E5C]/25 hover:bg-[#174A48] transition-colors"
+      >
+        <SendIcon />
+      </button>
+    </form>
+  );
+}
+
 interface ChatInterfaceProps {
   // Handoff from the case-study modal's mini "Ask about this project..."
   // input - a real question lands here and gets sent through the exact
@@ -195,7 +251,7 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
           role="log" entirely; only the real, changing conversation
           (messages, thinking state, errors) is a log. */}
       {isEmpty && (
-        <div className="space-y-6 lg:space-y-8 pt-[6vh] lg:pt-[8vh]">
+        <div className="pt-[6vh] lg:pt-[8vh]">
           {/* Round 25 ("start from scratch" council): the page used to
               make you scroll past a hero and a case-study grid before
               reaching this. Three of four advisors converged
@@ -266,7 +322,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               balance a heading's line lengths instead of just
               breaking wherever the width runs out, so short trailing
               fragments like this don't happen - a real CSS fix for a
-              real layout bug, not a taste call. */}
+              real layout bug, not a taste call.
+
+              Structural pass (direct feedback, confirmed: "the
+              structure itself hasn't changed" - fonts/shadows/colors
+              got polished across 3 rounds but it was still the same
+              single-column stack every round since round 3). Airbnb's
+              actual hero isn't a headline sitting alone above a
+              search bar six inches down the page - the two are one
+              paired unit. The compose bar now renders directly here,
+              tight against the headline (space-y-5, not the old gap
+              before the case study), so asking a question is the
+              hero's own call to action, not an afterthought at the
+              bottom of the scroll. */}
           <motion.h2
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -287,6 +355,28 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
               );
             })()}
           </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.08 }}
+            className="mt-5 max-w-[clamp(720px,72vw,1000px)]"
+          >
+            <ComposeBar value={inputValue} onChange={setInputValue} onSubmit={() => submitText(inputValue)} disabled={isThinking} sticky={false} />
+          </motion.div>
+
+          {/* Structural pass: the case study used to sit directly
+              under the headline in the same rhythm as everything
+              else - now that the input has moved up to pair with the
+              headline, this is genuinely its own second zone (a real
+              gap, a plain section label echoing "SHIPPED"/"Also:"'s
+              existing meta-label style) rather than more of the same
+              vertical stack. Chat-native rule holds: still nothing to
+              scroll past, still inline, still the same conversation -
+              this is composition, not a return to a separate page
+              section. */}
+          <p className="mt-12 lg:mt-16 mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#211D1D]/35">
+            Recent work
+          </p>
           <HeroCaseStudyBlock onOpen={(p) => onOpenCaseStudy?.(p)} delay={0.12} />
         </div>
       )}
@@ -396,67 +486,19 @@ export function ChatInterface({ initialQuestion, onConsumeInitialQuestion, onOpe
         <div ref={bottomRef} />
       </div>
 
-      {/* Council round 20: a rounded-full pill with an inline round send
-          button is the exact shape every AI chat product uses (ChatGPT,
-          Perplexity, Intercom) - recognizable as "AI chat input" on
-          sight, independent of color.
-
-          Sticky is now conditional on a real conversation existing.
-          Round 2's density fix (removing justify-center, adding real
-          top padding) pushed the empty state's total content height
-          close enough to typical viewport heights that `sticky bottom-4`
-          started triggering on first paint - no scrolling needed to
-          reach the "stuck" threshold, so the input rendered pinned mid-
-          page, overlapping the chips above it. Caught in a real
-          screenshot at 1440x900, not theoretical. Sticky only matters
-          once there's something to scroll past - a real, growing
-          message log - so it's off during the empty state and on once
-          messages exist.
-
-          Enhanced richness pass (direct feedback: "the chat doesn't
-          look like a chat"): round 4 had made this a bare hairline
-          underline at cold load specifically to avoid a disabled-gray
-          Ask button being the loudest thing on the page (Value &
-          Friction advisor's finding). That fixed the disabled-look but
-          cost the input its only chat-shaped chrome - on an otherwise
-          flat page, a plain underline read as a search box, not a
-          chat compose bar. Real fix, not a revert: pill shape and a
-          round icon send button at every state (cold load included),
-          filled in petrol (the new conversation accent) rather than
-          grayed ink - so "not ready yet" reads as a quieter shade of
-          the same real color, not a broken control.
-
-          Direct feedback ("layout wise, it's still not airbnb like"):
-          added a real soft shadow (Airbnb's search bar is a floating
-          pill, not a flat bordered one) and a touch more vertical
-          padding so it reads as the page's one prominent "search"
-          moment rather than a plain text field with rounded ends. */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitText(inputValue);
-        }}
-        className={`mt-6 max-w-[clamp(720px,72vw,1000px)] flex items-center gap-2 bg-[#FFFDF9] rounded-full border border-[#211D1D]/10 pl-5 pr-2 py-2.5 shadow-[0_2px_16px_-2px_rgba(33,29,29,0.10)] focus-within:shadow-[0_4px_24px_-2px_rgba(33,29,29,0.16)] focus-within:border-[#1F5E5C]/40 transition-shadow ${
-          isEmpty ? "" : "sticky bottom-4"
-        }`}
-      >
-        <input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask a question..."
-          aria-label="Message"
-          className="flex-1 text-[15px] text-[#211D1D] placeholder:text-[#211D1D]/40 outline-none bg-transparent"
-          disabled={isThinking}
-        />
-        <button
-          type="submit"
-          disabled={isThinking || !inputValue.trim()}
-          aria-label="Send"
-          className="shrink-0 w-9 h-9 rounded-full bg-[#1F5E5C] text-[#FAF3E7] flex items-center justify-center disabled:bg-[#1F5E5C]/25 hover:bg-[#174A48] transition-colors"
-        >
-          <SendIcon />
-        </button>
-      </form>
+      {/* Structural pass: this is now the *conversation's* compose bar
+          only - the cold-load one lives up next to the headline (see
+          ComposeBar's own comment). Same shape (round pill, icon send
+          button, soft shadow - council round 20's original reasoning
+          for the pill shape, and round 4/6's shadow/petrol treatment,
+          both still hold), rendered a second time here once there's a
+          real message log to pin it under. max-w matches the log's own
+          column so it doesn't jump width when a conversation starts. */}
+      {!isEmpty && (
+        <div className="mt-6 max-w-[clamp(720px,72vw,1000px)]">
+          <ComposeBar value={inputValue} onChange={setInputValue} onSubmit={() => submitText(inputValue)} disabled={isThinking} sticky />
+        </div>
+      )}
     </div>
   );
 }
